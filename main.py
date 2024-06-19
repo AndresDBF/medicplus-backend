@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, status, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine, Column, Integer, DateTime, Text
@@ -74,9 +74,10 @@ async def webhook(req: Request):
 @app.get("/webhook")
 async def verify_token(hub_mode: str = Query(..., alias='hub.mode'), hub_challenge: str = Query(..., alias='hub.challenge'), hub_verify_token: str = Query(..., alias='hub.verify_token')):
     if hub_verify_token == TOKEN_ANDERCODE:
-        return  hub_challenge
+        return PlainTextResponse(content=hub_challenge)
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")
+
 
 
 
