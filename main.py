@@ -116,6 +116,212 @@ def enviar_mensajes_whatsapp(texto, numero):
                 "address": "Pirineos 2 edificio 21"
             }
         }
+    elif "3" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "document",
+            "document": {
+                "link": "https://www.renfe.com/content/dam/renfe/es/General/PDF-y-otros/Ejemplo-de-descarga-pdf.pdf",
+                "caption": "Ejemplo de pdf"
+            }
+        }
+    elif "4" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "audio",
+            "audio": {
+                "link": "https://file-examples.com/wp-content/storage/2017/11/file_example_MP3_700KB.mp3",
+            }
+        }
+    elif "5" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "text": {
+                "preview_url": True,
+                "body": "Introduccion al curso https://youtu.be/"
+            }
+        }
+    elif "6" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "En breve me pondre en contacto contigo"
+            }
+        }
+    elif "7" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "📅 Horario de Atención : Lunes a Viernes. \n🕜 Horario : 9:00 am a 5:00 pm 🤓"
+            }
+        }
+    elif "0" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "🚀 Hola, visita mi web anderson-bastidas.com para más información.\n \n📌Por favor, ingresa un número #️⃣ para recibir información.\n \n1️⃣. Información del Curso. ❔\n2️⃣. Ubicación del local. 📍\n3️⃣. Enviar temario en PDF. 📄\n4️⃣. Audio explicando curso. 🎧\n5️⃣. Video de Introducción. ⏯️\n6️⃣. Hablar con AnderCode. 🙋‍♂️\n7️⃣. Horario de Atención. 🕜 \n0️⃣. Regresar al Menú. 🕜"
+            }
+        }
+    elif "boton" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "Confirmas tu registro?"
+                },
+                "footer": {
+                    "text": "Selecciona una de las opciones"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply":{
+                                "id":"btnsi",
+                                "title":"Si"
+                            }
+                        },{
+                            "type": "reply",
+                            "reply":{
+                                "id":"btnno",
+                                "title":"No"
+                            }
+                        },{
+                            "type": "reply",
+                            "reply":{
+                                "id":"btntalvez",
+                                "title":"Tal Vez"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    elif "btnsi" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Muchas gracias por aceptar"
+            }
+        }
+    elif "btnno" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Es una lastima"
+            }
+        }
+    elif "btntalvez" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Estare a la espera"
+            }
+        }
+    elif "lista" in texto:
+        data ={
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type" : "list",
+                "body": {
+                    "text": "Selecciona Alguna Opción"
+                },
+                "footer": {
+                    "text": "Selecciona una de las opciones para poder ayudarte"
+                },
+                "action":{
+                    "button":"Ver Opciones",
+                    "sections":[
+                        {
+                            "title":"Compra y Venta",
+                            "rows":[
+                                {
+                                    "id":"btncompra",
+                                    "title" : "Comprar",
+                                    "description": "Compra los mejores articulos de tecnologia"
+                                },
+                                {
+                                    "id":"btnvender",
+                                    "title" : "Vender",
+                                    "description": "Vende lo que ya no estes usando"
+                                }
+                            ]
+                        },{
+                            "title":"Distribución y Entrega",
+                            "rows":[
+                                {
+                                    "id":"btndireccion",
+                                    "title" : "Local",
+                                    "description": "Puedes visitar nuestro local."
+                                },
+                                {
+                                    "id":"btnentrega",
+                                    "title" : "Entrega",
+                                    "description": "La entrega se realiza todos los dias."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    elif "btncompra" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Los mejores articulos top en ofertas."
+            }
+        }
+    elif "btnvender" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Excelente elección."
+            }
+        } 
     else:
         data = {
             "messaging_product": "whatsapp",
