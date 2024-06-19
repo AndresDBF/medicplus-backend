@@ -38,7 +38,6 @@ TOKEN_ANDERCODE = "ANDERCODE"
 
 @app.post("/webhook")
 async def webhook(req: Request):
-    
     try:
         req_data = await req.json()
         print("Datos JSON recibidos:", req_data)
@@ -71,11 +70,10 @@ async def webhook(req: Request):
     except Exception as e:
         print("Error al procesar el mensaje:", e)
         return JSONResponse(content={'message': 'ERROR_PROCESSING_EVENT'}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
 
 @app.get("/webhook")
 async def verify_token(hub_mode: str, hub_challenge: str, hub_verify_token: str):
-    if hub_verify_token == TOKEN_ANDERCODE and hub_mode == "subscribe":
+    if hub_verify_token == TOKEN_ANDERCODE:
         return JSONResponse(content=hub_challenge)
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")
