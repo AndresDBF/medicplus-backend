@@ -10,7 +10,7 @@ from models.roles import roles
 from models.usuarios import usuarios
 from models.user_roles import user_roles
 
-from routes.webhook import chatbot
+from routes.chatbot import chatbot
 
 app = FastAPI()
 
