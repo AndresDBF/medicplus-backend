@@ -34,7 +34,7 @@ def agregar_mensajes_log(texto):
         conn.execute(log.insert().values(texto=texto))
         conn.commit()
     
-TOKEN_MEDIC_PLUS = "MEDICPLUS"
+TOKEN_ANDERCODE = "ANDERCODE"
 
 @app.post("/webhook")
 async def webhook(req: Request):
@@ -74,11 +74,12 @@ async def webhook(req: Request):
     
 
 @app.get("/webhook")
-async def verify_token(hub_mode: str = Query(None), hub_challenge: str = Query(None), hub_verify_token: str = Query(None)):
-    if hub_verify_token == TOKEN_MEDIC_PLUS:
+async def verify_token(hub_mode: str, hub_challenge: str, hub_verify_token: str):
+    if hub_verify_token == TOKEN_ANDERCODE and hub_mode == "subscribe":
         return JSONResponse(content=hub_challenge)
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")
+
 
 def enviar_mensajes_whatsapp(texto, numero):
     texto = texto.lower()
