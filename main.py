@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException, status
+from fastapi import FastAPI, Request, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -34,7 +34,7 @@ def agregar_mensajes_log(texto):
         conn.execute(log.insert().values(texto=texto))
         conn.commit()
     
-TOKEN = "WHATSAPPMEDICPLUS"
+TOKEN_MEDIC_PLUS = "MEDICPLUS"
 
 @app.post("/webhook")
 async def webhook(req: Request):
@@ -74,11 +74,11 @@ async def webhook(req: Request):
     
 
 @app.get("/webhook")
-async def verify_token(hub_verify_token: str, hub_challenge: str):
-    if hub_verify_token == TOKEN:
+async def verify_token(hub_verify_token: str = Query(None), hub_challenge: str = Query(None)):
+    if hub_verify_token == TOKEN_MEDIC_PLUS:
         return hub_challenge
     else:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Token Invalido")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")
 
 def enviar_mensajes_whatsapp(texto, numero):
     texto = texto.lower()
@@ -138,7 +138,7 @@ def enviar_mensajes_whatsapp(texto, numero):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAARqlwZAqLocBOZB6YKcQc6jOOIJx4kLogrwOYH2nlL6BUwQiU3ubcWXp4L9GZBZAOQVOApOVZC7kHkYvaSPtwLZBplQ81lRyQE6rkp8loaRA8ODH2APEhAtNNol99OMZCqXGqRCx5deXURsyhbK6dHT51GAZBclYZBGl4rih3CaQJcYyaubxQmVo4Svti5q4RGfD5NyadCxphGBPFEZAXrcFq3ZAcZD"
+        "Authorization": "Bearer EAARqlwZAqLocBO3tS2JnIw1ZBHVjHC8ukbaQxQPaiXegRZB1tA8RcfAQHvB2Kop2P4q8uxuGX0zlc9MPIupKynMekc1sLOocZB13UL0F4DcVwk3ZBHmdKRROrOErQudWQrvFFZBkEnsuMptoynKrSZBKtINH8AgdLZBagBIlw9bZCHfzTT36UpjZBO52z72KCR9UsJYZBsQElKJu6CcehLSIpgZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
