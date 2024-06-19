@@ -31,8 +31,9 @@ async def index(request: Request):
 def agregar_mensajes_log(texto):
     texto_str = json.dumps(texto)
     with engine.connect() as conn:
-        conn.execute(log.insert().values(texto=texto))
+        conn.execute(log.insert().values(texto=texto_str, fecha_y_hora=datetime.utcnow()))
         conn.commit()
+    print("Mensaje guardado en el log:", texto)
     
 TOKEN_ANDERCODE = "ANDERCODE"
 
@@ -47,6 +48,7 @@ async def webhook(req: Request):
                 value = change.get('value', {})
                 messages = value.get('messages', [])
                 for message in messages:
+                    print("Mensaje recibido:", message)  # Agregamos esta línea para debug
                     if "type" in message:
                         tipo = message["type"]
                         agregar_mensajes_log({"tipo": tipo})
@@ -114,7 +116,6 @@ def enviar_mensajes_whatsapp(texto, numero):
                 "address": "Pirineos 2 edificio 21"
             }
         }
-
     else:
         data = {
             "messaging_product": "whatsapp",
@@ -139,7 +140,7 @@ def enviar_mensajes_whatsapp(texto, numero):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAARqlwZAqLocBO3tS2JnIw1ZBHVjHC8ukbaQxQPaiXegRZB1tA8RcfAQHvB2Kop2P4q8uxuGX0zlc9MPIupKynMekc1sLOocZB13UL0F4DcVwk3ZBHmdKRROrOErQudWQrvFFZBkEnsuMptoynKrSZBKtINH8AgdLZBagBIlw9bZCHfzTT36UpjZBO52z72KCR9UsJYZBsQElKJu6CcehLSIpgZD"
+        "Authorization": "Bearer EAARqlwZAqLocBO3OvByoihCqf7srx9zvOCaUD8XSwZALg40oqoiYOd1HsuLqU2yba817P8pLMCbka7nTeRQWAduvxVyGYdVMRbpH5MZAjEMT14ebu8YZCJ05nCuE3RILzlM33ermowdZCnZBbT3I0sapx5LgehEtdshvI7WuqEO3uaciLO6FC9YWjOmttnrDiqRg2NqXsmkduBNAGFz0QZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -153,7 +154,9 @@ def enviar_mensajes_whatsapp(texto, numero):
             agregar_mensajes_log(f"Error al enviar mensaje: {response.status} {response.reason} {response_data}")
     except Exception as e:
         print(f"Exception: {e}")
-        
         agregar_mensajes_log(f"Exception al enviar mensaje: {e}")
+    finally:
+        connection.close()
+
         
     
