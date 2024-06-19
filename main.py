@@ -74,9 +74,9 @@ async def webhook(req: Request):
     
 
 @app.get("/webhook")
-async def verify_token(hub_verify_token: str = Query(None), hub_challenge: str = Query(None)):
+async def verify_token(hub_mode: str = Query(None), hub_challenge: str = Query(None), hub_verify_token: str = Query(None)):
     if hub_verify_token == TOKEN_MEDIC_PLUS:
-        return hub_challenge
+        return JSONResponse(content=hub_challenge)
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")
 
