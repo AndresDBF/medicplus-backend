@@ -72,11 +72,12 @@ async def webhook(req: Request):
         return JSONResponse(content={'message': 'ERROR_PROCESSING_EVENT'}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @app.get("/webhook")
-async def verify_token(hub_mode: str, hub_challenge: str, hub_verify_token: str):
+async def verify_token(hub_mode: str = Query(..., alias='hub.mode'), hub_challenge: str = Query(..., alias='hub.challenge'), hub_verify_token: str = Query(..., alias='hub.verify_token')):
     if hub_verify_token == TOKEN_ANDERCODE:
-        return JSONResponse(content=hub_challenge)
+        return JSONResponse(content={"hub.challenge": hub_challenge})
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")
+
 
 
 def enviar_mensajes_whatsapp(texto, numero):
