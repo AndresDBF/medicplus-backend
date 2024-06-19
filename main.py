@@ -6,8 +6,9 @@ from sqlalchemy import create_engine, Column, Integer, DateTime, Text
 from database.connection import engine
 from models.log import log
 from models.roles import roles
-from models.user_roles import user_roles
+
 from models.usuarios import usuarios
+from models.user_roles import user_roles
 
 from routes.webhook import chatbot
 

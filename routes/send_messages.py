@@ -1,4 +1,4 @@
-import http.client
+""" import http.client
 import json
 from fastapi import FastAPI, Request, HTTPException, status, Query, APIRouter
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -37,4 +37,4 @@ def enviar_mensajes_whatsapp (data):
     finally:
         connection.close()
 
-        
+         """
