@@ -14,7 +14,7 @@ app = FastAPI()
 
 # Configuración de plantillas y archivos estáticos
 templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 # Función para ordenar los registros por fecha y hora
 def ordenar_por_fecha_y_hora(registros):
