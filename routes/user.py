@@ -12,14 +12,17 @@ def get_user_state(numero):
         result = conn.execute(select(user_state_register).where(user_state_register.c.numero == numero)).fetchone()
         print("esto trae el result: ", result)
         if result is not None:
-            return dict(result)
+            result = dict(result)
+            result["consult"] = True
+            return result
         else:
-            return {"consult": None}
+            return {"state": None}
 
 def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=None, email=None):
     with engine.connect() as conn:
         print("entra en get_user_state_register")
-        if get_user_state(numero):
+        result = get_user_state(numero)
+        if result["consult"] is not None:
             print("entra en el if para actualizar")
             if nombre:
                 conn.execute(
