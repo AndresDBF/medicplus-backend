@@ -9,7 +9,7 @@ from sqlalchemy import select, insert, update
 def get_user_state(numero):
     with engine.connect() as conn:
         print("entra en get_user_state")
-        result = conn.execute(select(user_state_register).where(user_state_register.c.numero == numero)).fetchone()
+        result = conn.execute(select(user_state_register).where(user_state_register.c.numero == numero)).first()
         print("esto trae el result: ", result)
         if result is not None:
             result = dict(result)
