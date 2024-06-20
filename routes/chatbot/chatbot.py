@@ -52,6 +52,7 @@ async def webhook(req: Request):
                 messages = value.get('messages', [])
                 for message in messages:
                     print("esto trae el message: ", message)
+                    agregar_mensajes_log({"message": message})
                     numero = message['from']
                     if "type" in message:
                         tipo = message["type"]
@@ -61,6 +62,9 @@ async def webhook(req: Request):
                             if tipo_interactivo == "button_reply":
                                 text = message["interactive"]["button_reply"]["id"]
                                 print(f"esto se pasa al contestar mensajes whats app: el texto {text} y el numero {numero}")
+                                agregar_mensajes_log({"numero": numero})
+                                agregar_mensajes_log({"tipo": tipo})
+                                agregar_mensajes_log({"mensaje": text})
                                 contestar_mensajes_whatsapp(text, numero)
                             elif tipo_interactivo == "list_reply":
                                 text = message["interactive"]["list_reply"]["id"]
@@ -69,6 +73,9 @@ async def webhook(req: Request):
                             print("entra en text")
                             text = message["text"]["body"]
                             print(f"esto se pasa al contestar mensajes whats app: el texto {text} y el numero {numero}")
+                            agregar_mensajes_log({"numero": numero})
+                            agregar_mensajes_log({"tipo": tipo})
+                            agregar_mensajes_log({"mensaje": text})
                             contestar_mensajes_whatsapp(text, numero)
                         
         return JSONResponse(content={'message': 'EVENT_RECEIVED'})
@@ -280,19 +287,21 @@ def contestar_mensajes_whatsapp(texto, numero):
         enviar_mensajes_whatsapp(data)        
     #para ir al menu luego de registrarse
     if "volver" in texto:
-        print("pasa las expresiones regulares")
         data = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
             "to": numero,
             "type": "interactive",
-            "interactive": {
+            "interactive":{
                 "type": "button",
                 "body": {
                     "text": "Gracias por formar parte de los afiliados de MedicPlus🩺. ¿En que puedo ayudarte hoy?📝."
                 },
+                "footer": {
+                    "text": "Selecciona una de las opciones"
+                },
                 "action": {
-                    "buttons": [
+                    "buttons":[
                         {
                             "type": "reply",
                             "reply": {
@@ -339,6 +348,7 @@ def contestar_mensajes_whatsapp(texto, numero):
                 }
             }
         }
+        
         print("envia el mensaje principal")
         enviar_mensajes_whatsapp(data)
     #respuestas en caso de ser afiliado
@@ -349,7 +359,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             "text": {
                 "preview_url": False,
                 "body": (
-                    "No comprendo muy bien tu mensaje, por favor puedes repetirlo nuevamente.\n \n Recuerda Utilizar los botones proporcionados para poderte ayudar🤖"
+                    "No comprendo muy bien tu mensaje, por favor puedes repetirlo nuevamente.\n \nRecuerda Utilizar los botones proporcionados para poderte ayudar🤖"
                 )
             }
         }
