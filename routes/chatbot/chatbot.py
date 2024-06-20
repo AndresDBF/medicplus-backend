@@ -124,7 +124,9 @@ def contestar_mensajes_whatsapp(texto, numero):
         print("entra en user none")
         get_user_state_register(numero, 'INIT')
         user = get_user_state(numero) #para actualizar user 
-    if user["state"] == 'INIT' or texto == "volver":
+    
+    #mensajes de flujo de registro 
+    if user["state"] == 'INIT':
         print("entra en user init")
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
             print("pasa las expresiones regulares")
@@ -190,7 +192,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
             enviar_mensajes_whatsapp(data)
             get_user_state_register(numero, 'WAITING_FOR_NAME')
-
+    
     elif user["state"] == 'WAITING_FOR_NAME':
         print("entra para ingresar el nombre del usuario")
         get_user_state_register(numero, 'WAITING_FOR_SURNAME', nombre=texto)
@@ -276,7 +278,69 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
         
         enviar_mensajes_whatsapp(data)        
-    
+    #para ir al menu luego de registrarse
+    if "volver" in texto:
+        print("pasa las expresiones regulares")
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": "Gracias por formar parte de los afiliados de MedicPlus🩺. ¿En que puedo ayudarte hoy?📝."
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "si",
+                                "title": "Atención Médica Primaria"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "no",
+                                "title": "Telemedicina"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "no",
+                                "title": "Atención Médica Domiciliaria"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "no",
+                                "title": "Consultas Médicas"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "no",
+                                "title": "Laboratorio"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "no",
+                                "title": "Ambulancia"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        print("envia el mensaje principal")
+        enviar_mensajes_whatsapp(data)
     #respuestas en caso de ser afiliado
     else:
         data = {
