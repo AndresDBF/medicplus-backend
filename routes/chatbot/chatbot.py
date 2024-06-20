@@ -123,6 +123,7 @@ def contestar_mensajes_whatsapp(texto, numero):
     if user["consult"] is None:
         print("entra en user none")
         get_user_state_register(numero, 'INIT')
+        user = get_user_state(numero) #para actualizar user 
     if user["state"] == 'INIT' or texto == "volver":
         print("entra en user init")
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
