@@ -47,8 +47,9 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                 conn.commit()
            
         else:
-            stmt = user_state_register.insert().values(numero=numero, state=state)
-        conn.execute(stmt)
+            conn.execute(user_state_register.insert().values(numero=numero, state=state))
+            conn.commit()
+        
     
 """ 
  
