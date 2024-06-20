@@ -107,7 +107,7 @@ def enviar_mensajes_whatsapp (data):
         response = connection.getresponse()
         response_data = response.read().decode()
         print("se enviaron los mensajes")
-        print(response.status, response.reason, response_data)
+        print("este fue el response al enviar el mensaje: ", response.status, response.reason, response_data)
         if response.status != 200:
             agregar_mensajes_log(f"Error al enviar mensaje: {response.status} {response.reason} {response_data}")
     except Exception as e:
@@ -131,7 +131,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         print("entra en user none")
         get_user_state_register(numero, 'INIT')
         user = get_user_state(numero) #para actualizar user 
-    
+    print("este es el user state: ", user["state"])
     #mensajes de flujo de registro 
     if user["state"] == 'INIT':
         print("entra en user init")
@@ -287,6 +287,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         enviar_mensajes_whatsapp(data)        
     #para ir al menu luego de registrarse
     if "volver" in texto:
+        print("entra en volver")
         data = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
@@ -353,6 +354,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         enviar_mensajes_whatsapp(data)
     #respuestas en caso de ser afiliado
     else:
+        print("entra en el else final donde no entiende ningun mensaje ")
         data = {
             "messaging_product": "whatsapp",
             "to": numero,
