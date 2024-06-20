@@ -322,21 +322,21 @@ def contestar_mensajes_whatsapp(texto, numero):
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "si",
+                                "id": "atenmedicpri",
                                 "title": "Atención Médica Primaria"
                             }
                         },
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "no",
+                                "id": "telemed",
                                 "title": "Telemedicina"
                             }
                         },
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "no",
+                                "id": "atenmeddomi",
                                 "title": "Atención Médica Domiciliaria"
                             }
                         },
@@ -361,21 +361,21 @@ def contestar_mensajes_whatsapp(texto, numero):
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "si",
+                                "id": "conmed",
                                 "title": "Consultas Médicas"
                             }
                         },
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "no",
+                                "id": "labori",
                                 "title": "Laboratorio"
                             }
                         },
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "no",
+                                "id": "ambula",
                                 "title": "Ambulancia"
                             }
                         },
