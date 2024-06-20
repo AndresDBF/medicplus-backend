@@ -54,6 +54,13 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                     .values(state=state, email=email)
                 )
                 conn.commit()
+            else:
+                conn.execute(
+                    update(user_state_register)
+                    .where(user_state_register.c.numero == numero)
+                    .values(state=state)
+                )
+                conn.commit()
             print("actualizo los campos")
         else:
             print("entra en el else para insertar")
