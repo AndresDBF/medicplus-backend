@@ -29,13 +29,16 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "registros": registros})
 
 def agregar_mensajes_log(texto):
-    texto_str = json.dumps(texto)
-    print("asi queda el texto antes de insertar en el log: ", texto_str)
-    print("y este es el tipo de dato: ", type(texto_str))
-    with engine.connect() as conn:
-        conn.execute(log.insert().values(texto=texto_str, fecha_y_hora=datetime.utcnow()))
-        conn.commit()
-    print("Mensaje guardado en el log:", texto)
+    try:
+        texto_str = json.dumps(texto)
+        print("asi queda el texto antes de insertar en el log: ", texto_str)
+        print("y este es el tipo de dato: ", type(texto_str))
+        with engine.connect() as conn:
+            conn.execute(log.insert().values(texto=texto_str, fecha_y_hora=datetime.utcnow()))
+            conn.commit()
+        print("Mensaje guardado en el log:", texto)
+    except Exception as e:
+        print(f"Error al guardar el mensaje en el log: {e}")
 
 @chatbot.post("/webhook")
 async def webhook(req: Request):
@@ -117,7 +120,7 @@ saludos = [
 def contestar_mensajes_whatsapp(texto, numero):
     texto = texto.lower()
     user = get_user_state(numero)
-    if user is None:
+    if user["consult"] is None:
         print("entra en user none")
         get_user_state_register(numero, 'INIT')
     if user['state'] == 'INIT' or texto == "volver":

@@ -14,7 +14,7 @@ def get_user_state(numero):
         if result is not None:
             return dict(result)
         else:
-            return False
+            return {"consult": None}
 
 def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=None, email=None):
     with engine.connect() as conn:
