@@ -8,15 +8,19 @@ from sqlalchemy import select, insert, update
 
 def get_user_state(numero):
     with engine.connect() as conn:
+        print("entra en get_user_state")
         result = conn.execute(select(user_state_register).where(user_state_register.c.numero == numero)).fetchone()
-        if result:
+        print("esto trae el result: ", result)
+        if result is not None:
             return dict(result)
         else:
-            return None
+            return False
 
 def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=None, email=None):
     with engine.connect() as conn:
+        print("entra en get_user_state_register")
         if get_user_state(numero):
+            print("entra en el if para actualizar")
             if nombre:
                 conn.execute(
                     update(user_state_register)
@@ -45,11 +49,12 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                     .values(state=state, email=email)
                 )
                 conn.commit()
-           
+            print("actualizo los campos")
         else:
+            print("entra en el else para insertar")
             conn.execute(user_state_register.insert().values(numero=numero, state=state))
             conn.commit()
-        
+            print("se inserto la fila")
     
 """ 
  
