@@ -172,6 +172,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
             print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
+            return True
         elif texto == "si":
             print("entra en el boton que es afiliado")
             data = {
@@ -185,6 +186,7 @@ def contestar_mensajes_whatsapp(texto, numero):
                 }
             }
             enviar_mensajes_whatsapp(data)
+            return True
         elif texto == 'no':
             print("entra en el boton que no es afiliado")
             data = {
@@ -199,6 +201,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
             enviar_mensajes_whatsapp(data)
             get_user_state_register(numero, 'WAITING_FOR_NAME')
+            return True
     
     elif user["state"] == 'WAITING_FOR_NAME':
         print("entra para ingresar el nombre del usuario")
@@ -214,6 +217,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
         }
         enviar_mensajes_whatsapp(data)
+        return True
 
     elif user["state"] == 'WAITING_FOR_SURNAME':
         print("entra para ingresar el apellido del usuario")
@@ -229,6 +233,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
         }
         enviar_mensajes_whatsapp(data)
+        return True
 
     elif user["state"] == 'WAITING_FOR_ID':
         print("entra para ingresar la cedula del usuario")
@@ -244,6 +249,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
         }
         enviar_mensajes_whatsapp(data)
+        return True
 
     elif user["state"] == 'WAITING_FOR_EMAIL':
         print("entra para ingresar el correo del usuario")
@@ -284,7 +290,8 @@ def contestar_mensajes_whatsapp(texto, numero):
                 }
             }
         
-        enviar_mensajes_whatsapp(data)        
+        enviar_mensajes_whatsapp(data)    
+        return True    
     #para ir al menu luego de registrarse
     if "volver" in texto:
         print("entra en volver")
@@ -352,6 +359,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         
         print("envia el mensaje principal")
         enviar_mensajes_whatsapp(data)
+        return True
     #respuestas en caso de ser afiliado
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
@@ -366,4 +374,5 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
         }
         enviar_mensajes_whatsapp(data)
+        return True
     
