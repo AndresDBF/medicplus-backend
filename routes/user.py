@@ -67,6 +67,22 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
             conn.execute(user_state_register.insert().values(numero=numero, state=state))
             conn.commit()
             print("se inserto la fila")
+
+def verify_user(numero):
+    with engine.connect() as conn:
+        user = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
+    if user is not None:
+        texto = f"Hola {user.nom_usu} {user.ape_usu}👋🏼 ¿En que puedo ayudarte hoy?📝."
+        return {
+            "text": texto,
+            "registered": True
+        }
+    else:
+        texto = f"Lo siento, no te he encontrado en sistema como usuario afiliado🚫, deseas formar parte de Afiliados en Medic Plus?👨🏼‍⚕️ Registraremos tus datos paso a paso📝"
+        return {
+            "text": texto,
+            "registered": False
+        }
     
 """ 
  

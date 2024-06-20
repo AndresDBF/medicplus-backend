@@ -10,7 +10,7 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 
-from routes.user import get_user_state, get_user_state_register
+from routes.user import get_user_state, get_user_state_register, verify_user
 
 from datetime import datetime
 
@@ -132,9 +132,10 @@ def contestar_mensajes_whatsapp(texto, numero):
         get_user_state_register(numero, 'INIT')
         user = get_user_state(numero) #para actualizar user 
     print("este es el user state: ", user["state"])
-    #mensajes de flujo de registro 
+    
     if user["state"] == 'INIT':
         print("entra en user init")
+        #para mostrar el mensaje de inicio al recibir un saludo
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
             print("pasa las expresiones regulares")
             data = {
@@ -173,22 +174,143 @@ def contestar_mensajes_whatsapp(texto, numero):
             print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
             return True
+        #respuesta de botones en caso que sea afiliado o se quiera afiliar 
         elif texto == "si":
-            print("entra en el boton que es afiliado")
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "text",
-                "text": {
-                    "preview_url": False,
-                    "body": "Estas registrado ya nos comunicaremos contigo"
+            result_json = verify_user(numero)
+            #mensajes que seran mostrados cuando el usuario seleccione que es afiliado se verifica si de verdad esta registrado
+            #se encontrara un mensaje positivo dando las opciones y otro para pedir registrarse o hacerlo mas tarde
+            if result_json["registered"] == False:
+            
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive": {
+                        "type": "button",
+                        "body": {
+                            "text": f"{result_json["text"]}"
+                        },
+                        "action": {
+                            "buttons": [
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "tarde",
+                                        "title": "Mas tarde"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "no",
+                                        "title": "Quiero Registrarme"
+                                    }
+                                }
+                            ]
+                        }
+                    }
                 }
-            }
-            enviar_mensajes_whatsapp(data)
-            return True
+                print("envia el mensaje principal 3")
+                enviar_mensajes_whatsapp(data)
+                return True
+            else:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "text",
+                    "text": {
+                        "preview_url": False,
+                        "body": f"{texto}"
+                    }
+                }
+                print("envia el mensaje principal 1")
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": "Atenciones Médicas"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "atenmedicpri",
+                                        "title": "Primaria"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "telemed",
+                                        "title": "Telemedicina"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "atenmeddomi",
+                                        "title": "Domiciliaria"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                print("envia el mensaje principal 2")
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": "Otros Servicios."
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "conmed",
+                                        "title": "Consultas Médicas"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "labori",
+                                        "title": "Laboratorio"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "ambula",
+                                        "title": "Ambulancia"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                
+                print("envia el mensaje principal 3")
+                enviar_mensajes_whatsapp(data)
+                return True
+                
         elif texto == 'no':
             print("entra en el boton que no es afiliado")
+            
             data = {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
@@ -203,6 +325,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             get_user_state_register(numero, 'WAITING_FOR_NAME')
             return True
     
+    #mensajes de flujo de registro 
     elif user["state"] == 'WAITING_FOR_NAME':
         print("entra para ingresar el nombre del usuario")
         get_user_state_register(numero, 'WAITING_FOR_SURNAME', nombre=texto)
@@ -292,8 +415,9 @@ def contestar_mensajes_whatsapp(texto, numero):
         
         enviar_mensajes_whatsapp(data)    
         return True    
+    
     #para ir al menu luego de registrarse
-    if "volver" in texto:
+    elif "volver" in texto:
         print("entra en volver")
         data = {
             "messaging_product": "whatsapp",
@@ -387,7 +511,50 @@ def contestar_mensajes_whatsapp(texto, numero):
         print("envia el mensaje principal 3")
         enviar_mensajes_whatsapp(data)
         return True
-    #respuestas en caso de ser afiliado
+    #respuestas para los afiliados 
+    
+    #atencion medica primaria 
+    elif "atenmedicpri" in texto:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "¿Desea Generar una Alarma para ser llamado?📞"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "llamar",
+                                "title": "Sí"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "nollamar",
+                                "title": "No"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "volver",
+                                "title": "Volver al inicio"
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        print("envia el mensaje principal")
+        enviar_mensajes_whatsapp(data)
+    
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
         data = {
