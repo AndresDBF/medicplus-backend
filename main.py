@@ -5,12 +5,12 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine, Column, Integer, DateTime, Text
 from database.connection import engine
 from models.log import log
-from models.roles import roles
 
+from models.roles import roles
 from models.usuarios import usuarios
 from models.user_roles import user_roles
-
-from routes.chatbot import chatbot
+from models.user_state_register import user_state_register
+from routes.chatbot.chatbot import chatbot
 
 app = FastAPI()
 
