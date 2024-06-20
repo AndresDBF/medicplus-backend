@@ -30,6 +30,8 @@ async def index(request: Request):
 
 def agregar_mensajes_log(texto):
     texto_str = json.dumps(texto)
+    print("asi queda el texto antes de insertar en el log: ", texto_str)
+    print("y este es el tipo de dato: ", type(texto_str))
     with engine.connect() as conn:
         conn.execute(log.insert().values(texto=texto_str, fecha_y_hora=datetime.utcnow()))
         conn.commit()
@@ -46,19 +48,24 @@ async def webhook(req: Request):
                 value = change.get('value', {})
                 messages = value.get('messages', [])
                 for message in messages:
+                    print("esto trae el message: ", message)
                     numero = message['from']
                     if "type" in message:
                         tipo = message["type"]
                         if tipo == "interactive":
+                            print("entra en interactive")
                             tipo_interactivo = message["interactive"]["type"]
                             if tipo_interactivo == "button_reply":
                                 text = message["interactive"]["button_reply"]["id"]
+                                print(f"esto se pasa al contestar mensajes whats app: el texto {text} y el numero {numero}")
                                 contestar_mensajes_whatsapp(text, numero)
                             elif tipo_interactivo == "list_reply":
                                 text = message["interactive"]["list_reply"]["id"]
                                 contestar_mensajes_whatsapp(text, numero)
                         elif "text" in message:
+                            print("entra en text")
                             text = message["text"]["body"]
+                            print(f"esto se pasa al contestar mensajes whats app: el texto {text} y el numero {numero}")
                             contestar_mensajes_whatsapp(text, numero)
                         
         return JSONResponse(content={'message': 'EVENT_RECEIVED'})
@@ -80,7 +87,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAGPfdXlErwBOwpzEm675x80EqIDonWSDkILlcwNAXinQndsGcq4UH82fSl7K7C5HtwpjaqdgJygwH4plOAcFTRWVVcFC1H7Bt6mwsIx8rWKrdJFCv9PHhOyy3qF11wSxQZB0ZBrFogaD5ASIe5PhpHTrjXmh2PWsVGu3yNjchT7n8ZBgiM1JALOq3j2vPaZAHLN6xC5sd7cZC2wy8ZB8ZD"
+        "Authorization": "Bearer EAAGPfdXlErwBOZCrEZBZCzStTUmsc5rRSH3I7vaZCuBqhysllQJxsTl7Bnft2vlYbPLYw7uUyReJfF3IIaMJJuJXIZASsAOYQueMer8I7TaOJSTvZCxzXmZCgKyZAsQujZCfqgGobhfSCv9gKm23VS1PZBDhWh1PJVo3pQPhYGkgMlOLca7tJErkLJQH24UHz9mY0ZAwIjcQcbBwvcopSEoJboZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -89,6 +96,7 @@ def enviar_mensajes_whatsapp (data):
         connection.request("POST", "/v19.0/373926142459719/messages", data, headers)
         response = connection.getresponse()
         response_data = response.read().decode()
+        print("se enviaron los mensajes")
         print(response.status, response.reason, response_data)
         if response.status != 200:
             agregar_mensajes_log(f"Error al enviar mensaje: {response.status} {response.reason} {response_data}")
@@ -110,9 +118,12 @@ def contestar_mensajes_whatsapp(texto, numero):
     texto = texto.lower()
     user = get_user_state(numero)
     if user is None:
+        print("entra en user none")
         get_user_state_register(numero, 'INIT')
     if user['state'] == 'INIT' or texto == "volver":
+        print("entra en user init")
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
+            print("pasa las expresiones regulares")
             data = {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
