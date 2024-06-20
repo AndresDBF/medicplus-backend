@@ -123,7 +123,7 @@ def contestar_mensajes_whatsapp(texto, numero):
     if user["consult"] is None:
         print("entra en user none")
         get_user_state_register(numero, 'INIT')
-    if user['state'] == 'INIT' or texto == "volver":
+    if user["state"] == 'INIT' or texto == "volver":
         print("entra en user init")
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
             print("pasa las expresiones regulares")
@@ -160,8 +160,10 @@ def contestar_mensajes_whatsapp(texto, numero):
                     }
                 }
             }
+            print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
         elif texto == "si":
+            print("entra en el boton que es afiliado")
             data = {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
@@ -174,6 +176,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             }
             enviar_mensajes_whatsapp(data)
         elif texto == 'no':
+            print("entra en el boton que no es afiliado")
             data = {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
@@ -187,7 +190,8 @@ def contestar_mensajes_whatsapp(texto, numero):
             enviar_mensajes_whatsapp(data)
             get_user_state_register(numero, 'WAITING_FOR_NAME')
 
-    elif user['state'] == 'WAITING_FOR_NAME':
+    elif user["state"] == 'WAITING_FOR_NAME':
+        print("entra para ingresar el nombre del usuario")
         get_user_state_register(numero, 'WAITING_FOR_SURNAME', nombre=texto)
         data = {
             "messaging_product": "whatsapp",
@@ -201,7 +205,8 @@ def contestar_mensajes_whatsapp(texto, numero):
         }
         enviar_mensajes_whatsapp(data)
 
-    elif user['state'] == 'WAITING_FOR_SURNAME':
+    elif user["state"] == 'WAITING_FOR_SURNAME':
+        print("entra para ingresar el apellido del usuario")
         get_user_state_register(numero, 'WAITING_FOR_ID', apellido=texto)
         data = {
             "messaging_product": "whatsapp",
@@ -215,7 +220,8 @@ def contestar_mensajes_whatsapp(texto, numero):
         }
         enviar_mensajes_whatsapp(data)
 
-    elif user['state'] == 'WAITING_FOR_ID':
+    elif user["state"] == 'WAITING_FOR_ID':
+        print("entra para ingresar la cedula del usuario")
         get_user_state_register(numero, 'WAITING_FOR_EMAIL', cedula=texto)
         data = {
             "messaging_product": "whatsapp",
@@ -229,7 +235,8 @@ def contestar_mensajes_whatsapp(texto, numero):
         }
         enviar_mensajes_whatsapp(data)
 
-    elif user['state'] == 'WAITING_FOR_EMAIL':
+    elif user["state"] == 'WAITING_FOR_EMAIL':
+        print("entra para ingresar el correo del usuario")
         get_user_state_register(numero, 'REGISTERED', email=texto)
         
         # Aquí guarda el usuario en la base de datos
