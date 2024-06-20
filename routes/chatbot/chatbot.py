@@ -323,7 +323,7 @@ def contestar_mensajes_whatsapp(texto, numero):
                             "type": "reply",
                             "reply": {
                                 "id": "atenmedicpri",
-                                "title": "Atención Médica Primaria"
+                                "title": "Primaria"
                             }
                         },
                         {
@@ -337,7 +337,7 @@ def contestar_mensajes_whatsapp(texto, numero):
                             "type": "reply",
                             "reply": {
                                 "id": "atenmeddomi",
-                                "title": "Atención Médica Domiciliaria"
+                                "title": "Domiciliaria"
                             }
                         },
                     ]
