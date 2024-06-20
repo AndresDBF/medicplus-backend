@@ -299,14 +299,23 @@ def contestar_mensajes_whatsapp(texto, numero):
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
             "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Gracias por formar parte de los afiliados de MedicPlus🩺. ¿En que puedo ayudarte hoy?📝."
+            }
+        }
+        print("envia el mensaje principal 1")
+        enviar_mensajes_whatsapp(data)
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
             "type": "interactive",
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": "Gracias por formar parte de los afiliados de MedicPlus🩺. ¿En que puedo ayudarte hoy?📝."
-                },
-                "footer": {
-                    "text": "Selecciona una de las opciones"
+                    "text": "Atenciones Médicas"
                 },
                 "action": {
                     "buttons":[
@@ -331,10 +340,28 @@ def contestar_mensajes_whatsapp(texto, numero):
                                 "title": "Atención Médica Domiciliaria"
                             }
                         },
+                    ]
+                }
+            }
+        }
+        print("envia el mensaje principal 2")
+        enviar_mensajes_whatsapp(data)
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "Otros Servicios."
+                },
+                "action": {
+                    "buttons":[
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "no",
+                                "id": "si",
                                 "title": "Consultas Médicas"
                             }
                         },
@@ -351,13 +378,13 @@ def contestar_mensajes_whatsapp(texto, numero):
                                 "id": "no",
                                 "title": "Ambulancia"
                             }
-                        }
+                        },
                     ]
                 }
             }
         }
         
-        print("envia el mensaje principal")
+        print("envia el mensaje principal 3")
         enviar_mensajes_whatsapp(data)
         return True
     #respuestas en caso de ser afiliado
