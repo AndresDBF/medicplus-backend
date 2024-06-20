@@ -9,12 +9,14 @@ from sqlalchemy import select, insert, update
 def get_user_state(numero):
     with engine.connect() as conn:
         print("entra en get_user_state")
-        result = conn.execute(select(user_state_register).where(user_state_register.c.numero == numero)).first()
+        result = conn.execute(select(user_state_register).where(user_state_register.c.numero == numero)).fetchone()
         print("esto trae el result: ", result)
         if result is not None:
-            result = dict(result)
-            result["consult"] = True
-            return result
+            # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
+            columns = ["numero", "state", "nombre", "apellido", "cedula", "email", "fecha_y_hora"]
+            result_dict = dict(zip(columns, result))
+            result_dict["consult"] = True
+            return result_dict
         else:
             return {"consult": None}
 
