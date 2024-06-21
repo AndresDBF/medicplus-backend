@@ -10,7 +10,7 @@ from models.roles import roles
 from models.usuarios import usuarios
 from models.user_roles import user_roles
 from models.user_state_register import user_state_register
-from routes.chatbot.chatbot import chatbot
+from config.chatbot import chatbot
 
 app = FastAPI()
 

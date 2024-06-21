@@ -1,3 +1,4 @@
+import re
 from database.connection import engine
 from models.roles import roles
 from models.usuarios import usuarios
@@ -53,6 +54,8 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if cedula:
+                if not re.fullmatch(r'\d+', cedula):
+                    return False
                 conn.execute(
                     update(user_state_register)
                     .where(user_state_register.c.numero == numero)
@@ -61,6 +64,8 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if email:
+                if not re.fullmatch(r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$', email):
+                    return False
                 conn.execute(
                     update(user_state_register)
                     .where(user_state_register.c.numero == numero)
