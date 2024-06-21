@@ -73,21 +73,21 @@ def get_municipality(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idmunicipio",
+                            "id": "idmunicipio1",
                             "title": "Juan Griego"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idmunicipio",
+                            "id": "idmunicipio2",
                             "title": "Santa Ana"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idmunicipio",
+                            "id": "idmunicipio3",
                             "title": "Altagracia"
                         }
                     },
@@ -112,14 +112,14 @@ def get_municipality(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idmunicipio",
+                            "id": "idmunicipio4",
                             "title": "Porlamar"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idmunicipio",
+                            "id": "idmunicipio5",
                             "title": "Pampatar"
                         }
                     },
@@ -144,14 +144,14 @@ def get_municipality(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idmunicipio",
+                            "id": "idmunicipio6",
                             "title": "La Asunción"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idmunicipio",
+                            "id": "idmunicipio7",
                             "title": "Punta de Piedras"
                         }
                     },
@@ -159,7 +159,7 @@ def get_municipality(numero):
             }
         }
     }       
-    print("envia el mensaje principal 3")
+    print("envia el mensaje principal 4")
     enviar_mensajes_whatsapp(data)
     return True
 
