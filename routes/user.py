@@ -70,14 +70,18 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
 
 def verify_user(numero):
     with engine.connect() as conn:
+        print("entra en verify_user")
         user = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
+        print("esto trae el user: ", user)
     if user is not None:
+        print("entra en el if del verify_user")
         texto = f"Hola {user.nom_usu} {user.ape_usu}👋🏼 ¿En que puedo ayudarte hoy?📝."
         return {
             "text": texto,
             "registered": True
         }
     else:
+        print("entra en el else del verify_user")
         texto = f"Lo siento, no te he encontrado en sistema como usuario afiliado🚫, deseas formar parte de Afiliados en Medic Plus?👨🏼‍⚕️ Registraremos tus datos paso a paso📝"
         return {
             "text": texto,

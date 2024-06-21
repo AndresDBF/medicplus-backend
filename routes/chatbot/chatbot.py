@@ -174,13 +174,17 @@ def contestar_mensajes_whatsapp(texto, numero):
             print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
             return True
+        
         #respuesta de botones en caso que sea afiliado o se quiera afiliar 
         elif texto == "si":
+            print("entra en que si es afiliado")
             result_json = verify_user(numero)
             #mensajes que seran mostrados cuando el usuario seleccione que es afiliado se verifica si de verdad esta registrado
             #se encontrara un mensaje positivo dando las opciones y otro para pedir registrarse o hacerlo mas tarde
+            print("------------saliendo de verify_user-----------------")
+            print("esto trae el result_json: ", result_json)
             if result_json["registered"] == False:
-            
+                print("entra en el if")
                 data = {
                     "messaging_product": "whatsapp",
                     "recipient_type": "individual",
@@ -215,6 +219,7 @@ def contestar_mensajes_whatsapp(texto, numero):
                 enviar_mensajes_whatsapp(data)
                 return True
             else:
+                print("entra en el else")
                 data = {
                     "messaging_product": "whatsapp",
                     "recipient_type": "individual",
@@ -515,6 +520,7 @@ def contestar_mensajes_whatsapp(texto, numero):
     
     #atencion medica primaria 
     elif "atenmedicpri" in texto:
+        print("-------------------------------------entra en el elif de atenmedicpri------------------------------------------")
         data = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
