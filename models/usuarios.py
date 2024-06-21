@@ -11,7 +11,8 @@ usuarios = Table("usuarios", meta_data,
              
               Column("nom_usu", String(80), nullable=False),
               Column("ape_usu", String(80), nullable=False),
-            
+              Column("ced_usu", String(20), nullable=False),
+             
               Column("plan", Integer, nullable=False),
               Column("tel_usu", String(30), nullable=False),
               Column("created_at", TIMESTAMP, nullable=False, server_default=func.now()),

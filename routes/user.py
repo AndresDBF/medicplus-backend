@@ -14,7 +14,7 @@ def get_user_state(numero):
         print("esto trae el result: ", result)
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "nombre", "apellido", "cedula", "email", "fecha_y_hora"]
+            columns = ["numero", "state", "plan", "nombre", "apellido", "cedula", "email", "fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
             return result_dict
@@ -30,6 +30,7 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
             if plan:
                 if plan not in ["1","2","3","4","5"]:
                     return False
+                
                 conn.execute(
                     update(user_state_register)
                     .where(user_state_register.c.numero == numero)

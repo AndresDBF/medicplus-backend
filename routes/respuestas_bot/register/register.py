@@ -158,7 +158,13 @@ def insert_email(numero, texto, user):
         plan = int(user['plan'])
         print(f"asi queda el plan {plan} y este es el tipo de dato {type(plan)}")
         with engine.connect() as conn:
-            conn.execute(usuarios.insert().values(use_nam=user['nombre'].lower(),  email=texto, nom_usu=user['nombre'].title(),ape_usu=user['apellido'].title(), plan=plan, tel_usu=numero))
+            conn.execute(usuarios.insert().values(use_nam=user['nombre'].lower(),
+                                                  email=texto,
+                                                  nom_usu=user['nombre'].title(),
+                                                  ape_usu=user['apellido'].title(), 
+                                                  ced_usu=user['cedula'],
+                                                  plan=plan,
+                                                  tel_usu=numero))
             conn.commit()
         data = {
             "messaging_product": "whatsapp",
