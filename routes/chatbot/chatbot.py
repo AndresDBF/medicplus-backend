@@ -189,7 +189,7 @@ def contestar_mensajes_whatsapp(texto, numero):
                     "interactive": {
                         "type": "button",
                         "body": {
-                            "text": f"{result_json["text"]}"
+                            "text": f"{result_json[{'text'}]}"
                         },
                         "action": {
                             "buttons": [
