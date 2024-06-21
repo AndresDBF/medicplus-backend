@@ -63,14 +63,14 @@ def get_info_primary_attention(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "llamar",
+                            "id": "idllamar",
                             "title": "Sí"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "nollamar",
+                            "id": "idnollamar",
                             "title": "No"
                         }
                     },

@@ -63,14 +63,14 @@ def principal_message(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "si",
+                            "id": "idsi",
                             "title": "Afiliado"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "no",
+                            "id": "idno",
                             "title": "Quiero Ser Afiliado"
                         }
                     }
@@ -105,14 +105,14 @@ def is_affiliate(numero):
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "tarde",
+                                "id": "idtarde",
                                 "title": "Mas tarde"
                             }
                         },
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "no",
+                                "id": "idno",
                                 "title": "Quiero Registrarme"
                             }
                         }
@@ -152,7 +152,7 @@ def is_affiliate(numero):
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "atenmedicpri",
+                                "id": "idatenmedicpri",
                                 "title": "Primaria"
                             }
                         },
@@ -218,6 +218,34 @@ def is_affiliate(numero):
     enviar_mensajes_whatsapp(data)
     return True
 
+def affiliate_later(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {
+                "text": f"Puedo ayudarte en el momento que desees 🤖 Bien sea, programar una cita👨🏼‍⚕️ o responder preguntas generales de salud 📝 ¡Puedes volver al inicio cuando desees presionando el boton inferior!☑️🔘"
+            },
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idinicio",
+                            "title": "Ir al Inicio"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    print("envia el mensaje principal 3")
+    enviar_mensajes_whatsapp(data)
+    return True
+
 def return_button(numero):
     data = {
         "messaging_product": "whatsapp",
@@ -246,7 +274,7 @@ def return_button(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "atenmedicpri",
+                            "id": "idatenmedicpri",
                             "title": "Primaria"
                         }
                     },

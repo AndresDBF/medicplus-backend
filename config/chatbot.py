@@ -13,7 +13,7 @@ from models.usuarios import usuarios
 from routes.user import get_user_state, get_user_state_register, verify_user
 
 #rutas para respuestas del bot 
-from routes.respuestas_bot.principal import principal_message, is_affiliate, return_button, message_not_found
+from routes.respuestas_bot.principal import principal_message, is_affiliate, return_button, message_not_found, affiliate_later
 from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
 from routes.respuestas_bot.medical_attention.primary import get_info_primary_attention, confirm_call
 from routes.respuestas_bot.principal import agregar_mensajes_log
@@ -106,15 +106,20 @@ def contestar_mensajes_whatsapp(texto, numero):
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
             principal_message(numero)
             return True
-        
         #respuesta de botones en caso que sea afiliado o se quiera afiliar 
-        elif texto == "si":
+        elif texto == "idsi":
             print("entra en que si es afiliado")
             
             is_affiliate(numero)
-        elif texto == 'no':
+        elif texto == 'idno':
             print("entra en el boton que no es afiliado")
             get_plan(numero)
+            return True
+        elif texto == 'idtarde':
+            affiliate_later(numero)
+            return True
+        elif "idinicio":
+            principal_message(numero)
             return True
     
     #mensajes de flujo de registro 
@@ -142,24 +147,28 @@ def contestar_mensajes_whatsapp(texto, numero):
         print("entra para ingresar el correo del usuario")
         insert_email(numero, texto, user)
         return True
-            
-    #para ir al menu luego de registrarse
-    elif "volver" in texto:
-        print("entra en volver")
-        return_button(numero)
-        return True
-    #respuestas para los afiliados 
-    
-    #atencion medica primaria 
-    elif "atenmedicpri" in texto:
-        print("-------------------------------------entra en el elif de atenmedicpri------------------------------------------")
-        get_info_primary_attention(numero)
-        return True
-    elif "llamar":
-        print("entra en el elif de llamar ")
-        confirm_call(numero)
-        return True
+    elif user["state"] == "REGISTERED":
+        if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
+            principal_message(numero)
+            return True
+               
+        #para ir al menu luego de registrarse
+        elif "idvolver" in texto:
+            print("entra en volver")
+            return_button(numero)
+            return True
+        #respuestas para los afiliados 
+        
+        #atencion medica primaria 
+        elif "idatenmedicpri" in texto:
+            print("-------------------------------------entra en el elif de atenmedicpri------------------------------------------")
+            get_info_primary_attention(numero)
+            return True
+        elif "idllamar" in texto:
+            print("entra en el elif de llamar ")
+            confirm_call(numero)
+            return True
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
         message_not_found(numero)
-        return True
+        return True    

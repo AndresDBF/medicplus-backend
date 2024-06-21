@@ -181,7 +181,7 @@ def insert_email(numero, texto, user):
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "volver",
+                                "id": "idvolver",
                                 "title": "Volver"
                             }
                         }
