@@ -77,7 +77,6 @@ async def webhook(req: Request):
         print("Error al procesar el mensaje:", e)
         return JSONResponse(content={'message': 'ERROR_PROCESSING_EVENT'}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 @chatbot.get("/webhook")
 async def verify_token(hub_mode: str = Query(..., alias='hub.mode'), hub_challenge: str = Query(..., alias='hub.challenge'), hub_verify_token: str = Query(..., alias='hub.verify_token')):
     if hub_verify_token == TOKEN_ANDERCODE:
@@ -141,7 +140,7 @@ def contestar_mensajes_whatsapp(texto, numero):
 
     elif user["state"] == 'WAITING_FOR_EMAIL':
         print("entra para ingresar el correo del usuario")
-        insert_email(numero, texto)
+        insert_email(numero, texto, user)
         return True
             
     #para ir al menu luego de registrarse
