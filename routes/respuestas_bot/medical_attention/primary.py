@@ -75,7 +75,7 @@ def get_info_primary_attention(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "volver",
+                            "id": "idvolver",
                             "title": "Volver al inicio"
                         }
                     },
@@ -157,7 +157,7 @@ def cancel_call(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "atenmeddomi",
+                            "id": "idatenmeddomi",
                             "title": "Domiciliaria"
                         }
                     },

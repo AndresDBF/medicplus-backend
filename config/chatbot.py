@@ -16,6 +16,7 @@ from routes.user import get_user_state, get_user_state_register, verify_user
 from routes.respuestas_bot.principal import principal_message, is_affiliate, return_button, message_not_found, affiliate_later
 from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
 from routes.respuestas_bot.medical_attention.primary import get_info_primary_attention, confirm_call, cancel_call
+from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -99,7 +100,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         get_user_state_register(numero, 'INIT')
         user = get_user_state(numero) #para actualizar user 
     print("este es el user state: ", user["state"])
-    
+    #----------------------------------------------respuestas para los NO afiliados-----------------------------------------------------
     if user["state"] == 'INIT':
         print("entra en user init")
         #para mostrar el mensaje de inicio al recibir un saludo
@@ -147,6 +148,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         print("entra para ingresar el correo del usuario")
         insert_email(numero, texto, user)
         return True
+    #--------------------------------------respuestas para los afiliados ----------------------------------------------------
     elif user["state"] == "REGISTERED":
         print("entra en el register")
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
@@ -159,7 +161,6 @@ def contestar_mensajes_whatsapp(texto, numero):
             print("entra en volver")
             return_button(numero)
             return True
-        #respuestas para los afiliados 
         
         #atencion medica primaria 
         elif "idatenmedicpri" in texto:
@@ -175,6 +176,23 @@ def contestar_mensajes_whatsapp(texto, numero):
             cancel_call(numero)
             return True
         
+        #atencion medica domiciliaria
+        elif "idatenmeddomi" in texto:
+            print("entra en atencion medica domiciliaria")
+            get_municipality(numero)
+            return True
+        elif "idmunicipio" in texto:
+            print("entra en la confirmacion de servicio por municipio")
+            confirm_service(numero)
+            return True
+        elif "idconfirmdomiciliary" in texto:
+            print("entra en confirmar domicilio")
+            accept_domiciliary(numero)
+            return True
+        elif "iddeclinedomiciliary" in texto: 
+            print("cancelar domicilio ")
+            decline_domiciliary(numero)
+            return True
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
         message_not_found(numero)
