@@ -154,8 +154,11 @@ def insert_email(numero, texto, user):
     result = get_user_state_register(numero, 'REGISTERED', email=texto)
     if result == True:
         # Aquí guarda el usuario en la base de datos
+        print(f"el user plan: {user['plan']} y el tipo de dato es {type(user['plan'])}")
+        plan = int(user['plan'])
+        print(f"asi queda el plan {plan} y este es el tipo de dato {type(plan)}")
         with engine.connect() as conn:
-            conn.execute(usuarios.insert().values(use_nam=user['nombre'].lower(),  email=texto, nom_usu=user['nombre'].title(),ape_usu=user['apellido'].title(), plan=int(user['plan']), tel_usu=numero))
+            conn.execute(usuarios.insert().values(use_nam=user['nombre'].lower(),  email=texto, nom_usu=user['nombre'].title(),ape_usu=user['apellido'].title(), plan=plan, tel_usu=numero))
             conn.commit()
         data = {
             "messaging_product": "whatsapp",

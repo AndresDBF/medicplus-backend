@@ -156,6 +156,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         get_info_primary_attention(numero)
         return True
     elif "llamar":
+        print("entra en el elif de llamar ")
         confirm_call(numero)
         return True
     else:
