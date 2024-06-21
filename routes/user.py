@@ -20,12 +20,22 @@ def get_user_state(numero):
         else:
             return {"consult": None}
 
-def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=None, email=None):
+def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None, cedula=None, email=None):
     with engine.connect() as conn:
         print("entra en get_user_state_register")
         result = get_user_state(numero)
         if result["consult"] is not None:
             print("entra en el if para actualizar")
+            if plan:
+                if plan not in ["1","2","3","4","5"]:
+                    return False
+                conn.execute(
+                    update(user_state_register)
+                    .where(user_state_register.c.numero == numero)
+                    .values(state=state, plan=plan)
+                )
+                conn.commit()
+                
             if nombre:
                 conn.execute(
                     update(user_state_register)
@@ -33,6 +43,7 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                     .values(state=state, nombre=nombre)
                 )
                 conn.commit()
+                
             if apellido:
                 conn.execute(
                     update(user_state_register)
@@ -40,6 +51,7 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                     .values(state=state, apellido=apellido)
                 )
                 conn.commit()
+                
             if cedula:
                 conn.execute(
                     update(user_state_register)
@@ -47,6 +59,7 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                     .values(state=state, cedula=cedula)
                 )
                 conn.commit()
+                
             if email:
                 conn.execute(
                     update(user_state_register)
@@ -54,6 +67,7 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                     .values(state=state, email=email)
                 )
                 conn.commit()
+                
             else:
                 conn.execute(
                     update(user_state_register)
@@ -62,11 +76,13 @@ def get_user_state_register(numero, state, nombre=None, apellido=None, cedula=No
                 )
                 conn.commit()
             print("actualizo los campos")
+            return True
         else:
             print("entra en el else para insertar")
             conn.execute(user_state_register.insert().values(numero=numero, state=state))
             conn.commit()
             print("se inserto la fila")
+            return True
 
 def verify_user(numero):
     with engine.connect() as conn:

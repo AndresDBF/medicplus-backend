@@ -227,7 +227,7 @@ def contestar_mensajes_whatsapp(texto, numero):
                     "type": "text",
                     "text": {
                         "preview_url": False,
-                        "body": f"{texto}"
+                        "body": f"{result_json['text']}"
                     }
                 }
                 print("envia el mensaje principal 1")
@@ -323,14 +323,43 @@ def contestar_mensajes_whatsapp(texto, numero):
                 "type": "text",
                 "text": {
                     "preview_url": False,
-                    "body": "Para registrarte, por favor envía tu nombre:"
+                    "body": "Para registrarte, Te Guiaré los pasos que deberas seguir para formar parte de nuestros Afiliados en Medic Plus🩺👨🏼‍⚕️\nComenzamos Escogiendo un plan en el que te gustaria pertenecer, puedes escoger alguno escribiendo el numero correspondiente al plan #️⃣\n1. Plan 1.\n2. Plan 2.\n3. Plan 3.\n4. Plan 4.\n5. Plan 5."
                 }
             }
             enviar_mensajes_whatsapp(data)
-            get_user_state_register(numero, 'WAITING_FOR_NAME')
+            get_user_state_register(numero, 'WAITING_FOR_PLAN')
             return True
     
     #mensajes de flujo de registro 
+    elif user["state"] == 'WAITING_FOR_PLAN':
+        print("entra para ingresar el plan")
+        result = get_user_state_register(numero, 'WAITING_FOR_NAME', plan=texto)
+        if result == True:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "Gracias. Por favor envía tus nombres completos:"
+                }
+            }
+            enviar_mensajes_whatsapp(data)
+            return True
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el numero correspondiente al plan que te he propuesto🤖👨🏻‍💻"
+                }
+            }
+            enviar_mensajes_whatsapp(data)
+            return True
     elif user["state"] == 'WAITING_FOR_NAME':
         print("entra para ingresar el nombre del usuario")
         get_user_state_register(numero, 'WAITING_FOR_SURNAME', nombre=texto)
@@ -341,7 +370,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "Gracias. Ahora, por favor envía tu apellido:"
+                "body": "Por favor envía tus apellidos completos:"
             }
         }
         enviar_mensajes_whatsapp(data)
@@ -385,15 +414,8 @@ def contestar_mensajes_whatsapp(texto, numero):
         
         # Aquí guarda el usuario en la base de datos
         with engine.connect() as conn:
-            conn.execute(usuarios.insert().values(
-                use_nam=user['nombre'].lower(),  # Cambia según tus necesidades
-                email=texto,
-                password="default",  # Asigna un valor por defecto o genera uno
-                nom_usu=user['nombre'],
-                ape_usu=user['apellido'],
-                gen_usu="U",  # Asigna un valor por defecto o solicita al usuario
-                tel_usu=numero
-            ))
+            conn.execute(usuarios.insert().values(use_nam=user['nombre'].lower(),  email=texto, nom_usu=user['nombre'].title(),ape_usu=user['apellido'].title(), plan=user['plan'], tel_usu=numero))
+            conn.commit()
         data = {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
@@ -529,7 +551,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": "¿Desea Generar una Alarma para ser llamado?📞"
+                    "text": "¿Desea Generar una Alarma para ser llamado?📞 \nsi seleccionas Si☑️ en minutos recibirias una llamadas de uno de nuestros operadores disponibles \nSi seleccionas No❌ daremos por cancelada tu petición. \nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️.  "
                 },
                 "action": {
                     "buttons":[
@@ -560,7 +582,32 @@ def contestar_mensajes_whatsapp(texto, numero):
         }
         print("envia el mensaje principal")
         enviar_mensajes_whatsapp(data)
-    
+    elif "llamar":
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "La alarma ha sido Generada 📢 recibirá una llamada en los proximos minutos📞⌚"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "volver",
+                                "title": "Volver al inicio"
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        return True
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
         data = {
