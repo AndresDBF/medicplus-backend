@@ -15,7 +15,7 @@ from routes.user import get_user_state, get_user_state_register, verify_user
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, is_affiliate, return_button, message_not_found, affiliate_later
 from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
-from routes.respuestas_bot.medical_attention.primary import get_info_primary_attention, confirm_call
+from routes.respuestas_bot.medical_attention.primary import get_info_primary_attention, confirm_call, cancel_call
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -148,7 +148,9 @@ def contestar_mensajes_whatsapp(texto, numero):
         insert_email(numero, texto, user)
         return True
     elif user["state"] == "REGISTERED":
+        print("entra en el register")
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
+            print("entra en el mensaje principal")
             principal_message(numero)
             return True
                
@@ -168,6 +170,11 @@ def contestar_mensajes_whatsapp(texto, numero):
             print("entra en el elif de llamar ")
             confirm_call(numero)
             return True
+        elif "idnollamar" in texto:
+            print("entra en el elif de llamar ")
+            cancel_call(numero)
+            return True
+        
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
         message_not_found(numero)

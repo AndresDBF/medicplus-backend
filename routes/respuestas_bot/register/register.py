@@ -12,12 +12,11 @@ from sqlalchemy import insert, select
 def agregar_mensajes_log(texto):
     try:
         texto_str = json.dumps(texto)
-        print("asi queda el texto antes de insertar en el log: ", texto_str)
-        print("y este es el tipo de dato: ", type(texto_str))
+     
         with engine.connect() as conn:
             conn.execute(log.insert().values(texto=texto_str, fecha_y_hora=datetime.utcnow()))
             conn.commit()
-        print("Mensaje guardado en el log:", texto)
+      
     except Exception as e:
         print(f"Error al guardar el mensaje en el log: {e}")
 
@@ -36,8 +35,6 @@ def enviar_mensajes_whatsapp (data):
         connection.request("POST", "/v19.0/330743666794546/messages", data, headers)
         response = connection.getresponse()
         response_data = response.read().decode()
-        print("se enviaron los mensajes")
-        print("este fue el response al enviar el mensaje: ", response.status, response.reason, response_data)
         if response.status != 200:
             agregar_mensajes_log(f"Error al enviar mensaje: {response.status} {response.reason} {response_data}")
     except Exception as e:

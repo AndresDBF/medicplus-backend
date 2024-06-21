@@ -13,12 +13,11 @@ from sqlalchemy import insert, select
 def agregar_mensajes_log(texto):
     try:
         texto_str = json.dumps(texto)
-        print("asi queda el texto antes de insertar en el log: ", texto_str)
-        print("y este es el tipo de dato: ", type(texto_str))
+       
         with engine.connect() as conn:
             conn.execute(log.insert().values(texto=texto_str, fecha_y_hora=datetime.utcnow()))
             conn.commit()
-        print("Mensaje guardado en el log:", texto)
+        
     except Exception as e:
         print(f"Error al guardar el mensaje en el log: {e}")
 
@@ -37,8 +36,7 @@ def enviar_mensajes_whatsapp (data):
         connection.request("POST", "/v19.0/330743666794546/messages", data, headers)
         response = connection.getresponse()
         response_data = response.read().decode()
-        print("se enviaron los mensajes")
-        print("este fue el response al enviar el mensaje: ", response.status, response.reason, response_data)
+        
         if response.status != 200:
             agregar_mensajes_log(f"Error al enviar mensaje: {response.status} {response.reason} {response_data}")
     except Exception as e:
@@ -115,3 +113,104 @@ def confirm_call(numero):
     }
     enviar_mensajes_whatsapp(data)
     return True
+
+def cancel_call(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "text",
+        "text": {
+            "preview_url": False,
+            "body": "He cancelado tu solicitud de atención médica🗑 ¿Deseas alguna otra ayuda?🤖"
+        }
+    }
+    
+    print("envia el mensaje principal 1")
+    enviar_mensajes_whatsapp(data)
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": "Atenciones Médicas"
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idatenmedicpri",
+                            "title": "Primaria"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "telemed",
+                            "title": "Telemedicina"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "atenmeddomi",
+                            "title": "Domiciliaria"
+                        }
+                    },
+                ]
+            }
+        }
+    }
+    print("envia el mensaje principal 2")
+    enviar_mensajes_whatsapp(data)
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": "Otros Servicios."
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "conmed",
+                            "title": "Consultas Médicas"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "labori",
+                            "title": "Laboratorio"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "ambula",
+                            "title": "Ambulancia"
+                        }
+                    },
+                ]
+            }
+        }
+    }
+        
+    print("envia el mensaje principal 3")
+    enviar_mensajes_whatsapp(data)
+    return True
+
+
+
+
+
+
