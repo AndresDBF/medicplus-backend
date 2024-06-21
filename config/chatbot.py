@@ -155,7 +155,16 @@ def contestar_mensajes_whatsapp(texto, numero):
             print("entra en el mensaje principal")
             principal_message(numero)
             return True
-               
+        
+        elif texto == "idsi":
+            print("entra en que si es afiliado")
+            
+            is_affiliate(numero)
+        elif texto == 'idno':
+            print("entra en el boton que no es afiliado")
+            get_plan(numero)
+            return True
+             
         #para ir al menu luego de registrarse
         elif "idvolver" in texto:
             print("entra en volver")

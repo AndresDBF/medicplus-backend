@@ -45,19 +45,75 @@ def enviar_mensajes_whatsapp (data):
         
 
 def get_plan(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": "Para registrarte, Te Guiaré los pasos que deberas seguir para formar parte de nuestros Afiliados en Medic Plus🩺👨🏼‍⚕️\nComenzamos Escogiendo un plan en el que te gustaria pertenecer, puedes escoger alguno escribiendo el numero correspondiente al plan #️⃣\n1. Plan 1.\n2. Plan 2.\n3. Plan 3.\n4. Plan 4.\n5. Plan 5."
+    with engine.connect() as conn:
+        user =  conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
+    if user is None:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Para registrarte, Te Guiaré los pasos que deberas seguir para formar parte de nuestros Afiliados en Medic Plus🩺👨🏼‍⚕️\nComenzamos Escogiendo un plan en el que te gustaria pertenecer, puedes escoger alguno escribiendo el numero correspondiente al plan #️⃣\n1. Plan 1.\n2. Plan 2.\n3. Plan 3.\n4. Plan 4.\n5. Plan 5."
+            }
         }
-    }
-    enviar_mensajes_whatsapp(data)
-    get_user_state_register(numero, 'WAITING_FOR_PLAN')
-    return True
+        enviar_mensajes_whatsapp(data)
+        get_user_state_register(numero, 'WAITING_FOR_PLAN')
+        return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Contamos con tu registro en nuestro sistema como afiliado de Medic Plus.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Escribe tu consulta y comencemos!"
+            }
+        }
+        print("envia el mensaje principal 1")
+        enviar_mensajes_whatsapp(data)
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "Atenciones Médicas"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idatenmedicpri",
+                                "title": "Primaria"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "telemed",
+                                "title": "Telemedicina"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idatenmeddomi",
+                                "title": "Domiciliaria"
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        print("envia el mensaje principal 2")
+        enviar_mensajes_whatsapp(data)
+        
 
 def insert_plan(numero, texto):
     result = get_user_state_register(numero, 'WAITING_FOR_NAME', plan=texto)
@@ -201,3 +257,4 @@ def insert_email(numero, texto, user):
         }
         enviar_mensajes_whatsapp(data)    
         return True 
+    
