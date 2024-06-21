@@ -157,7 +157,7 @@ def is_affiliate(numero):
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "telemed",
+                                "id": "idtelemed",
                                 "title": "Telemedicina"
                             }
                         },

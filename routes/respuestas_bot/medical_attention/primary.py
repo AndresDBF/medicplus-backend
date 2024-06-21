@@ -54,7 +54,7 @@ def get_info_primary_attention(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "¿Desea Generar una Alarma para ser llamado?📞 \nsi seleccionas Si☑️ en minutos recibirias una llamadas de uno de nuestros operadores disponibles \nSi seleccionas No❌ daremos por cancelada tu petición. \nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️.  "
+                "text": "¿Desea Generar una Alarma para ser llamado?📞 \n\nsi seleccionas Si☑️ en minutos recibirias una llamadas de uno de nuestros operadores disponibles, con el fin de cubrir tu atención médica primaria.👨🏼‍⚕️ \n\nSi seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️.  "
             },
             "action": {
                 "buttons":[

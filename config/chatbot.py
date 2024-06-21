@@ -16,6 +16,7 @@ from routes.user import get_user_state, get_user_state_register, verify_user
 from routes.respuestas_bot.principal import principal_message, is_affiliate, return_button, message_not_found, affiliate_later
 from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
 from routes.respuestas_bot.medical_attention.primary import get_info_primary_attention, confirm_call, cancel_call
+from routes.respuestas_bot.medical_attention.telemedicine import get_info_telemedicine_attention, cancel_telemedicine
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
@@ -173,7 +174,7 @@ def contestar_mensajes_whatsapp(texto, numero):
         
         #atencion medica primaria 
         elif "idatenmedicpri" in texto:
-            print("-------------------------------------entra en el elif de atenmedicpri------------------------------------------")
+            print("-------------------------------------entra en el elif de idatenmedicpri------------------------------------------")
             get_info_primary_attention(numero)
             return True
         elif "idllamar" in texto:
@@ -183,6 +184,20 @@ def contestar_mensajes_whatsapp(texto, numero):
         elif "idnollamar" in texto:
             print("entra en el elif de llamar ")
             cancel_call(numero)
+            return True
+        
+        #respuestas para telemedicina 
+        elif "idtelemed" in texto:
+            print("-------------------------------------entra en el elif de telemedicina------------------------------------------")
+            get_info_telemedicine_attention(numero)
+            return True
+        elif "idllamar" in texto:
+            print("entra en el elif de llamar ")
+            confirm_call(numero)
+            return True
+        elif "idnollamar" in texto:
+            print("entra en el elif de llamar ")
+            cancel_telemedicine(numero)
             return True
         
         #atencion medica domiciliaria
