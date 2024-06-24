@@ -94,7 +94,6 @@ saludos = [
 ]
 
 def contestar_mensajes_whatsapp(texto: str, numero):
-    
     #consulta para tomar el status del usuario cuando ingrese la cedula 
     user = get_user_state_identification(numero)
     print("sale de get_user_state_identification")

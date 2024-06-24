@@ -23,7 +23,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBOyAEc9G5t2L0OpAwMMrGKgOMyZAFxZAxagGQxZC4qwIOZBVxdVMLafbM84V3Va8IOTexfJK3wP2JDubvyNeVZAjaFZBVQRfo8fzJhmdtJXe3qQsFE5YwzVjVZAfgC4qgoyOZBj4LfkgBNkkGnlduqd3TtwMYcWIhcZCSHpAkgu2fZAodR5ndKcKVvVtDwSdrhtnwtjatklOdUZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBO8dJGrruwB1PiX9keXnZBH4Ga82ECi0ZAcAh3uIWQrSg30q8ljJDzldrZA7utAZAkWqU2SP3AwK2dJQjOdGcDoIdyJxbqYdPKD8HszolWnVLMsAJBpe95TLlUu7NUjq0SCMq92K6RTIdtOoqvsEPiMLltCIICKlyvNndz0KQHMcrfglDFUQvOnZCmIvg7DKZAGL3GoqwIZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
