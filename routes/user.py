@@ -120,8 +120,8 @@ def get_user_state_identification_register(numero, state, cedula=None):
                 if not re.fullmatch(r'\d{7,}', cedula):
                     return False
                 conn.execute(
-                    update(user_state_register)
-                    .where(user_state_register.c.numero == numero)
+                    update(user_state_attention)
+                    .where(user_state_attention.c.numero == numero)
                     .values(numero=numero, state=state, cedula=cedula)
                 )
                 conn.commit()
@@ -129,8 +129,8 @@ def get_user_state_identification_register(numero, state, cedula=None):
             else:
                 print("entra en el else de que no existe cedula ")
                 conn.execute(
-                    update(user_state_register)
-                    .where(user_state_register.c.numero == numero)
+                    update(user_state_attention)
+                    .where(user_state_attention.c.numero == numero)
                     .values(numero=numero, state=state)
                 )
                 conn.commit()
