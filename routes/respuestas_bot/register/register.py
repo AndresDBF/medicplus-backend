@@ -4,7 +4,7 @@ import http
 from database.connection import engine
 from models.usuarios import usuarios
 from models.log import log
-from routes.user import get_user_state, get_user_state_register
+from routes.user import get_user_state, get_user_state_register, get_user_state_identification_register
 from routes.user import verify_user
 from datetime import datetime
 from sqlalchemy import insert, select
@@ -60,6 +60,7 @@ def get_plan(numero):
         }
         enviar_mensajes_whatsapp(data)
         get_user_state_register(numero, 'WAITING_FOR_PLAN')
+        
         return True
     else:
         data = {
@@ -94,6 +95,7 @@ def get_plan(numero):
         }
         print("envia el mensaje principal 1")
         enviar_mensajes_whatsapp(data)
+        get_user_state_identification_register(numero, 'INIT')
         return True
 
 def insert_plan(numero, texto):
