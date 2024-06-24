@@ -128,34 +128,63 @@ def insert_plan(numero, texto):
         return True
     
 def insert_name(numero, texto):
-    get_user_state_register(numero, 'WAITING_FOR_SURNAME', nombre=texto)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": "Por favor envía tus apellidos completos:"
+    result = get_user_state_register(numero, 'WAITING_FOR_SURNAME', nombre=texto)
+    if result == True:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Por favor envía tus apellidos completos:"
+            }
         }
-    }
-    enviar_mensajes_whatsapp(data)
-    return True
+        enviar_mensajes_whatsapp(data)
+        return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "No comprendí muy bien tu respuesta, recuerda ingresar el nombre utilizando solamente letras para continuar con el proceso🤖👨🏻‍💻"
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        return True    
     
 def insert_last_name(numero, texto):
-    get_user_state_register(numero, 'WAITING_FOR_ID', apellido=texto)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": "Perfecto. Por favor envía tu cédula:"
+    result = get_user_state_register(numero, 'WAITING_FOR_ID', apellido=texto)
+    if result == True:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Perfecto. Por favor envía tu cédula:"
+            }
         }
-    }
-    enviar_mensajes_whatsapp(data)
-    return True
+        enviar_mensajes_whatsapp(data)
+        return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "No comprendí muy bien tu respuesta, recuerda ingresar el apellido utilizando solamente letras para continuar con el proceso🤖👨🏻‍💻"
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        return True    
+ 
 
 def insert_identification(numero, texto):
     result = get_user_state_register(numero, 'WAITING_FOR_EMAIL', cedula=texto)

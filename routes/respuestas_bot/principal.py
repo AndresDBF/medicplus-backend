@@ -2,7 +2,8 @@ import json
 import http
 from database.connection import engine
 from models.log import log
-from routes.user import verify_user
+from models.usuarios import usuarios
+from routes.user import verify_user, get_user_state_identification_register, get_user_state_register
 from datetime import datetime
 from sqlalchemy import insert
 
@@ -51,7 +52,7 @@ def principal_message(numero):
         "interactive": {
             "type": "button",
             "body": {
-                "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Escribe tu consulta y comencemos!."
+                "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud.\n\nDurante el transcurso de tus solicitudes te brindaré variedad de opiones a traves de botones 🔵☑️ por lo que no tendras necesidad de escribir, enviar audios o imagenes en su mayoria ¡Selecciona una opción para comenzar!"
             },
             "action": {
                 "buttons": [
@@ -217,6 +218,50 @@ def return_button(numero):
     }
     print("envia el mensaje principal 1")
     enviar_mensajes_whatsapp(data)
+    return True
+
+def cancel_button(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {
+                "text": "He cancelado tu solicitud🩺. ¿En que puedo ayudarte nuevamente?📝."
+            },
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idservicios",
+                            "title": "Servicios"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idplanes",
+                            "title": "Planes"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    print("envia el mensaje principal 1")
+    enviar_mensajes_whatsapp(data)
+    with engine.connect() as conn:
+        user = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
+    
+    if user is not None:
+            
+        get_user_state_register(numero, "REGISTERED")
+    else:
+        get_user_state_register(numero, "INIT")
+    get_user_state_identification_register(numero,'INIT')
     return True
 
 def message_not_found(numero):

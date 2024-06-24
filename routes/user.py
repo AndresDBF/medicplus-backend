@@ -57,6 +57,8 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if nombre:
+                if not re.fullmatch(r'^[A-Za-zÀ-ÖØ-öø-ÿ]+$', nombre):
+                    return False
                 conn.execute(
                     update(user_state_register)
                     .where(user_state_register.c.numero == numero)
@@ -65,6 +67,8 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if apellido:
+                if not re.fullmatch(r'^[A-Za-zÀ-ÖØ-öø-ÿ]+$', apellido):
+                    return False
                 conn.execute(
                     update(user_state_register)
                     .where(user_state_register.c.numero == numero)
