@@ -70,25 +70,31 @@ def send_information_for_telemedicine(numero, cedula):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"No he encontrado en el sistema el número de identidad que me has proporcionado.\n\n Puedes volver a darme tu identificación y realizaré la busqueda en el sistema.👨🏻‍💻 \n\nTambién puedes volver al inicio si deseas↩️"
+                        "text": f"No he encontrado en el sistema el número de identidad que me has proporcionado, sin embargo puedes decidir entre las siguientes opciones.\n\n☑️Puedes volver a darme tu identificación y realizaré nuevamente la busqueda en el sistema.👨🏻‍💻 \n\n☑️Puedes unirte a nuestro grupo de afiliados de medic plus presionando el boton 'Quiero ser Afiliado'👨🏼‍💼🧑🏻‍💼🔵 \n\n☑️Puedes volver al inicio si deseas↩️"
                     },
                     "action": {
                         "buttons":[
                             {
                                 "type": "reply",
                                 "reply": {
+                                    "id": "idregistrar",
+                                    "title": "Quiero ser Afiliado"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
                                     "id": "idvolver",
                                     "title": "Volver al inicio"
                                 }
-                            },
+                            }
                         ]
                     }
                 }
             }    
-            
-            
             print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
+            get_user_state_identification_register(numero, "WAITING_FOR_ID_TELEMEDICINE", cedula)
             return True
         else:
             data = {
@@ -116,6 +122,7 @@ def send_information_for_telemedicine(numero, cedula):
             }  
             print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
+            get_user_state_identification_register(numero, "WAITING_FOR_ID_TELEMEDICINE", cedula)
             return True
     else:
         data = {
@@ -172,7 +179,6 @@ def get_info_telemedicine_attention(numero):
     print("envia el mensaje principal")
     enviar_mensajes_whatsapp(data)
     return True
-
 
 
 def cancel_telemedicine(numero):

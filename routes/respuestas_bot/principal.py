@@ -193,7 +193,7 @@ def return_button(numero):
         "interactive": {
             "type": "button",
             "body": {
-                "text": "Gracias por confiar en nuestros de MedicPlus🩺. ¿En que puedo ayudarte nuevamente?📝."
+                "text": "Gracias por confiar en nuestros servicios de MedicPlus🩺. ¿En que puedo ayudarte nuevamente?📝."
             },
             "action": {
                 "buttons": [
