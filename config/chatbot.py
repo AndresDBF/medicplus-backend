@@ -15,7 +15,7 @@ from routes.user import get_user_state, get_user_state_register, verify_user, ge
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan
 #from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
-from routes.respuestas_bot.medical_attention.primary import get_info_identification_attention_primary, get_information_for_identification, get_info_primary_attention, confirm_call, cancel_call
+from routes.respuestas_bot.medical_attention.primary import get_info_identification_attention_primary, get_information_for_identification, get_info_primary_attention, confirm_call, cancel_call, question_affilate
 from routes.respuestas_bot.medical_attention.telemedicine import get_info_identification_telemedicine, send_information_for_telemedicine
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 from routes.respuestas_bot.principal import agregar_mensajes_log
@@ -100,11 +100,12 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     if user["consult"] is None:
         print("el user es null entra en el if")
         get_user_state_identification_register(numero, "INIT")
-       
         user = get_user_state_identification(numero)
         print("actualiza user ")
     print("pasa el if del user null")
     texto = texto.lower()
+    
+    
     if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
         print("entra en el mensaje principal")
         principal_message(numero)
@@ -122,8 +123,11 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         return True
     
     #---------------------------respuestas a selecciones de los servicios-------------------------
-    #atencion medica inmediata
+    #-------------------atencion medica inmediata----------------------
     #para afiliados
+    elif "idatenmedicpri" in texto:
+        print("entra en primaria para preguntar si es afiliado o no")
+        question_affilate(numero)
     elif "idconfirmaffiliate" in texto:
         print("entra en que si es afiliado")
         get_info_identification_attention_primary(numero)
@@ -147,16 +151,18 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         print("entra en que no quiere llamar")
         cancel_call(numero)
         return True
+    #-------------------telemedicina----------------------
     
-    #para telemedicina
     elif "idtelemed" in texto:
         print("entra en la telemedicina")
         get_info_identification_telemedicine(numero)
         return True
-    elif "idconfirmtelemedicine" in texto:
+    elif user["state"] == "WAITING_FOR_ID_TELEMEDICINE":
+        print("entra para mostrar la respuesta de telemedina")
         send_information_for_telemedicine(numero,texto)   
     
-    #para la atencion medica domiciliaria 
+    #-------------------atencion medica domiciliaria----------------------
+    
     elif "idatenmeddomi" in texto:
         print("entra en atencion medica domiciliaria")
         get_municipality(numero)
