@@ -148,7 +148,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         return True
     
     #para telemedicina
-    elif "idtelemed":
+    elif "idtelemed" in texto:
         print("entra en la telemedicina")
         get_info_identification_telemedicine(numero)
         return True
