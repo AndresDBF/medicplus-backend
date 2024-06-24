@@ -204,7 +204,7 @@ def insert_identification(numero, texto):
         return True
     
 def insert_email(numero, texto, user):
-    result = get_user_state_register(numero, 'REGISTERED', email=texto)
+    result = get_user_state_register(numero, 'INIT', email=texto)
     if result == True:
         # Aquí guarda el usuario en la base de datos
         print(f"el user plan: {user['plan']} y el tipo de dato es {type(user['plan'])}")

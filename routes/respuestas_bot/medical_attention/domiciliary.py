@@ -239,92 +239,31 @@ def decline_domiciliary(numero):
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
         "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": "He Cancelado el transporte del equipo médico, ¿Deseas alguna otra ayuda?🤖"
-        }
-    }
-    
-    print("envia el mensaje principal 1")
-    enviar_mensajes_whatsapp(data)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
         "type": "interactive",
-        "interactive":{
+        "interactive": {
             "type": "button",
             "body": {
-                "text": "Atenciones Médicas"
+                "text": "He cancelado el transporte del equipo médico🗑 ¿En que puedo ayudarte nuevamente?📝."
             },
             "action": {
-                "buttons":[
+                "buttons": [
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idatenmedicpri",
-                            "title": "Primaria"
+                            "id": "idservicios",
+                            "title": "Servicios"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "telemed",
-                            "title": "Telemedicina"
+                            "id": "idplanes",
+                            "title": "Planes"
                         }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idatenmeddomi",
-                            "title": "Domiciliaria"
-                        }
-                    },
+                    }
                 ]
             }
         }
-    }
-    print("envia el mensaje principal 2")
-    enviar_mensajes_whatsapp(data)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "Otros Servicios."
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "conmed",
-                            "title": "Consultas Médicas"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "labori",
-                            "title": "Laboratorio"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "ambula",
-                            "title": "Ambulancia"
-                        }
-                    },
-                ]
-            }
-        }
-    }
-        
-    print("envia el mensaje principal 3")
+    }        
     enviar_mensajes_whatsapp(data)
     return True

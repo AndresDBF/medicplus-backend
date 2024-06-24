@@ -2,7 +2,9 @@ import json
 import http
 from database.connection import engine
 from models.log import log
-from routes.user import verify_user
+from models.usuarios import usuarios
+from routes.user import verify_user, get_user_state_identification, get_user_state_identification_register
+
 from datetime import datetime
 from sqlalchemy import insert
 
@@ -41,7 +43,94 @@ def enviar_mensajes_whatsapp (data):
     finally:
         connection.close()
         
-    
+def get_info_identification_telemedicine(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "to": numero,
+        "text": {
+            "preview_url": False,
+            "body": "Gracias por escoger nuestro servicio de telemedicina 📞\n\nPor favor me indicas tu numero de identidad y buscare en el sistema que tipo de afiliado eres.👨🏻‍💻"
+        }
+    }    
+    print("envia el mensaje principal")
+    enviar_mensajes_whatsapp(data)
+    get_user_state_identification_register(numero, 'WAITING_FOR_ID_TELEMEDICINE')
+    return True
+
+def send_information_for_telemedicine(numero, cedula):
+    result = get_user_state_identification(numero, "IDENTIFICATION_FOUND", cedula)
+    if result == True:
+        with engine.connect() as conn:
+            user = conn.execute(usuarios.select().where(usuarios.c.ced_usu==cedula)).first()
+        if not user:
+            data = {
+                "messaging_product": "whatsapp",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": f"No he encontrado en el sistema el número de identidad que me has proporcionado.\n\n Puedes volver a darme tu identificación y realizaré la busqueda en el sistema.👨🏻‍💻 \n\nTambién puedes volver al inicio si deseas↩️"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idvolver",
+                                    "title": "Volver al inicio"
+                                }
+                            },
+                        ]
+                    }
+                }
+            }    
+            
+            
+            print("envia el mensaje principal")
+            enviar_mensajes_whatsapp(data)
+            return True
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": f"He contactado con nuestros operadores encargados de los servicios de telemedicina mediante una alarma a nombre de {user.nom_usu} {user.ape_usu}📢 en breves minutos seras contacto por uno de ellos📲☎️"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idvolver",
+                                    "title": "Volver al inicio"
+                                }
+                            },
+                        ]
+                    }
+                }
+            }  
+            print("envia el mensaje principal")
+            enviar_mensajes_whatsapp(data)
+            return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "text": {
+                "preview_url": False,
+                "body": "El numero de identidad ingresado no es válido, puedes volver a proporcionarlo tomando en cuenta los siguientes aspectos: \n\n☑️ Cádena de Números mayor a 7\n\n☑️ El mensaje no debe contener letras, espacios o caracteres especiales (puntos, comas, numerales, etc)"
+            }
+        }    
+        print("envia el mensaje principal")
+        enviar_mensajes_whatsapp(data)
+        return True
+   
+ 
 def get_info_telemedicine_attention(numero):
     data = {
         "messaging_product": "whatsapp",
@@ -58,14 +147,14 @@ def get_info_telemedicine_attention(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idllamar",
+                            "id": "idconfirmtelemedicine",
                             "title": "Sí"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idnollamar",
+                            "id": "iddeclinelemedicine",
                             "title": "No"
                         }
                     },

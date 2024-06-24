@@ -53,23 +53,20 @@ def principal_message(numero):
             "body": {
                 "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Escribe tu consulta y comencemos!."
             },
-            "footer": {
-                "text": "Dinos si eres o quieres ser un Afiliado de MedicPlus."
-            },
             "action": {
                 "buttons": [
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idsi",
-                            "title": "Afiliado"
+                            "id": "idservicios",
+                            "title": "Servicios"
                         }
                     },
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idno",
-                            "title": "Quiero Ser Afiliado"
+                            "id": "idplanes",
+                            "title": "Planes"
                         }
                     }
                 ]
@@ -80,6 +77,163 @@ def principal_message(numero):
     enviar_mensajes_whatsapp(data)
     return True
 
+def get_services(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "text",
+        "text": {
+            "preview_url": False,
+            "body": "A continuación te enseño los servicios que Medic Plus puede ofrecerte 🩺, puedes seleccionar alguno de ellos y a la brevedad te guiaré los pasos que deberás seguir según tu solicitud📌👨🏻‍💻"
+        }
+    }
+    print("envia el mensaje principal 1")
+    enviar_mensajes_whatsapp(data)
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": "Atenciones Médicas"
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idatenmedicpri",
+                            "title": "Primaria"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idtelemed",
+                            "title": "Telemedicina"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idatenmeddomi",
+                            "title": "Domiciliaria"
+                        }
+                    },
+                ]
+            }
+        }
+    }
+    print("envia el mensaje principal 2")
+    enviar_mensajes_whatsapp(data)
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": "Otros Servicios."
+            },
+            "action": {
+            "buttons":[
+                {
+                    "type": "reply",
+                    "reply": {
+                        "id": "conmed",
+                        "title": "Consultas Médicas"
+                    }
+                },
+                {
+                    "type": "reply",
+                    "reply": {
+                        "id": "labori",
+                        "title": "Laboratorio"
+                    }
+                },
+                {
+                    "type": "reply",
+                    "reply": {
+                        "id": "ambula",
+                        "title": "Ambulancia"
+                    }
+                },
+            ]
+        }
+    }
+    }
+                
+    print("envia el mensaje principal 3")
+    enviar_mensajes_whatsapp(data)
+    return True
+
+def get_plan(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "text",
+        "text": {
+            "preview_url": False,
+            "body": "Aun no cuento con esta funcion, pronto podre ayudarte"
+        }
+    }
+    enviar_mensajes_whatsapp(data)
+
+def return_button(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {
+                "text": "Gracias por confiar en nuestros de MedicPlus🩺. ¿En que puedo ayudarte nuevamente?📝."
+            },
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idservicios",
+                            "title": "Servicios"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idplanes",
+                            "title": "Planes"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    print("envia el mensaje principal 1")
+    enviar_mensajes_whatsapp(data)
+    return True
+
+def message_not_found(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "to": numero,
+        "text": {
+            "preview_url": False,
+            "body": (
+                "No comprendo muy bien tu mensaje, por favor puedes repetirlo nuevamente.\n \nRecuerda Utilizar los botones proporcionados para poderte ayudar🤖"
+            )
+        }
+    }
+    enviar_mensajes_whatsapp(data)
+    return True
+    
+""" 
 def is_affiliate(numero):
     result_json = verify_user(numero)
     #mensajes que seran mostrados cuando el usuario seleccione que es afiliado se verifica si de verdad esta registrado
@@ -244,111 +398,4 @@ def affiliate_later(numero):
     enviar_mensajes_whatsapp(data)
     return True
 
-def return_button(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": "Gracias por formar parte de los afiliados de MedicPlus🩺. ¿En que puedo ayudarte hoy?📝."
-        }
-    }
-    print("envia el mensaje principal 1")
-    enviar_mensajes_whatsapp(data)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "Atenciones Médicas"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idatenmedicpri",
-                            "title": "Primaria"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "telemed",
-                            "title": "Telemedicina"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idatenmeddomi",
-                            "title": "Domiciliaria"
-                        }
-                    },
-                ]
-            }
-        }
-    }
-    print("envia el mensaje principal 2")
-    enviar_mensajes_whatsapp(data)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "Otros Servicios."
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "conmed",
-                            "title": "Consultas Médicas"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "labori",
-                            "title": "Laboratorio"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "ambula",
-                            "title": "Ambulancia"
-                        }
-                    },
-                ]
-            }
-        }
-    }
-        
-    print("envia el mensaje principal 3")
-    enviar_mensajes_whatsapp(data)
-    return True
-
-def message_not_found(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "to": numero,
-        "text": {
-            "preview_url": False,
-            "body": (
-                "No comprendo muy bien tu mensaje, por favor puedes repetirlo nuevamente.\n \nRecuerda Utilizar los botones proporcionados para poderte ayudar🤖"
-            )
-        }
-    }
-    enviar_mensajes_whatsapp(data)
-    return True
-    
+ """

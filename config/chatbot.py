@@ -10,13 +10,13 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 
-from routes.user import get_user_state, get_user_state_register, verify_user
+from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_identification_register
 
 #rutas para respuestas del bot 
-from routes.respuestas_bot.principal import principal_message, is_affiliate, return_button, message_not_found, affiliate_later
-from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
-from routes.respuestas_bot.medical_attention.primary import get_info_primary_attention, confirm_call, cancel_call
-from routes.respuestas_bot.medical_attention.telemedicine import get_info_telemedicine_attention, cancel_telemedicine
+from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan
+#from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
+from routes.respuestas_bot.medical_attention.primary import get_info_identification_attention_primary, get_information_for_identification, get_info_primary_attention, confirm_call, cancel_call
+from routes.respuestas_bot.medical_attention.telemedicine import get_info_identification_telemedicine, send_information_for_telemedicine
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
@@ -93,13 +93,94 @@ saludos = [
     'qué pasa', 'qué hay', 'qué cuentas', 'buen día'
 ]
 
-def contestar_mensajes_whatsapp(texto, numero):
+def contestar_mensajes_whatsapp(texto: str, numero):
+    
+    #consulta para tomar el status del usuario cuando ingrese la cedula 
+    user = get_user_state_identification(numero)
+    if user["consult"] is None:
+        get_user_state_identification_register(numero, "INIT")
+        user = get_user_state_identification(numero)
+        
     texto = texto.lower()
-    user = get_user_state(numero)
+    if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
+        principal_message(numero)
+        return True
+    
+    #seleccion de las primeras opciones de servicios o planes 
+    elif "idservicios" in texto:
+        print("entra en seleccion de servicios")
+        get_services(numero)
+        return True
+    
+    elif "idplanes" in texto:
+        print("entra en planes")
+        get_plan(numero)
+        return True
+    
+    #---------------------------respuestas a selecciones de los servicios-------------------------
+    #atencion medica inmediata
+    #para afiliados
+    elif "idconfirmaffiliate" in texto:
+        print("entra en que si es afiliado")
+        get_info_identification_attention_primary(numero)
+        return True
+    
+    elif user["state"] == "WAITING_FOR_ID":
+        print("entra en recibir cedula")
+        get_information_for_identification(numero, texto)
+        return True
+    
+    elif "idnotaffiliate" in texto:
+        print("entra para la atencion de los no afiliados")
+        get_info_primary_attention(numero)
+        return True
+    #para no afiliados
+    elif "idllamar" in texto:
+        print("entra en que quiere llamar")
+        confirm_call(numero)
+        return True
+    elif "idnollamar" in texto:
+        print("entra en que no quiere llamar")
+        cancel_call(numero)
+        return True
+    
+    #para telemedicina
+    elif "idtelemed":
+        print("entra en la telemedicina")
+        get_info_identification_telemedicine(numero)
+        return True
+    elif "idconfirmtelemedicine":
+        send_information_for_telemedicine(numero,texto)   
+    
+    #para la atencion medica domiciliaria 
+    elif "idatenmeddomi" in texto:
+        print("entra en atencion medica domiciliaria")
+        get_municipality(numero)
+        return True
+    elif "idmunicipio" in texto:
+        print("entra en la confirmacion de servicio por municipio")
+        confirm_service(numero)
+        return True
+    elif "idconfirmdomiciliary" in texto:
+        print("entra en confirmar domicilio")
+        accept_domiciliary(numero)
+        return True
+    elif "iddeclinedomiciliary" in texto: 
+        print("cancelar domicilio")
+        decline_domiciliary(numero)
+        return True
+        
+    #boton de volver 
+    elif "idvolver" in texto:
+        return_button(numero)
+        return True
+    
+    """ user = get_user_state(numero)
+    #verifica el status del usuario si ha sido registrado o no
     if user["consult"] is None:
         print("entra en user none")
         get_user_state_register(numero, 'INIT')
-        user = get_user_state(numero) #para actualizar user 
+        user = get_user_state(numero) 
     print("este es el user state: ", user["state"])
     #----------------------------------------------respuestas para los NO afiliados-----------------------------------------------------
     if user["state"] == 'INIT':
@@ -108,10 +189,15 @@ def contestar_mensajes_whatsapp(texto, numero):
         if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
             principal_message(numero)
             return True
+        #para ir al menu luego de registrarse
+        elif "idvolver" in texto:
+            print("entra en volver")
+            return_button(numero)
+            return True
+        
         #respuesta de botones en caso que sea afiliado o se quiera afiliar 
         elif texto == "idsi":
             print("entra en que si es afiliado")
-            
             is_affiliate(numero)
         elif texto == 'idno':
             print("entra en el boton que no es afiliado")
@@ -149,6 +235,9 @@ def contestar_mensajes_whatsapp(texto, numero):
         print("entra para ingresar el correo del usuario")
         insert_email(numero, texto, user)
         return True
+    
+    
+    
     #--------------------------------------respuestas para los afiliados ----------------------------------------------------
     elif user["state"] == "REGISTERED":
         print("entra en el register")
@@ -166,12 +255,7 @@ def contestar_mensajes_whatsapp(texto, numero):
             get_plan(numero)
             return True
              
-        #para ir al menu luego de registrarse
-        elif "idvolver" in texto:
-            print("entra en volver")
-            return_button(numero)
-            return True
-        
+       
         #atencion medica primaria 
         elif "idatenmedicpri" in texto:
             print("-------------------------------------entra en el elif de idatenmedicpri------------------------------------------")
@@ -221,3 +305,20 @@ def contestar_mensajes_whatsapp(texto, numero):
         print("entra en el else final donde no entiende ningun mensaje ")
         message_not_found(numero)
         return True    
+    
+    """
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

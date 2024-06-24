@@ -4,6 +4,7 @@ from models.roles import roles
 from models.usuarios import usuarios
 from models.user_roles import user_roles
 from models.user_state_register import user_state_register
+from models.user_state_attention import user_state_attention
 
 from sqlalchemy import select, insert, update
 
@@ -21,6 +22,20 @@ def get_user_state(numero):
         else:
             return {"consult": None}
 
+def get_user_state_identification(numero):
+    with engine.connect() as conn:
+        result = conn.execute(select(user_state_attention).where(user_state_attention.c.numero == numero)).fetchone()
+        if result is not None:
+            # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
+            columns = ["numero", "state", "plan", "nombre", "apellido", "cedula", "email", "fecha_y_hora"]
+            result_dict = dict(zip(columns, result))
+            result_dict["consult"] = True
+            return result_dict
+        else:
+            return {"consult": None}
+        
+#funciones para maneras status del usuario durante la conversacion con el bot 
+#para el registro
 def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None, cedula=None, email=None):
     with engine.connect() as conn:
         print("entra en get_user_state_register")
@@ -55,7 +70,7 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if cedula:
-                if not re.fullmatch(r'\d+', cedula):
+                if not re.fullmatch(r'\d{7,}', cedula):
                     return False
                 conn.execute(
                     update(user_state_register)
@@ -90,6 +105,26 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
             print("se inserto la fila")
             return True
 
+#para la solicitud de identidad 
+def get_user_state_identification_register(numero, state, cedula=None):
+    with engine.connect() as conn:
+        result = get_user_state_identification(numero)
+        if result["consult"] is not None:
+            if cedula:
+                if not re.fullmatch(r'\d{7,}', cedula):
+                    return False
+                conn.execute(
+                    update(user_state_register)
+                    .where(user_state_register.c.numero == numero)
+                    .values(numero=numero, state=state, cedula=cedula)
+                )
+                conn.commit()
+                return True
+        else:
+            conn.execute(user_state_attention.insert(state=state, cedula=None))
+            conn.commit()
+            return True
+            
 def verify_user(numero):
     with engine.connect() as conn:
         print("entra en verify_user")
