@@ -12,6 +12,10 @@ from models.user_roles import user_roles
 from models.user_state_register import user_state_register
 from config.chatbot import chatbot
 
+from routes.data.data import data
+
 app = FastAPI()
+app.title = "Documentacion Medic plus"
 
 app.include_router(chatbot, tags=["Webhook Whatsapp"])
+app.include_router(data, ["data user"])

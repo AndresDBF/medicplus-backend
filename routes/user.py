@@ -138,7 +138,7 @@ def get_user_state_identification_register(numero, state, cedula=None):
                 
         else:
             print("entra en el else para insertar")
-            conn.execute(user_state_attention.insert(state=state, cedula=None))
+            conn.execute(user_state_attention.insert(numero=numero, state=state, cedula=None))
             conn.commit()
             return True
             
