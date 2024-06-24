@@ -108,7 +108,9 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     if user_register["consult"] is None:
         print("el user register es null, entra en el if ")
         get_user_state_register(numero, "INIT")
+        user_register = get_user_state(numero)
         print("actualiza el status del user register")
+        
     print("pasa el if del user null")
     print("este es el user state: ", user_id["state"])
     print("este es el user register: ", user_register)
