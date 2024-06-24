@@ -108,7 +108,7 @@ def get_info_identification_attention_primary(numero):
 
 
 def get_information_for_identification(numero, cedula):
-    result = get_user_state_identification(numero, "IDENTIFICATION_FOUND", cedula)
+    result = get_user_state_identification_register(numero, "IDENTIFICATION_FOUND", cedula)
     if result == True:
         with engine.connect() as conn:
             user = conn.execute(usuarios.select().where(usuarios.c.ced_usu==cedula)).first()

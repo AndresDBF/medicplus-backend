@@ -58,7 +58,7 @@ def get_info_identification_telemedicine(numero):
     return True
 
 def send_information_for_telemedicine(numero, cedula):
-    result = get_user_state_identification(numero, "IDENTIFICATION_FOUND", cedula)
+    result = get_user_state_identification_register(numero, "IDENTIFICATION_FOUND", cedula)
     if result == True:
         with engine.connect() as conn:
             user = conn.execute(usuarios.select().where(usuarios.c.ced_usu==cedula)).first()
