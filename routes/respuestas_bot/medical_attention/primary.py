@@ -98,7 +98,7 @@ def get_info_identification_attention_primary(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Gracias por escoger nuestro servicio de Atención Médica Inmediata 🚑🩺\n\n Por favor me indicas tu numero de identidad y buscare en el sistema que tipo de afiliado eres.👨🏻‍💻"
+            "body": "Estoy para brindarte la atención médica al instante 🚑🩺\n\n Por favor me indicas tu número de identidad y buscaré en el sistema que tipo de afiliado eres.👨🏻‍💻"
         }
     }    
     print("envia el mensaje principal")
@@ -139,6 +139,7 @@ def get_information_for_identification(numero, cedula):
             
             print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
+            get_user_state_identification_register(numero, "WAITING_FOR_ID", cedula)
             return True
         else:
             data = {
@@ -166,6 +167,7 @@ def get_information_for_identification(numero, cedula):
             }  
             print("envia el mensaje principal")
             enviar_mensajes_whatsapp(data)
+            
             return True
     else:
         data = {
@@ -178,6 +180,7 @@ def get_information_for_identification(numero, cedula):
         }    
         print("envia el mensaje principal")
         enviar_mensajes_whatsapp(data)
+        get_user_state_identification_register(numero, "WAITING_FOR_ID", cedula)
         return True
         
 #funcion utilizada solo para los no afiliados 

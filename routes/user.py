@@ -118,13 +118,16 @@ def get_user_state_identification_register(numero, state, cedula=None):
             if cedula:
                 print("entra en el if de que existe cedula")
                 if not re.fullmatch(r'\d{7,}', cedula):
+                    print("entra en cedula incorrecta")
                     return False
+                print("pasa el if de la expresion regular de la cedula")
                 conn.execute(
                     update(user_state_attention)
                     .where(user_state_attention.c.numero == numero)
                     .values(numero=numero, state=state, cedula=cedula)
                 )
                 conn.commit()
+                print("actualiza los datos")
                 return True
             else:
                 print("entra en el else de que no existe cedula ")
