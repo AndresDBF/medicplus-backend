@@ -24,12 +24,15 @@ def get_user_state(numero):
 
 def get_user_state_identification(numero):
     with engine.connect() as conn:
+        print("entra en get_user_state_identification")
         result = conn.execute(select(user_state_attention).where(user_state_attention.c.numero == numero)).fetchone()
+        print("este es el result: ", result)
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "plan", "nombre", "apellido", "cedula", "email", "fecha_y_hora"]
+            columns = ["numero", "state", "cedula", "fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
+            print("este es el result_dict: ", result_dict)
             return result_dict
         else:
             return {"consult": None}
@@ -108,9 +111,12 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
 #para la solicitud de identidad 
 def get_user_state_identification_register(numero, state, cedula=None):
     with engine.connect() as conn:
+        print("entra en get_user_state_identification_register")
         result = get_user_state_identification(numero)
         if result["consult"] is not None:
+            print("entra en el if")
             if cedula:
+                print("entra en el if de que existe cedula")
                 if not re.fullmatch(r'\d{7,}', cedula):
                     return False
                 conn.execute(
@@ -120,7 +126,18 @@ def get_user_state_identification_register(numero, state, cedula=None):
                 )
                 conn.commit()
                 return True
+            else:
+                print("entra en el else de que no existe cedula ")
+                conn.execute(
+                    update(user_state_register)
+                    .where(user_state_register.c.numero == numero)
+                    .values(numero=numero, state=state)
+                )
+                conn.commit()
+                return True
+                
         else:
+            print("entra en el else para insertar")
             conn.execute(user_state_attention.insert(state=state, cedula=None))
             conn.commit()
             return True
@@ -144,103 +161,4 @@ def verify_user(numero):
             "text": texto,
             "registered": False
         }
-    
-""" 
  
- def recibir_mensajes(req):
-    print("el req: ", req)
-    try:
-        req_data = request.get_json()
-        print("Datos JSON recibidos:", req_data)
-        
-        for entry in req_data.get('entry', []):
-            for change in entry.get('changes', []):
-                value = change.get('value', {})
-                messages = value.get('messages', [])
-                for message in messages:
-                    numero = message.get('from')
-                    user = user_create_state(numero)
-                    
-                    if user.state == 'INIT':
-                        if 'text' in message:
-                            texto = message['text']['body'].lower()
-                            if texto in ['hola', 'buenas', 'buenos', 'que tal']:
-                                enviar_mensajes_interactivo(numero)
-                                update_user_state(numero, 'WAITING_FOR_CEDULA')
-                                
-                    elif user.state == 'WAITING_FOR_CEDULA':
-                        if 'text' in message:
-                            cedula = message['text']['body']
-                            # Aquí puedes agregar la lógica para verificar la cédula en tu base de datos
-                            # Ejemplo de verificación de cédula:
-                            if verificar_cedula(cedula):
-                                enviar_mensaje(numero, "Cédula verificada correctamente.")
-                                update_user_state(numero, 'VERIFIED', cedula)
-                            else:
-                                enviar_mensaje(numero, "Cédula no encontrada. Inténtalo de nuevo.")
-                                
-        return jsonify({'message': 'EVENT_RECEIVED'})
-    except Exception as e:
-        print("Error al procesar el mensaje:", e)
-        return jsonify({'message': 'ERROR_PROCESSING_EVENT'}), 500
-
-
-
-
-
-def enviar_mensajes_interactivo(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive": {
-            "type": "button",
-            "body": {
-                "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Escribe tu consulta y comencemos!."
-            },
-            "footer": {
-                "text": "Dinos si eres o quieres ser un Afiliado de MedicPlus."
-            },
-            "action": {
-                "buttons": [
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "si",
-                            "title": "Afiliado"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "no",
-                            "title": "Quiero Ser Afiliado"
-                        }
-                    }
-                ]
-            }
-        }
-    }
-    enviar_mensajes_whatsapp(data)
-
-def enviar_mensaje(numero, texto):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": texto
-        }
-    }
-    enviar_mensajes_whatsapp(data)
-
-
-def verificar_cedula(cedula):
-    # Aquí va la lógica para verificar la cédula en tu base de datos
-    # Ejemplo:
-    usuario = Usuario.query.filter_by(cedula=cedula).first()
-    return usuario is not None
- """

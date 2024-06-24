@@ -97,12 +97,16 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     #consulta para tomar el status del usuario cuando ingrese la cedula 
     user = get_user_state_identification(numero)
+    print("sale de get_user_state_identification")
     if user["consult"] is None:
+        print("el user es null entra en el if")
         get_user_state_identification_register(numero, "INIT")
+        print("sale de get_user_state_identification_register")
         user = get_user_state_identification(numero)
-        
+        print("actualiza user ")
     texto = texto.lower()
     if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
+        print("entra en el mensaje principal")
         principal_message(numero)
         return True
     
