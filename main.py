@@ -18,4 +18,4 @@ app = FastAPI()
 app.title = "Documentacion Medic plus"
 
 app.include_router(chatbot, tags=["Webhook Whatsapp"])
-app.include_router(data, ["data user"])
+app.include_router(data, tags=["data user"])
