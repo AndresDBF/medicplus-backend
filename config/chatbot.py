@@ -103,6 +103,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         user = get_user_state_identification(numero)
         print("actualiza user ")
     print("pasa el if del user null")
+    print("este es el user state: ", user["state"])
     texto = texto.lower()
     
     
@@ -122,7 +123,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         get_plan(numero)
         return True
     
-    #---------------------------respuestas a selecciones de los servicios-------------------------
+#---------------------------respuestas a selecciones de los servicios-------------------------
     #-------------------atencion medica inmediata----------------------
     #para afiliados
     elif "idatenmedicpri" in texto:

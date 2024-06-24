@@ -134,6 +134,7 @@ def get_user_state_identification_register(numero, state, cedula=None):
                     .values(numero=numero, state=state)
                 )
                 conn.commit()
+                print("inserta los datos ")
                 return True
                 
         else:
