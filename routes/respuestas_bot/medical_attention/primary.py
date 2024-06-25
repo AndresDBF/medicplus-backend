@@ -150,7 +150,7 @@ def get_information_for_identification(numero, cedula):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"He contactado con nuestros operadores que brindaran tu servicio solicitado mediante una alarma a nombre de {user.nom_usu} {user.ape_usu}📢 en breves minutos seras contacto por uno de ellos📲☎️"
+                        "text": f"He contactado con nuestros operadores que brindarán tu servicio solicitado mediante una alarma a nombre de {user.nom_usu} {user.ape_usu}📢 en breves minutos serás contactado por uno de ellos📲☎️"
                     },
                     "action": {
                         "buttons":[
@@ -175,7 +175,7 @@ def get_information_for_identification(numero, cedula):
             "to": numero,
             "text": {
                 "preview_url": False,
-                "body": "El numero de identidad ingresado no es válido, puedes volver a proporcionarlo tomando en cuenta los siguientes aspectos: \n\n☑️ Cádena de Números mayor a 7\n\n☑️ El mensaje no debe contener letras, espacios o caracteres especiales (puntos, comas, numerales, etc)"
+                "body": "El número de identidad ingresado no es válido, puedes volver a proporcionarlo tomando en cuenta los siguientes aspectos: \n\n☑️ Cádena de Números mayor a 7\n\n☑️ El mensaje no debe contener letras, espacios o caracteres especiales (puntos, comas, numerales, etc)"
             }
         }    
         print("envia el mensaje principal")
@@ -193,7 +193,7 @@ def get_info_primary_attention(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "¿Desea Generar una Alarma para ser llamado?📞 \n\nSí seleccionas Si☑️ en minutos recibirias una llamadas de uno de nuestros operadores disponibles, con el fin de cubrir tu atención médica inmediata.👨🏼‍⚕️ \n\nSí seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️."
+                "text": "¿Desea Generar una Alarma para ser llamado?📞 \n\nSí seleccionas Si☑️ en minutos recibirás una llamadas de uno de nuestros operadores disponibles, con el fin de cubrir tu atención médica inmediata.👨🏼‍⚕️ \n\nSí seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️."
             },
             "action": {
                 "buttons":[

@@ -54,7 +54,7 @@ def principal_message(numero):
         "interactive": {
             "type": "button",
             "body": {
-                "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud.\n\nDurante el transcurso de tus solicitudes te brindaré variedad de opiones a traves de botones 🔵☑️ por lo que no tendras necesidad de escribir, enviar audios o imagenes en su mayoria ¡Selecciona una opción para comenzar!"
+                "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud.\n\nDurante el transcurso de tus solicitudes te brindaré variedad de opciones a traves de botones 🔵☑️ por lo que no tendrás necesidad de escribir, enviar audios o imagenes en su mayoria ¡Selecciona una opción para comenzar!"
             },
             "action": {
                 "buttons": [
@@ -109,7 +109,7 @@ def get_services(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idatenmedicpri",
-                            "title": "Primaria"
+                            "title": "Inmediata"
                         }
                     },
                     {
@@ -182,7 +182,7 @@ def get_plan_service(numero):
         "type": "text",
         "text": {
             "preview_url": False,
-            "body": "Aun no cuento con esta funcion, pronto podre ayudarte"
+            "body": "Aun no cuento con esta función, pronto podré ayudarte"
         }
     }
     enviar_mensajes_whatsapp(data)
@@ -265,15 +265,17 @@ def cancel_button(numero):
     }
     print("envia el mensaje principal 1")
     enviar_mensajes_whatsapp(data)
+    #verificamos el status del registro y de la solicitud de cedula 
     with engine.connect() as conn:
-        user = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
-    
-    if user is not None:
-            
-        get_user_state_register(numero, "REGISTERED")
-    else:
-        get_user_state_register(numero, "INIT")
-    get_user_state_identification_register(numero,'INIT')
+        verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
+        verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
+        if verify_register != "REGISTERED":
+            print("entra en el if para reiniciar status de registro")
+            get_user_state_register(numero,'INIT')
+        #la condicion se puede extender a medida que se creen las opciones
+        if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+            print("entra en el if para reiniciar status de identidad")
+            get_user_state_identification_register(numero,'INIT')
     return True
 
 def message_not_found(numero):

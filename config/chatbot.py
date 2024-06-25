@@ -128,6 +128,9 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         return_button(numero)
         return True
     
+    elif any(re.search(r'\b' + cancelar + r'\b', texto) for cancelar in cancelaciones):
+        print("entra en las cancelaciones")
+        cancel_button(numero)
     #validamos los status de las variables 
     #status del registro
     elif user_register["state"] == 'WAITING_FOR_PLAN':
@@ -171,9 +174,6 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         print("entra en el mensaje principal")
         principal_message(numero)
         return True
-    elif any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
-        print("entra en las cancelaciones")
-        cancel_button(numero)
     #seleccion de las primeras opciones de servicios o planes 
     elif "idservicios" in texto:
         print("entra en seleccion de servicios")

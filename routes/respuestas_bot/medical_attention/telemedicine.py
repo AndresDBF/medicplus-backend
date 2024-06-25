@@ -105,7 +105,7 @@ def send_information_for_telemedicine(numero, cedula):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"He contactado con nuestros operadores encargados de los servicios de telemedicina mediante una alarma a nombre de {user.nom_usu} {user.ape_usu}📢 en breves minutos seras contacto por uno de ellos📲☎️"
+                        "text": f"He contactado con nuestros operadores encargados de los servicios de telemedicina mediante una alarma a nombre de {user.nom_usu} {user.ape_usu}📢 en breves minutos seras contactado por uno de ellos📲☎️"
                     },
                     "action": {
                         "buttons":[
@@ -129,7 +129,7 @@ def send_information_for_telemedicine(numero, cedula):
             "to": numero,
             "text": {
                 "preview_url": False,
-                "body": "El numero de identidad ingresado no es válido, puedes volver a proporcionarlo tomando en cuenta los siguientes aspectos: \n\n☑️ Cádena de Números mayor a 7\n\n☑️ El mensaje no debe contener letras, espacios o caracteres especiales (puntos, comas, numerales, etc)"
+                "body": "El número de identidad ingresado no es válido, puedes volver a proporcionarlo tomando en cuenta los siguientes aspectos: \n\n☑️ Cádena de Números mayor a 7\n\n☑️ El mensaje no debe contener letras, espacios o caracteres especiales (puntos, comas, numerales, etc)"
             }
         }    
         print("envia el mensaje principal")
@@ -147,7 +147,7 @@ def get_info_telemedicine_attention(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "¿Desea Generar una Alarma para ser llamado?📞 \n\nsi seleccionas Si☑️ en minutos recibirias una llamada de uno de nuestros operadores disponibles, con el de cubrir tu atención de telemedicina📞👨🏼‍⚕️ \n\nSi seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️.  "
+                "text": "¿Desea Generar una Alarma para ser llamado?📞 \n\nsi seleccionas Si☑️ en minutos recibirias una llamada de uno de nuestros operadores disponibles que cubrirá tu servicio de telemedicina📞👨🏼‍⚕️ \n\nSi seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️.  "
             },
             "action": {
                 "buttons":[
@@ -211,7 +211,7 @@ def cancel_telemedicine(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idatenmedicpri",
-                            "title": "Primaria"
+                            "title": "Inmediata"
                         }
                     },
                     {
