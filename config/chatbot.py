@@ -101,20 +101,20 @@ cancelaciones = [
 def contestar_mensajes_whatsapp(texto: str, numero):
     #consulta para tomar el status del usuario cuando ingrese la cedula 
     user_id = get_user_state_identification(numero)
-    print("sale de get_user_state_identification")
+    
     #consulta para tomar el status del usuario en el registro
     user_register = get_user_state(numero)
-    print("sale de get_user_state")
+   
     if user_id["consult"] is None:
-        print("el user es null entra en el if")
+      
         get_user_state_identification_register(numero, "INIT")
         user_id = get_user_state_identification(numero)
-        user_id("actualiza user ")
+       
     if user_register["consult"] is None:
-        print("el user register es null, entra en el if ")
+
         get_user_state_register(numero, "INIT")
         user_register = get_user_state(numero)
-        print("actualiza el status del user register")
+      
         
     print("pasa el if del user null")
     print("este es el user state: ", user_id["state"])
@@ -165,7 +165,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         get_information_for_identification(numero, texto)
         return True
     #para telemedicina
-    elif user_id["state"] == "WAITING_FOR_ID_TELEMEDICINE":
+    elif user_id["state"] == "WAITING_FOR_ID_TELEMEDICINE" and not "idregistrar" in texto:
         print("entra para mostrar la respuesta de telemedina")
         send_information_for_telemedicine(numero,texto)   
         
