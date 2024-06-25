@@ -46,7 +46,7 @@ def get_user_state_especiality(numero):
         result = conn.execute(select(user_state_especiality).where(user_state_especiality.c.numero == numero)).fetchone()
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "num_esp", "fecha_y_hora"]
+            columns = ["numero", "state", "nom_esp", "especiality", "fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
         
@@ -174,23 +174,70 @@ def get_user_state_identification_register(numero, state, cedula=None):
 #para la solicitud de especialidades
 def update_user_state_especiality(numero, state, especialidad=None, nombre_medico=None):
     with engine.connect() as conn:
+        print("entra en update_user_state_especiality")
+        print("el numero: ", numero)
+        print("el status: ", state)
         result = get_user_state_especiality(numero)
+        
         if result["consult"] is not None:
-           
+            print("entra en el if esto trae el result: ", result)
             if especialidad:
                 if especialidad not in ["1", "2", "3", "4", "5", "6"]:
                     return False
-           
-                conn.execute(
-                    update(user_state_especiality)
-                    .where(user_state_especiality.c.numero == numero)
-                    .values(numero=numero, state=state, especialidad=especialidad)
-                )
-                conn.commit()
-           
+                if especialidad == "1":
+                    conn.execute(
+                        update(user_state_especiality)
+                        .where(user_state_especiality.c.numero == numero)
+                        .values(numero=numero, state=state, nom_esp='Medicina General')
+                    )
+                    conn.commit()
+                if especialidad == "2":
+                    conn.execute(
+                        update(user_state_especiality)
+                        .where(user_state_especiality.c.numero == numero)
+                        .values(numero=numero, state=state, nom_esp='Pediatría')
+                    )
+                    conn.commit()
+                if especialidad == "3":
+                    conn.execute(
+                        update(user_state_especiality)
+                        .where(user_state_especiality.c.numero == numero)
+                        .values(numero=numero, state=state, nom_esp='Traumatología')
+                    )
+                    conn.commit()
+                if especialidad == "4":
+                    conn.execute(
+                        update(user_state_especiality)
+                        .where(user_state_especiality.c.numero == numero)
+                        .values(numero=numero, state=state, nom_esp='Neumonología')
+                    )
+                    conn.commit()
+                if especialidad == "5":
+                    conn.execute(
+                        update(user_state_especiality)
+                        .where(user_state_especiality.c.numero == numero)
+                        .values(numero=numero, state=state, nom_esp='Neurología')
+                    )
+                    conn.commit()
+                if especialidad == "6":
+                    conn.execute(
+                        update(user_state_especiality)
+                        .where(user_state_especiality.c.numero == numero)
+                        .values(numero=numero, state=state, nom_esp='Cardiología')
+                    )
+                    conn.commit()
+
+                
                 return True                
-        else:           
-            conn.execute(user_state_attention.insert().values(numero=numero, state=state))
+            if nombre_medico:
+                if not re.fullmatch(r'^\d+$', nombre_medico):
+                    return False
+                conn.execute(user_state_especiality.update().where(user_state_especiality.c.numero == numero)
+                             .values(numero=numero, state=state, especiality=nombre_medico))
+                conn.commit()
+        else:   
+            print("entra en el else ")        
+            conn.execute(user_state_especiality.insert().values(numero=numero, state=state))
             conn.commit()
             return True
     

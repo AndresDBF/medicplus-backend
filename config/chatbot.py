@@ -10,7 +10,7 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 
-from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_identification_register
+from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_identification_register, get_user_state_especiality, update_user_state_especiality
 
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan_service, cancel_button
@@ -20,7 +20,9 @@ from routes.respuestas_bot.medical_attention.primary import get_info_identificat
 from routes.respuestas_bot.medical_attention.telemedicine import get_info_identification_telemedicine, send_information_for_telemedicine
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 #otros servicios
-from routes.respuestas_bot.other_services.medic_consult import get_list_especiality
+from routes.respuestas_bot.other_services.medic_consult import get_list_speciality, get_names_especialitys
+
+
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -43,7 +45,7 @@ async def index(request: Request):
 async def webhook(req: Request):
     try:
         req_data = await req.json()
-        print("Datos JSON recibidos:", req_data)
+       
         
         for entry in req_data.get('entry', []):
             for change in entry.get('changes', []):
@@ -112,6 +114,10 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     #consulta para tomar el status del usuario en el registro
     user_register = get_user_state(numero)
+    
+    #consulta para tomar el status del usuario en la solicitud de consulta 
+    user_consult = get_user_state_especiality(numero)
+    
    
     if user_id["consult"] is None:
       
@@ -122,11 +128,14 @@ def contestar_mensajes_whatsapp(texto: str, numero):
 
         get_user_state_register(numero, "INIT")
         user_register = get_user_state(numero)
-      
+    
+    if user_consult["consult"] is None:
+        update_user_state_especiality(numero, "INIT")
         
     print("pasa el if del user null")
     print("este es el user state: ", user_id["state"])
     print("este es el user register: ", user_register)
+    print("este es el user consult: ", user_consult)
     
     
     texto = texto.lower()
@@ -180,7 +189,11 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif user_id["state"] == "WAITING_FOR_ID_TELEMEDICINE" and not "idregistrar" in texto:
         print("entra para mostrar la respuesta de telemedina")
         send_information_for_telemedicine(numero,texto)   
-        
+    #para las solicitudes de consultas 
+    elif user_consult["state"] == "WAITING_FOR_SPECIALITY":
+        get_names_especialitys()
+    
+    
     
     elif any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
         print("entra en el mensaje principal")
@@ -257,7 +270,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     #---------------------consultas medicas----------------------------------------
     elif "idconmed" in texto:
         print("entra en consultas medicas")
-        get_list_especiality(numero)
+        get_list_speciality(numero)
         return True
         
     else:

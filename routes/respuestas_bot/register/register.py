@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO8SQ5fR7Ej3tmTTRZBoAO5y8RCXIQHiVXSrZA5Nm5EEGY22hEBSC1NOfIWsZAiQzhkN1bU2sjDhViEK19ZCPahNWirvCnwpX2TeysE7HR25FgZAazbEMiOIfwmxXDTdRTHdK5M2o7tSDjzxEkNXsGloOdiZAcXBr8K3HTWlLjvRoCfZC9FWBoFIvYiRPQLTwyfr1G2S1LkZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOwEe0P5DH6HMBh1J5jeJbhit9spStB7Nd4UOaffVpAtZBfKhpK6N1LDMZAqvokHUCNGVpGV4jF9YyCKjTtKLgAMWGFKXkmfpn6LqVGpTU5WcrhOpWj0ngwOolUuDval3RlezP5hE1T9HnEdPaYJdAIZCOAn0W1ZAry4qBnFH3PlAIeHZBgia72cPXtafqLtlZCJZALUv0YZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -122,7 +122,7 @@ def insert_plan(numero, texto):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el numero correspondiente al plan que te he propuesto🤖👨🏻‍💻"
+                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente al plan que te he propuesto🤖👨🏻‍💻"
             }
         }
         enviar_mensajes_whatsapp(data)
