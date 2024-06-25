@@ -220,6 +220,16 @@ def return_button(numero):
     }
     print("envia el mensaje principal 1")
     enviar_mensajes_whatsapp(data)
+    with engine.connect() as conn:
+        verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
+        verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
+        if verify_register != "REGISTERED":
+            print("entra en el if para reiniciar status de registro")
+            get_user_state_register(numero,'INIT')
+        #la condicion se puede extender a medida que se creen las opciones
+        if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+            print("entra en el if para reiniciar status de identidad")
+            get_user_state_identification_register(numero,'INIT')
     return True
 
 def cancel_button(numero):

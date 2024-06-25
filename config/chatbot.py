@@ -122,9 +122,15 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     
     texto = texto.lower()
+    #valida primero el idvolver por si algun proceso no fue completado
+    
+    if "idvolver" in texto:
+        return_button(numero)
+        return True
+    
     #validamos los status de las variables 
     #status del registro
-    if user_register["state"] == 'WAITING_FOR_PLAN':
+    elif user_register["state"] == 'WAITING_FOR_PLAN':
         print("entra para ingresar el plan")
         insert_plan(numero, texto)
         return True
@@ -235,11 +241,6 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif "iddeclinedomiciliary" in texto: 
         print("cancelar domicilio")
         decline_domiciliary(numero)
-        return True
-        
-    #boton de volver 
-    elif "idvolver" in texto:
-        return_button(numero)
         return True
     
     else:
