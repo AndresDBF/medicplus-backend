@@ -20,7 +20,7 @@ from routes.respuestas_bot.medical_attention.primary import get_info_identificat
 from routes.respuestas_bot.medical_attention.telemedicine import get_info_identification_telemedicine, send_information_for_telemedicine
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 #otros servicios
-from routes.respuestas_bot.other_services.medic_consult import get_list_speciality, get_names_especialitys
+from routes.respuestas_bot.other_services.medic_consult import get_list_speciality, get_names_especialitys, save_appointment
 
 
 from routes.respuestas_bot.principal import agregar_mensajes_log
@@ -148,10 +148,12 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif any(re.search(r'\b' + cancelar + r'\b', texto) for cancelar in cancelaciones):
         print("entra en las cancelaciones")
         cancel_button(numero)
+        return True
     
     elif any(re.search(r'\b' + despedir + r'\b', texto) for despedir in despedidadas):
         print("entra en las cancelaciones")
         cancel_button(numero)
+        return True
     #validamos los status de las variables 
     #status del registro
     elif user_register["state"] == 'WAITING_FOR_PLAN':
@@ -189,11 +191,13 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif user_id["state"] == "WAITING_FOR_ID_TELEMEDICINE" and not "idregistrar" in texto:
         print("entra para mostrar la respuesta de telemedina")
         send_information_for_telemedicine(numero,texto)   
+        return True
     #para las solicitudes de consultas 
     elif user_consult["state"] == "WAITING_FOR_SPECIALITY":
-        get_names_especialitys()
-    
-    
+        get_names_especialitys(numero, texto)
+    elif user_consult["state"] == "WAITING_FOR_NAME_ESP":
+        save_appointment(numero, texto)
+        return True
     
     elif any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
         print("entra en el mensaje principal")
@@ -216,12 +220,14 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif "idregistrar" in texto:
         print("entra en la primera fase de escoger plan para registrarse")
         get_plan(numero)
+        return True
       
     #-------------------atencion medica inmediata----------------------
     #para afiliados
     elif "idatenmedicpri" in texto:
         print("entra en primaria para preguntar si es afiliado o no")
         question_affilate(numero)
+        return True
     elif "idconfirmaffiliate" in texto:
         print("entra en que si es afiliado")
         get_info_identification_attention_primary(numero)

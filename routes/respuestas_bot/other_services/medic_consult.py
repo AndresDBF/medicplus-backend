@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBOwEe0P5DH6HMBh1J5jeJbhit9spStB7Nd4UOaffVpAtZBfKhpK6N1LDMZAqvokHUCNGVpGV4jF9YyCKjTtKLgAMWGFKXkmfpn6LqVGpTU5WcrhOpWj0ngwOolUuDval3RlezP5hE1T9HnEdPaYJdAIZCOAn0W1ZAry4qBnFH3PlAIeHZBgia72cPXtafqLtlZCJZALUv0YZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -59,7 +59,7 @@ def get_list_speciality(numero):
     return True
 
 def get_names_especialitys(numero, especialidad):
-    result = update_user_state_especiality(numero, 'WAITING_FOR_NAME_ESP',especialidad)
+    result = update_user_state_especiality(numero, 'WAITING_FOR_NAME_ESP', especialidad)
     if result == True:
         if especialidad == "1":
             data = {
@@ -67,7 +67,7 @@ def get_names_especialitys(numero, especialidad):
                 "to": numero,
                 "text": {
                     "preview_url": False,
-                    "body": "A continuación te daré los nombres de los médicos generales disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️"
+                    "body": "A continuación te daré los nombres de los médicos generales disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️\n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
                 }
             }   
         elif especialidad == "2":
@@ -193,4 +193,17 @@ def save_appointment(numero, nombre_medico):
         enviar_mensajes_whatsapp(data)
         update_user_state_especiality(numero, "WAITING_FOR_NAME_ESP")
         return True 
-        
+
+def confirm_consult(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "text",
+        "text": {
+            "preview_url": False,
+            "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente al plan que te he propuesto🤖👨🏻‍💻"
+        }
+    }           
+    enviar_mensajes_whatsapp(data)
+    return True

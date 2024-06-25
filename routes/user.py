@@ -177,63 +177,80 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
         print("entra en update_user_state_especiality")
         print("el numero: ", numero)
         print("el status: ", state)
+        print("la especialidad: ", especialidad)
+        print("el nombre_medico: ", nombre_medico)
         result = get_user_state_especiality(numero)
         
         if result["consult"] is not None:
-            print("entra en el if esto trae el result: ", result)
+          
             if especialidad:
+                print("entra en el if de especialidad")
                 if especialidad not in ["1", "2", "3", "4", "5", "6"]:
                     return False
-                if especialidad == "1":
+                elif especialidad == "1":
+                    print("entra en 1")
                     conn.execute(
                         update(user_state_especiality)
                         .where(user_state_especiality.c.numero == numero)
                         .values(numero=numero, state=state, nom_esp='Medicina General')
                     )
                     conn.commit()
-                if especialidad == "2":
+                elif especialidad == "2":
+                    print("entra en 2")
                     conn.execute(
                         update(user_state_especiality)
                         .where(user_state_especiality.c.numero == numero)
                         .values(numero=numero, state=state, nom_esp='Pediatría')
                     )
                     conn.commit()
-                if especialidad == "3":
+                elif especialidad == "3":
+                    print("entra en 3")
                     conn.execute(
                         update(user_state_especiality)
                         .where(user_state_especiality.c.numero == numero)
                         .values(numero=numero, state=state, nom_esp='Traumatología')
                     )
                     conn.commit()
-                if especialidad == "4":
+                elif especialidad == "4":
+                    print("entra en 4")
                     conn.execute(
                         update(user_state_especiality)
                         .where(user_state_especiality.c.numero == numero)
                         .values(numero=numero, state=state, nom_esp='Neumonología')
                     )
                     conn.commit()
-                if especialidad == "5":
+                elif especialidad == "5":
+                    print("entra en 5")
                     conn.execute(
                         update(user_state_especiality)
                         .where(user_state_especiality.c.numero == numero)
                         .values(numero=numero, state=state, nom_esp='Neurología')
                     )
                     conn.commit()
-                if especialidad == "6":
+                elif especialidad == "6":
+                    print("entra en 6")
                     conn.execute(
                         update(user_state_especiality)
                         .where(user_state_especiality.c.numero == numero)
                         .values(numero=numero, state=state, nom_esp='Cardiología')
                     )
                     conn.commit()
+                
 
                 
                 return True                
-            if nombre_medico:
+            elif nombre_medico:
                 if not re.fullmatch(r'^\d+$', nombre_medico):
                     return False
                 conn.execute(user_state_especiality.update().where(user_state_especiality.c.numero == numero)
                              .values(numero=numero, state=state, especiality=nombre_medico))
+                conn.commit()
+            else:
+                conn.execute(
+                    update(user_state_especiality)
+                    .where(user_state_especiality.c.numero == numero)
+                    .values(numero=numero, state=state)
+                )
                 conn.commit()
         else:   
             print("entra en el else ")        
