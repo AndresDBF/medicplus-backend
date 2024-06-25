@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO8dJGrruwB1PiX9keXnZBH4Ga82ECi0ZAcAh3uIWQrSg30q8ljJDzldrZA7utAZAkWqU2SP3AwK2dJQjOdGcDoIdyJxbqYdPKD8HszolWnVLMsAJBpe95TLlUu7NUjq0SCMq92K6RTIdtOoqvsEPiMLltCIICKlyvNndz0KQHMcrfglDFUQvOnZCmIvg7DKZAGL3GoqwIZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBO8SQ5fR7Ej3tmTTRZBoAO5y8RCXIQHiVXSrZA5Nm5EEGY22hEBSC1NOfIWsZAiQzhkN1bU2sjDhViEK19ZCPahNWirvCnwpX2TeysE7HR25FgZAazbEMiOIfwmxXDTdRTHdK5M2o7tSDjzxEkNXsGloOdiZAcXBr8K3HTWlLjvRoCfZC9FWBoFIvYiRPQLTwyfr1G2S1LkZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -147,7 +147,7 @@ def get_services(numero):
                 {
                     "type": "reply",
                     "reply": {
-                        "id": "conmed",
+                        "id": "idconmed",
                         "title": "Consultas Médicas"
                     }
                 },
@@ -335,6 +335,19 @@ def decline_action(numero):
         if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
             print("entra en el if para reiniciar status de identidad")
             get_user_state_identification_register(numero,'INIT')
+    return True
+
+def goodbye_message(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "to": numero,
+        "text": {
+            "preview_url": False,
+            "body": "Ha sido un placer ofrecerte mi ayuda 🤖, en Medic Plus cumplimos por velar el bienestar de nuestros Afiliados👨🏼‍⚕️☑️  puedes contactar conmigo cuando desees 📲 y con gusto serás atendido👨🏻‍💻"
+        }
+    }    
+    print("envia el mensaje principal")
+    enviar_mensajes_whatsapp(data)
     return True
 """ 
 def is_affiliate(numero):

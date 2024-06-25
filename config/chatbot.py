@@ -15,9 +15,12 @@ from routes.user import get_user_state, get_user_state_register, verify_user, ge
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan_service, cancel_button
 from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
+#atenciones medicas
 from routes.respuestas_bot.medical_attention.primary import get_info_identification_attention_primary, get_information_for_identification, get_info_primary_attention, confirm_call, cancel_call, question_affilate
 from routes.respuestas_bot.medical_attention.telemedicine import get_info_identification_telemedicine, send_information_for_telemedicine
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
+#otros servicios
+from routes.respuestas_bot.other_services.medic_consult import get_list_especiality
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -95,7 +98,12 @@ saludos = [
 
 cancelaciones = [
     'cancelar', 'cancela', 'atras', 'retrocede', 'no quiero', 'olvida', 'olvidalo', 'llevame',
-    'lleveme', 'lleve', 'ir', 'inicio','menu','opciones'
+    'lleveme', 'lleve', 'ir', 'inicio','menu','opciones', 'de nuevo'
+]
+
+despedidadas = [
+    'adios', 'chao', 'bye', 'hasta luego', 'nos vemos', 'hasta pronto', 'gracias', 'agradecido',
+    'hablamos luego', 'hablamos despues', 'gracias', 'terminar', 'terminado', 'cumplido', 'cumplir'
 ]
 
 def contestar_mensajes_whatsapp(texto: str, numero):
@@ -129,6 +137,10 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         return True
     
     elif any(re.search(r'\b' + cancelar + r'\b', texto) for cancelar in cancelaciones):
+        print("entra en las cancelaciones")
+        cancel_button(numero)
+    
+    elif any(re.search(r'\b' + despedir + r'\b', texto) for despedir in despedidadas):
         print("entra en las cancelaciones")
         cancel_button(numero)
     #validamos los status de las variables 
@@ -242,7 +254,12 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         print("cancelar domicilio")
         decline_domiciliary(numero)
         return True
-    
+    #---------------------consultas medicas----------------------------------------
+    elif "idconmed" in texto:
+        print("entra en consultas medicas")
+        get_list_especiality(numero)
+        return True
+        
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
         message_not_found(numero)
