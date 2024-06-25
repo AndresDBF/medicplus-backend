@@ -33,7 +33,7 @@ def enviar_mensajes_whatsapp (data):
     connection = http.client.HTTPSConnection("graph.facebook.com")
     
     try:
-        connection.request("POST", "/v19.0/330743666794546/messages", data, headers)
+        connection.request("POST", "/v19.0/378961785290654/messages", data, headers)
         response = connection.getresponse()
         response_data = response.read().decode()
         
