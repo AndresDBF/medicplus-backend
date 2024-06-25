@@ -3,9 +3,11 @@ import http
 from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
+from models.user_state_attention import user_state_attention
+from models.user_state_register import user_state_register
 from routes.user import verify_user, get_user_state_identification_register, get_user_state_register
 from datetime import datetime
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 
 def agregar_mensajes_log(texto):
     try:
@@ -172,7 +174,7 @@ def get_services(numero):
     enviar_mensajes_whatsapp(data)
     return True
 
-def get_plan(numero):
+def get_plan_service(numero):
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -277,7 +279,51 @@ def message_not_found(numero):
     }
     enviar_mensajes_whatsapp(data)
     return True
-    
+
+def decline_action(numero):
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {
+                "text": "He cancelado tu solicitud🩺. ¿En que puedo ayudarte nuevamente?📝."
+            },
+            "action": {
+                "buttons": [
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idservicios",
+                            "title": "Servicios"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idplanes",
+                            "title": "Planes"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    enviar_mensajes_whatsapp(data)
+    #verificamos el status del registro y de la solicitud de cedula 
+    with engine.connect() as conn:
+        verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
+        verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
+        if verify_register != "REGISTERED":
+            print("entra en el if para reiniciar status de registro")
+            get_user_state_register(numero,'INIT')
+        #la condicion se puede extender a medida que se creen las opciones
+        if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+            print("entra en el if para reiniciar status de identidad")
+            get_user_state_identification_register(numero,'INIT')
+    return True
 """ 
 def is_affiliate(numero):
     result_json = verify_user(numero)

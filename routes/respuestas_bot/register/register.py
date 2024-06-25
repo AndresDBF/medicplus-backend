@@ -60,6 +60,7 @@ def get_plan(numero):
         }
         enviar_mensajes_whatsapp(data)
         get_user_state_register(numero, 'WAITING_FOR_PLAN')
+        get_user_state_identification_register(numero,'INIT')
         
         return True
     else:
