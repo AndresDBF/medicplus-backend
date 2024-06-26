@@ -256,7 +256,7 @@ def cancel_telemedicine(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "labori",
+                            "id": "idlabori",
                             "title": "Laboratorio"
                         }
                     },

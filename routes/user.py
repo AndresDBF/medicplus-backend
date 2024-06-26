@@ -174,7 +174,7 @@ def get_user_state_identification_register(numero, state, cedula=None):
 #para la solicitud de especialidades
 def update_user_state_especiality(numero, state, especialidad=None, nombre_medico=None):
     with engine.connect() as conn:
-        print("entra en update_user_state_especiality")
+        print("---------------------entra en update_user_state_especiality---------------------")
         print("el numero: ", numero)
         print("el status: ", state)
         print("la especialidad: ", especialidad)
@@ -240,18 +240,25 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
                 
                 return True                
             elif nombre_medico:
+                print("entra en nombre medico")
                 if not re.fullmatch(r'^\d+$', nombre_medico):
+                    print("entra en el if del regex")
                     return False
+                print("pasa el if del regex")
                 conn.execute(user_state_especiality.update().where(user_state_especiality.c.numero == numero)
                              .values(numero=numero, state=state, especiality=nombre_medico))
                 conn.commit()
+                print("actualiza los datos")
+                return True
             else:
+                print("entra en el else donde no consigue parametros")
                 conn.execute(
                     update(user_state_especiality)
                     .where(user_state_especiality.c.numero == numero)
                     .values(numero=numero, state=state)
                 )
                 conn.commit()
+                return True
         else:   
             print("entra en el else ")        
             conn.execute(user_state_especiality.insert().values(numero=numero, state=state))

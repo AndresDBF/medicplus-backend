@@ -5,7 +5,8 @@ from models.log import log
 from models.usuarios import usuarios
 from models.user_state_attention import user_state_attention
 from models.user_state_register import user_state_register
-from routes.user import verify_user, get_user_state_identification_register, get_user_state_register
+from models.user_state_especiality import user_state_especiality
+from routes.user import verify_user, get_user_state_identification_register, get_user_state_register, update_user_state_especiality
 from datetime import datetime
 from sqlalchemy import insert, select
 
@@ -154,7 +155,7 @@ def get_services(numero):
                 {
                     "type": "reply",
                     "reply": {
-                        "id": "labori",
+                        "id": "idlabori",
                         "title": "Laboratorio"
                     }
                 },
@@ -223,13 +224,20 @@ def return_button(numero):
     with engine.connect() as conn:
         verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
         verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
-        if verify_register != "REGISTERED":
-            print("entra en el if para reiniciar status de registro")
-            get_user_state_register(numero,'INIT')
+        verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        if verify_register:
+            if verify_register != "REGISTERED":
+                print("entra en el if para reiniciar status de registro")
+                get_user_state_register(numero,'INIT')
         #la condicion se puede extender a medida que se creen las opciones
-        if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
-            print("entra en el if para reiniciar status de identidad")
-            get_user_state_identification_register(numero,'INIT')
+        if verify_ident:
+            if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+                print("entra en el if para reiniciar status de identidad")
+                get_user_state_identification_register(numero,'INIT')
+        if verify_consult:
+            if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_especiality(numero, 'INIT')
     return True
 
 def cancel_button(numero):
@@ -269,13 +277,20 @@ def cancel_button(numero):
     with engine.connect() as conn:
         verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
         verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
-        if verify_register != "REGISTERED":
-            print("entra en el if para reiniciar status de registro")
-            get_user_state_register(numero,'INIT')
+        verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        if verify_register:
+            if verify_register != "REGISTERED":
+                print("entra en el if para reiniciar status de registro")
+                get_user_state_register(numero,'INIT')
         #la condicion se puede extender a medida que se creen las opciones
-        if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
-            print("entra en el if para reiniciar status de identidad")
-            get_user_state_identification_register(numero,'INIT')
+        if verify_ident:
+            if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+                print("entra en el if para reiniciar status de identidad")
+                get_user_state_identification_register(numero,'INIT')
+        if verify_consult:
+            if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_especiality(numero, 'INIT')
     return True
 
 def message_not_found(numero):
@@ -328,13 +343,20 @@ def decline_action(numero):
     with engine.connect() as conn:
         verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
         verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
-        if verify_register != "REGISTERED":
-            print("entra en el if para reiniciar status de registro")
-            get_user_state_register(numero,'INIT')
+        verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        if verify_register:
+            if verify_register != "REGISTERED":
+                print("entra en el if para reiniciar status de registro")
+                get_user_state_register(numero,'INIT')
         #la condicion se puede extender a medida que se creen las opciones
-        if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
-            print("entra en el if para reiniciar status de identidad")
-            get_user_state_identification_register(numero,'INIT')
+        if verify_ident:
+            if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+                print("entra en el if para reiniciar status de identidad")
+                get_user_state_identification_register(numero,'INIT')
+        if verify_consult:
+            if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_especiality(numero, 'INIT')
     return True
 
 def goodbye_message(numero):
@@ -348,170 +370,22 @@ def goodbye_message(numero):
     }    
     print("envia el mensaje principal")
     enviar_mensajes_whatsapp(data)
-    return True
-""" 
-def is_affiliate(numero):
-    result_json = verify_user(numero)
-    #mensajes que seran mostrados cuando el usuario seleccione que es afiliado se verifica si de verdad esta registrado
-    #se encontrara un mensaje positivo dando las opciones y otro para pedir registrarse o hacerlo mas tarde
-    print("------------saliendo de verify_user-----------------")
-    print("esto trae el result_json: ", result_json)
-    if result_json["registered"] == False:
-        print("entra en el if")
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "interactive",
-            "interactive": {
-                "type": "button",
-                "body": {
-                    "text": f"{result_json['text']}"
-                },
-                "action": {
-                    "buttons": [
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idtarde",
-                                "title": "Mas tarde"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idno",
-                                "title": "Quiero Registrarme"
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-        print("envia el mensaje principal 3")
-        enviar_mensajes_whatsapp(data)
-        return True
-    else:
-        print("entra en el else")
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": f"{result_json['text']}"
-            }
-        }
-        print("envia el mensaje principal 1")
-        enviar_mensajes_whatsapp(data)
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": "Atenciones Médicas"
-                },
-                "action": {
-                    "buttons":[
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idatenmedicpri",
-                                "title": "Primaria"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idtelemed",
-                                "title": "Telemedicina"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idatenmeddomi",
-                                "title": "Domiciliaria"
-                            }
-                        },
-                    ]
-                }
-            }
-        }
-        print("envia el mensaje principal 2")
-        enviar_mensajes_whatsapp(data)
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": "Otros Servicios."
-                },
-                "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "conmed",
-                            "title": "Consultas Médicas"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "labori",
-                            "title": "Laboratorio"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "ambula",
-                            "title": "Ambulancia"
-                        }
-                    },
-                ]
-            }
-        }
-    }
-                
-    print("envia el mensaje principal 3")
-    enviar_mensajes_whatsapp(data)
+    with engine.connect() as conn:
+        verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
+        verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
+        verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        if verify_register:
+            if verify_register != "REGISTERED":
+                print("entra en el if para reiniciar status de registro")
+                get_user_state_register(numero,'INIT')
+        #la condicion se puede extender a medida que se creen las opciones
+        if verify_ident:
+            if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+                print("entra en el if para reiniciar status de identidad")
+                get_user_state_identification_register(numero,'INIT')
+        if verify_consult:
+            if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_especiality(numero, 'INIT')
     return True
 
-def affiliate_later(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive": {
-            "type": "button",
-            "body": {
-                "text": f"Puedo ayudarte en el momento que desees 🤖 Bien sea, programar una cita👨🏼‍⚕️ o responder preguntas generales de salud 📝 ¡Puedes volver al inicio cuando desees presionando el boton inferior!☑️🔘"
-            },
-            "action": {
-                "buttons": [
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idinicio",
-                            "title": "Ir al Inicio"
-                        }
-                    }
-                ]
-            }
-        }
-    }
-    print("envia el mensaje principal 3")
-    enviar_mensajes_whatsapp(data)
-    return True
-
- """
