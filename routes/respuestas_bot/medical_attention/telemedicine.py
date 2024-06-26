@@ -3,7 +3,7 @@ import http
 from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
-from routes.user import verify_user, get_user_state_identification, get_user_state_identification_register
+from routes.user import get_user_state_identification_register
 
 from datetime import datetime
 from sqlalchemy import insert

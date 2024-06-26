@@ -10,7 +10,7 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 
-from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_identification_register, get_user_state_especiality, update_user_state_especiality
+from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification,get_user_state_especiality, get_user_state_lab, get_user_state_identification_register, update_user_state_especiality, update_user_state_lab
 
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan_service, cancel_button, goodbye_message
@@ -21,7 +21,7 @@ from routes.respuestas_bot.medical_attention.telemedicine import get_info_identi
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 #otros servicios
 from routes.respuestas_bot.other_services.medic_consult import get_list_speciality, get_names_especialitys, save_appointment, confirm_consult, cancel_consult
-from routes.respuestas_bot.other_services.laboratory import get_service_lab
+from routes.respuestas_bot.other_services.laboratory import get_service_lab, select_service_lab, confirm_imaging, confirm_visit_lab, cancel_visit_lab
 
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
@@ -105,7 +105,7 @@ cancelaciones = [
 
 despedidadas = [
     'adios', 'chao', 'bye', 'hasta luego', 'nos vemos', 'hasta pronto', 'gracias', 'agradecido',
-    'hablamos luego', 'hablamos despues', 'gracias', 'terminar', 'terminado', 'cumplido', 'cumplir', 'no necesito', 'no quiero'
+    'hablamos luego', 'hablamos despues', 'cumplido', 'cumplir', 'terminar','terminado'
 ]
 
 def contestar_mensajes_whatsapp(texto: str, numero):
@@ -118,6 +118,8 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     #consulta para tomar el status del usuario en la solicitud de consulta 
     user_consult = get_user_state_especiality(numero)
     
+    #consulta para tomar el status del usuario en la solicitud de laboratorios
+    user_lab = get_user_state_lab(numero) 
    
     if user_id["consult"] is None:
       
@@ -131,20 +133,29 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     if user_consult["consult"] is None:
         update_user_state_especiality(numero, "INIT")
+    
+    if user_lab["consult"] is None:
+        update_user_state_lab(numero, "INIT")
         
     print("pasa el if del user null")
-    print("este es el user state: ", user_id["state"])
+    print("este es el user state: ", user_id)
     print("este es el user register: ", user_register)
     print("este es el user consult: ", user_consult)
+    print("este es el user lab: ", user_lab)
     
     
     texto = texto.lower()
-    #valida primero el idvolver por si algun proceso no fue completado
+#-------------------------------------valida primero el idvolver por si algun proceso no fue completado----------------------------------
     
     if "idvolver" in texto:
         return_button(numero)
         return True
-    
+
+#---------------------------------VALIDANDO LOS BOTONES ---------------------------------------------------------------------
+    elif any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
+        print("entra en el mensaje principal")
+        principal_message(numero)
+        return True
     elif any(re.search(r'\b' + cancelar + r'\b', texto) for cancelar in cancelaciones):
         print("entra en las cancelaciones")
         cancel_button(numero)
@@ -154,7 +165,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         print("entra en las cancelaciones")
         goodbye_message(numero)
         return True
-    #validamos los status de las variables 
+#-------------------------------------validamos los status de las variables --------------------------------------------------------------
     #status del registro
     elif user_register["state"] == 'WAITING_FOR_PLAN':
         print("entra para ingresar el plan")
@@ -205,16 +216,15 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         save_appointment(numero, texto)
         return True
     
-    #para la seleccion de laboratorios
-    elif "idlabori" in texto:
-        get_service_lab(numero)
+    #LABORATORIOS
+    elif user_lab["state"] == "WAITING_FOR_TEST":
+        select_service_lab(numero, texto)
         return True
-    
-    elif any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
-        print("entra en el mensaje principal")
-        principal_message(numero)
-        return True
-    #seleccion de las primeras opciones de servicios o planes 
+    elif user_lab["state"] == "WAITING_FOR_SELECT_TEST":
+        confirm_imaging(numero)
+        return True       
+
+#----------------------------seleccion de las primeras opciones de servicios o planes --------------------------------------------------
     elif "idservicios" in texto:
         print("entra en seleccion de servicios")
         get_services(numero)
@@ -233,7 +243,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         get_plan(numero)
         return True
       
-    #-------------------atencion medica inmediata----------------------
+#-------------------------------------------ATENCION MEDICA INMEDIATA--------------------------------------------------------------------
     #para afiliados
     elif "idatenmedicpri" in texto:
         print("entra en primaria para preguntar si es afiliado o no")
@@ -257,7 +267,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         print("entra en que no quiere llamar")
         cancel_call(numero)
         return True
-    #-------------------telemedicina----------------------
+#------------------------------------------------TELEMEDICINA---------------------------------------------------------------------------
     
     elif "idtelemed" in texto:
         print("entra en la telemedicina")
@@ -266,7 +276,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
  
     
 
-    #-------------------atencion medica domiciliaria----------------------
+#-----------------------------------------ATENCION MEDICA DOMICILIARIA------------------------------------------------------------------
     
     elif "idatenmeddomi" in texto:
         print("entra en atencion medica domiciliaria")
@@ -284,7 +294,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         print("cancelar domicilio")
         decline_domiciliary(numero)
         return True
-    #---------------------consultas medicas----------------------------------------
+#------------------------------------------------CONSULTAS MEDICAS-----------------------------------------------------------------------
     elif "idconmed" in texto:
         print("entra en consultas medicas")
         get_list_speciality(numero)
@@ -295,7 +305,21 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif "iddeclineconsult" in texto:
         cancel_consult(numero)
         return True
-        
+    
+#------------------------------------------------LABORATORIOS----------------------------------------------------------------------------
+    elif "idlabori" in texto:
+        get_service_lab(numero)
+        return True
+    elif "idconfirmvisit" in texto:
+        confirm_visit_lab(numero)
+        return True
+    elif "idcancelvisit" in texto:
+        cancel_visit_lab(numero)
+        return True
+    
+    
+    
+    
     else:
         print("entra en el else final donde no entiende ningun mensaje ")
         message_not_found(numero)

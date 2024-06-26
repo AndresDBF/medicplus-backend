@@ -6,7 +6,8 @@ from models.usuarios import usuarios
 from models.user_state_attention import user_state_attention
 from models.user_state_register import user_state_register
 from models.user_state_especiality import user_state_especiality
-from routes.user import verify_user, get_user_state_identification_register, get_user_state_register, update_user_state_especiality
+from models.user_state_lab import user_state_laboratory
+from routes.user import verify_user, get_user_state_identification_register, get_user_state_register, update_user_state_especiality, update_user_state_lab
 from datetime import datetime
 from sqlalchemy import insert, select
 
@@ -225,6 +226,8 @@ def return_button(numero):
         verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
         verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
         verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
+        
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -238,6 +241,10 @@ def return_button(numero):
             if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
                 print("entra en el if para reiniciar status de consulta")
                 update_user_state_especiality(numero, 'INIT')
+        if verify_lab:
+            if verify_lab not in ['CONFIRM_VISIT_LAB', 'CANCEL_VISIT_LAB']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_lab(numero, 'INIT')
     return True
 
 def cancel_button(numero):
@@ -278,6 +285,8 @@ def cancel_button(numero):
         verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
         verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
         verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
+        
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -291,6 +300,10 @@ def cancel_button(numero):
             if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
                 print("entra en el if para reiniciar status de consulta")
                 update_user_state_especiality(numero, 'INIT')
+        if verify_lab:
+            if verify_lab not in ['CONFIRM_VISIT_LAB', 'CANCEL_VISIT_LAB']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_lab(numero, 'INIT')
     return True
 
 def message_not_found(numero):
@@ -344,6 +357,8 @@ def decline_action(numero):
         verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
         verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
         verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
+        
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -357,6 +372,10 @@ def decline_action(numero):
             if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
                 print("entra en el if para reiniciar status de consulta")
                 update_user_state_especiality(numero, 'INIT')
+        if verify_lab:
+            if verify_lab not in ['CONFIRM_VISIT_LAB', 'CANCEL_VISIT_LAB']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_lab(numero, 'INIT')
     return True
 
 def goodbye_message(numero):
@@ -374,6 +393,8 @@ def goodbye_message(numero):
         verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
         verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
         verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
+        
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -387,5 +408,9 @@ def goodbye_message(numero):
             if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
                 print("entra en el if para reiniciar status de consulta")
                 update_user_state_especiality(numero, 'INIT')
+        if verify_lab:
+            if verify_lab not in ['CONFIRM_VISIT_LAB', 'CANCEL_VISIT_LAB']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_lab(numero, 'INIT')
     return True
 

@@ -3,11 +3,11 @@ import http
 from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
-from models.user_state_especiality import user_state_especiality
-from routes.user import verify_user, get_user_state_identification, get_user_state_identification_register, update_user_state_especiality, get_user_state_especiality
+from models.user_state_lab import user_state_laboratory
+from routes.user import get_user_state_lab, update_user_state_lab
 
 from datetime import datetime
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 
 def agregar_mensajes_log(texto):
     try:
@@ -54,5 +54,221 @@ def get_service_lab(numero):
         }
     }   
     enviar_mensajes_whatsapp(data)
+    update_user_state_lab(numero, 'WAITING_FOR_TEST')
     return True
-    
+
+def select_service_lab(numero, test):
+    result =  update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_LAB', test=test)
+    if result == True:
+        with engine.connect() as conn:
+            test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)
+                                .order_by(user_state_laboratory.c.created_at.asc())).scalar()
+        if test == "Imagenología":
+            data = {
+                "messaging_product": "whatsapp",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": f"Estas son las opciones disponibles para pruebas de imagenología, selecciona una de ellas."
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "ideco",
+                                    "title": "Eco"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idrayosrx",
+                                    "title": "RX"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }  
+            enviar_mensajes_whatsapp(data)
+            update_user_state_lab(numero=numero, state='WAITING_FOR_SELECT_TEST')
+            return True
+        else:  
+            data = {
+                "messaging_product": "whatsapp",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": f"La {test} tiene un costo de 30$💸, desea agendar la visita al laboratorio💉? Su confirmacion la agendaré al personal para indicarle disponibilidad📝 "
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idconfirmvisit",
+                                    "title": "Confirmar Visita"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idcancelvisit",
+                                    "title": "Cancelar Visita"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }  
+            enviar_mensajes_whatsapp(data)
+            return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        print("a punto de llamar a la funcion en el else de respuesta incorrecta")
+        update_user_state_lab(numero, "WAITING_FOR_TEST")
+        return True 
+
+def confirm_imaging(numero):
+    update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_IMAGING')
+    with engine.connect() as conn:
+        imaging = conn.execute(select(user_state_laboratory.c.eco).select_from(user_state_laboratory)
+                               .where(user_state_laboratory.c.numero==numero)).scalar()
+    if imaging == False:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": f"La prueba de RX tiene un costo de 30$💸, desea agendar la visita al laboratorio💉? Su confirmacion la agendaré al personal para indicarle disponibilidad📝 "
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconfirmvisit",
+                                "title": "Confirmar Visita"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idcancelvisit",
+                                "title": "Cancelar Visita"
+                            }
+                        }
+                    ]
+                }
+            }
+        }  
+        enviar_mensajes_whatsapp(data)
+        return True 
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": f"La Prueba de ECO tiene un costo de 30$💸, desea agendar la visita al laboratorio💉? Su confirmacion la agendaré al personal para indicarle disponibilidad📝 "
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconfirmvisit",
+                                "title": "Confirmar Visita"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idcancelvisit",
+                                "title": "Cancelar Visita"
+                            }
+                        }
+                    ]
+                }
+            }
+        }  
+        enviar_mensajes_whatsapp(data)
+        return True
+        
+
+def confirm_visit_lab(numero):
+    update_user_state_lab(numero=numero, state="CONFIRM_VISIT_LAB")
+    data = {
+        "messaging_product": "whatsapp",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": f"He programado tu visita al laboratorio y he contactado con el personal de cita, el cual, te indicarán la disponibilidad lo antes posible📢📝"
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idvolver",
+                            "title": "Volver"
+                        }
+                    }
+                ]
+            }
+        }
+    }  
+    enviar_mensajes_whatsapp(data)
+    return True
+
+def cancel_visit_lab(numero):
+    update_user_state_lab(numero, 'CANCEL_VISIT_LAB')
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": f"Tu visita ha sido Cancelada ❌ Puedo Agendarte otra visita a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorios📍"
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idvolver",
+                            "title": "Volver"
+                        }
+                    },
+                ]
+            }
+        }
+    }          
+    enviar_mensajes_whatsapp(data)
+    return True
+
+
+     

@@ -240,7 +240,7 @@ def cancel_consult(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": f"Tu consulta ha sido Cancelada ❌ Puedo Agendarte otra cita cuando desees en el menu de Consultas Médicas📍"
+                "text": f"Tu consulta ha sido Cancelada ❌ Puedo Agendarte otra cita cuando desees ubicandote en el menú y en la opción Consultas Médicas📍"
             },
             "action": {
                 "buttons":[

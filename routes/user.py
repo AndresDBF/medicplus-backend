@@ -6,11 +6,13 @@ from models.user_roles import user_roles
 from models.user_state_register import user_state_register
 from models.user_state_attention import user_state_attention
 from models.user_state_especiality import user_state_especiality
+from models.user_state_lab import user_state_laboratory
 
 from sqlalchemy import select, insert, update
 
 #para tomar el status del registro
 def get_user_state(numero):
+    print("---------------------entra en get_user_state---------------------")
     with engine.connect() as conn:
         
         result = conn.execute(select(user_state_register).where(user_state_register.c.numero == numero)).fetchone()
@@ -26,6 +28,7 @@ def get_user_state(numero):
 
 #para tomar el status de la solicitud de identidad
 def get_user_state_identification(numero):
+    print("---------------------entra en get_user_state_identification---------------------")
     with engine.connect() as conn:
         
         result = conn.execute(select(user_state_attention).where(user_state_attention.c.numero == numero)).fetchone()
@@ -42,6 +45,7 @@ def get_user_state_identification(numero):
 
 #para tomar el status de las consultas medicas 
 def get_user_state_especiality(numero):
+    print("---------------------entra en get_user_state_especiality---------------------")
     with engine.connect() as conn:
         result = conn.execute(select(user_state_especiality).where(user_state_especiality.c.numero == numero)).fetchone()
         if result is not None:
@@ -54,13 +58,27 @@ def get_user_state_especiality(numero):
         else:
             return {"consult": None}
 
-
+#para la solicitud de una prueba de laboratorio
+def get_user_state_lab(numero):
+    print("---------------------entra en get_user_state_lab---------------------")
+    with engine.connect() as conn:
+        result = conn.execute(select(user_state_laboratory).where(user_state_laboratory.c.numero == numero)).fetchone()
+        if result is not None:
+            # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
+            columns = ["numero", "state", "test", "eco", "rx", "fecha_y_hora"]
+            result_dict = dict(zip(columns, result))
+            result_dict["consult"] = True
+        
+            return result_dict
+        else:
+            return {"consult": None}
 
 #---------------------------------------------------------------------------
         
 #funciones para maneras status del usuario durante la conversacion con el bot 
 #para el registro
 def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None, cedula=None, email=None):
+    print("---------------------entra en get_user_state_register---------------------")
     with engine.connect() as conn:
         
         result = get_user_state(numero)
@@ -135,6 +153,7 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
 
 #para la solicitud de identidad 
 def get_user_state_identification_register(numero, state, cedula=None):
+    print("---------------------entra en get_user_state_identification_register---------------------")
     with engine.connect() as conn:
        
         result = get_user_state_identification(numero)
@@ -265,6 +284,101 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
             conn.commit()
             return True
     
+#para la solicitud de una prueba de laboratorio
+def update_user_state_lab(numero, state, test=None, rx_or_eco=None):
+    with engine.connect() as conn:
+        print("---------------------entra en update_user_state_lab---------------------")
+        print("el numero: ", numero)
+        print("el status: ", state)
+        print("la especialidad: ", test)
+        print("el nombre_medico: ", rx_or_eco)
+        result = get_user_state_lab(numero)
+        
+        if result["consult"] is not None:
+            if test:
+                print("entra en el if de test")
+                if test not in ["1", "2", "3", "4", "5", "6"]:
+                    return False
+                elif test == "1":
+                    print("entra en 1")
+                    conn.execute(
+                        update(user_state_laboratory)
+                        .where(user_state_laboratory.c.numero == numero)
+                        .values(numero=numero, state=state, test='Prueba de Sangre')
+                    )
+                    conn.commit()
+                elif test == "2":
+                    print("entra en 2")
+                    conn.execute(
+                        update(user_state_laboratory)
+                        .where(user_state_laboratory.c.numero == numero)
+                        .values(numero=numero, state=state, test='Prueba de Orina')
+                    )
+                    conn.commit()
+                elif test == "3":
+                    print("entra en 3")
+                    conn.execute(
+                        update(user_state_laboratory)
+                        .where(user_state_laboratory.c.numero == numero)
+                        .values(numero=numero, state=state, test='Prueba de Eces')
+                    )
+                    conn.commit()
+                elif test == "4":
+                    print("entra en 4")
+                    conn.execute(
+                        update(user_state_laboratory)
+                        .where(user_state_laboratory.c.numero == numero)
+                        .values(numero=numero, state=state, test='Prueba de COVID-19')
+                    )
+                    conn.commit()
+                elif test == "5":
+                    print("entra en 5")
+                    conn.execute(
+                        update(user_state_laboratory)
+                        .where(user_state_laboratory.c.numero == numero)
+                        .values(numero=numero, state=state, test='Placa de Torax')
+                    )
+                    conn.commit()
+                elif test == "6":
+                    print("entra en 6")
+                    conn.execute(
+                        update(user_state_laboratory)
+                        .where(user_state_laboratory.c.numero == numero)
+                        .values(numero=numero, state=state, test='Imagenología')
+                    )
+                    conn.commit()
+                return True                
+            elif rx_or_eco:
+                print("entra en eco o rayos x")
+                if rx_or_eco not in ["ideco", "idrayosrx"]:
+                    print("entra en el if del regex")
+                    return False
+                print("pasa el if del regex")
+                if rx_or_eco == "ideco":
+                    conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero == numero)
+                                .values(numero=numero, state=state, eco=True, rx=False))
+                    conn.commit()
+                else:
+                    conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero == numero)
+                                .values(numero=numero, state=state, eco=False, rx=True))
+                    conn.commit()
+                print("actualiza los datos")
+                return True
+            else:
+                print("entra en el else donde no consigue parametros")
+                conn.execute(
+                    update(user_state_laboratory)
+                    .where(user_state_laboratory.c.numero == numero)
+                    .values(numero=numero, state=state)
+                )
+                conn.commit()
+                return True
+        else:   
+            print("entra en el else ")        
+            conn.execute(user_state_laboratory.insert().values(numero=numero, state=state))
+            conn.commit()
+            return True
+        
 def verify_user(numero):
     with engine.connect() as conn:
         
