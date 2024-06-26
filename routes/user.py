@@ -111,7 +111,7 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if nombre:
-                if not re.fullmatch(r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$', nombre):
+                if not re.fullmatch(r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$', nombre) or len(nombre) < 3:
                     return False
                 conn.execute(
                     update(user_state_register)
@@ -121,7 +121,7 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if apellido:
-                if not re.fullmatch(r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$', apellido):
+                if not re.fullmatch(r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$', apellido) or len(apellido) < 3:
                     return False
                 conn.execute(
                     update(user_state_register)
@@ -131,7 +131,7 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
                 conn.commit()
                 
             if cedula:
-                if not re.fullmatch(r'\d{7,}', cedula):
+                if not re.fullmatch(r'\d{7,}', cedula) or len(cedula) < 7 or len(cedula) > 9:
                     return False
                 conn.execute(
                     update(user_state_register)

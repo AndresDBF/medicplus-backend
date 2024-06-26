@@ -25,7 +25,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -49,7 +49,7 @@ def get_info_identification_telemedicine(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Gracias por escoger nuestro servicio de telemedicina 📞\n\nPor favor me indicas tu numero de identidad y buscare en el sistema que tipo de afiliado eres.👨🏻‍💻"
+            "body": "Por favor me indicas tu numero de identidad y buscare en el sistema que tipo de afiliado eres.👨🏻‍💻"
         }
     }    
     print("envia el mensaje principal")
@@ -70,7 +70,7 @@ def send_information_for_telemedicine(numero, cedula):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"No he encontrado en el sistema el número de identidad que me has proporcionado, sin embargo puedes decidir entre las siguientes opciones.\n\n☑️Puedes volver a darme tu identificación y realizaré nuevamente la busqueda en el sistema.👨🏻‍💻 \n\n☑️Puedes unirte a nuestro grupo de afiliados de medic plus presionando el boton 'Quiero ser Afiliado'👨🏼‍💼🧑🏻‍💼🔵 \n\n☑️Puedes volver al inicio si deseas↩️"
+                        "text": f"No he encontrado en el sistema el número de identidad que me has proporcionado, puedes realizar lo siguiente:.\n\n☑️Puedes volver a darme tu identificación y realizaré nuevamente la busqueda en el sistema.👨🏻‍💻 \n\n☑️Puedes unirte a nuestro grupo de afiliados de MedicPlus presionando el boton Quiero ser Afiliado👨🏼‍💼🧑🏻‍💼🔵 \n\n☑️Puedes volver al inicio si deseas↩️"
                     },
                     "action": {
                         "buttons":[
@@ -147,7 +147,7 @@ def get_info_telemedicine_attention(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "¿Desea Generar una Alarma para ser llamado?📞 \n\nsi seleccionas Si☑️ en minutos recibirias una llamada de uno de nuestros operadores disponibles que cubrirá tu servicio de telemedicina📞👨🏼‍⚕️ \n\nSi seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️.  "
+                "text": "¿Deseas Generar una Alarma para ser llamado?📞 \n\nsi seleccionas Si☑️ en minutos recibirias una llamada de uno de nuestros operadores disponibles que cubrirá tu servicio de telemedicina📞👨🏼‍⚕️ \n\nSi seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️.  "
             },
             "action": {
                 "buttons":[

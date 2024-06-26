@@ -28,7 +28,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -56,7 +56,7 @@ def principal_message(numero):
         "interactive": {
             "type": "button",
             "body": {
-                "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud.\n\nDurante el transcurso de tus solicitudes te brindaré variedad de opciones a traves de botones 🔵☑️ por lo que no tendrás necesidad de escribir, enviar audios o imagenes en su mayoria ¡Selecciona una opción para comenzar!"
+                "text": "¡Hola!👋🏼 Soy MedicBot🤖, tu asistente virtual de salud. ¿En qué puedo ayudarte hoy? Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud.\n\nDurante el transcurso de tus solicitudes te brindaré variedad de opciones a traves de botones, por lo que no tendrás necesidad de escribir, enviar audios o imagenes en su mayoria. ¡Selecciona una opción para comenzar!"
             },
             "action": {
                 "buttons": [
@@ -329,7 +329,7 @@ def decline_action(numero):
         "interactive": {
             "type": "button",
             "body": {
-                "text": "He cancelado tu solicitud🩺. ¿En que puedo ayudarte nuevamente?📝."
+                "text": "He cancelado tu proceso🩺. ¿En que puedo ayudarte nuevamente?📝."
             },
             "action": {
                 "buttons": [
@@ -384,7 +384,7 @@ def goodbye_message(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Ha sido un placer ofrecerte mi ayuda 🤖, en Medic Plus cumplimos por velar el bienestar de nuestros Afiliados👨🏼‍⚕️☑️  puedes contactar conmigo cuando desees 📲 y con gusto serás atendido👨🏻‍💻"
+            "body": "Ha sido un placer ofrecerte mi ayuda 🤖, en MedicPlus cumplimos por velar el bienestar de nuestros Afiliados👨🏼‍⚕️☑️  puedes contactar conmigo cuando desees 📲 y con gusto serás atendido👨🏻‍💻"
         }
     }    
     print("envia el mensaje principal")

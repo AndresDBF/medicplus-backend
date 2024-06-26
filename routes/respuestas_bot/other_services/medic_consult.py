@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -51,7 +51,7 @@ def get_list_speciality(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Gracias por escoger nuestro servicio de Consultas Médicas 🩻 \n\nComencemos escogiendo algunas de nuestras especialidades disponibles y en breves minutos podré agendar tu cita📆. Estas son nuestras especialidades disponibles:\n1. Médico General\n2. Pediatría \n3. Traumatología \n4. Neumología \n5. Neurología \n6. Cardiología \nPuedes escribirme el número correspondiente a la especialidad y continuaré con el proceso."
+            "body": "Gracias por escoger nuestro servicio de Consultas Médicas 🩻 \n\Indicame el número de algunas de nuestras especialidades disponibles y en breves minutos podré agendar tu cita📆. Estas son nuestras especialidades disponibles:\n1. Médico General\n2. Pediatría \n3. Traumatología \n4. Neumología \n5. Neurología \n6. Cardiología \n"
         }
     }   
     enviar_mensajes_whatsapp(data)
@@ -127,7 +127,7 @@ def get_names_especialitys(numero, especialidad):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente al plan que te he propuesto🤖👨🏻‍💻"
+                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a la especialidad que te he propuesto🤖👨🏻‍💻"
             }
         }
         enviar_mensajes_whatsapp(data)
@@ -151,7 +151,7 @@ def save_appointment(numero, nombre_medico):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"El costo total de la consulta es de 30$💸\n¿Desea Agendar la cita con el especialista en {name_esp.nom_esp}?  \n\nSi confirmas la consulta, transferiré tu solicitud hacia la persona encargada de citas.\n\nPuedes cancelar la solicitud presionando el boton de Volver al inicio↩️"
+                    "text": f"El costo total de la consulta es de 30$💸\n¿Deseas Agendar la cita con el especialista en {name_esp.nom_esp}?  \n\nSi confirmas la consulta, transferiré tu solicitud hacia la persona encargada de citas.\n\nPuedes cancelar la solicitud presionando el boton No❌ o Volver al inicio↩️"
                 },
                 "action": {
                     "buttons":[
@@ -191,7 +191,7 @@ def save_appointment(numero, nombre_medico):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
+                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a los doctores que te he propuesto🤖👨🏻‍💻"
             }
         }
         enviar_mensajes_whatsapp(data)

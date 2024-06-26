@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -55,7 +55,7 @@ def get_plan(numero):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "¡Buena Elección!, Te Guiaré los pasos que deberas seguir para formar parte de nuestros Afiliados en Medic Plus🩺👨🏼‍⚕️\nComenzamos Escogiendo un plan en el que te gustaria pertenecer, puedes escoger alguno escribiendo el numero correspondiente al plan #️⃣\n1. Plan 1.\n2. Plan 2.\n3. Plan 3.\n4. Plan 4.\n5. Plan 5."
+                "body": "Gracias por decidir formar parte del grupo de Afiliados de MedicPlus, Te Guiaré los pasos que deberas seguir para formar parte de nuestro equipo🩺👨🏼‍⚕️\nComenzamos Escogiendo un plan en el que te gustaria pertenecer, puedes escoger alguno escribiendo el número correspondiente al plan #️⃣\n1. Plan 1.\n2. Plan 2.\n3. Plan 3.\n4. Plan 4.\n5. Plan 5."
             }
         }
         enviar_mensajes_whatsapp(data)
@@ -151,7 +151,7 @@ def insert_name(numero, texto):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda ingresar el nombre utilizando solamente letras para continuar con el proceso🤖👨🏻‍💻"
+                "body": "No comprendí muy bien tu respuesta, recuerda ingresar un nombre mayor a 2 caracteres y utilizando solamente letras para continuar con el proceso🤖👨🏻‍💻"
             }
         }
         enviar_mensajes_whatsapp(data)
@@ -167,7 +167,7 @@ def insert_last_name(numero, texto):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "Perfecto. Por favor envía tu cédula:"
+                "body": "Por favor envía tu cédula de identidad:"
             }
         }
         enviar_mensajes_whatsapp(data)
@@ -180,7 +180,7 @@ def insert_last_name(numero, texto):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda ingresar el apellido utilizando solamente letras para continuar con el proceso🤖👨🏻‍💻"
+                "body": "No comprendí muy bien tu respuesta, recuerda ingresar un apellido mayor a 2 caracteres y utilizando solamente letras para continuar con el proceso🤖👨🏻‍💻"
             }
         }
         enviar_mensajes_whatsapp(data)
@@ -197,7 +197,7 @@ def insert_identification(numero, texto):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "Muy bien. Finalmente, por favor envía tu correo electrónico:"
+                "body": "Finalmente, por favor envía tu correo electrónico:"
             }
         }
         enviar_mensajes_whatsapp(data)    
@@ -240,7 +240,7 @@ def insert_email(numero, texto, user):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": "Su informacion ha sido registrada exitosamente.📝 uno de nuestros asesores de ventas 🧑🏻‍💼👨🏼‍💼 se pondra en contacto con usted en la brevedad posible."
+                    "text": "He procesado tu información exitosamente.📝 uno de nuestros asesores de ventas 🧑🏻‍💼👨🏼‍💼 se pondrá en contacto contigo en la brevedad posible."
                 },
                 "action": {
                     "buttons": [

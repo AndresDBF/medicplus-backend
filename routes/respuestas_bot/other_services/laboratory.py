@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -50,7 +50,7 @@ def get_service_lab(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Por favor selecciona dentro de estas opciones el número correspondiente a la prueba que deseas realizarte🧬💉\n1. Prueba de Sangre.\n2. Prueba de Orina\n3. Prueba de Eces.\n4. Prueba de COVID-19.\n5. Placa de Torax\n6. Imagenologia."
+            "body": "Selecciona el número correspondiente a la prueba que deseas adquirir🧬💉\n1. Prueba de Sangre.\n2. Prueba de Orina\n3. Prueba de Eces.\n4. Prueba de COVID-19.\n5. Placa de Torax\n6. Imagenologia."
         }
     }   
     enviar_mensajes_whatsapp(data)
@@ -71,7 +71,7 @@ def select_service_lab(numero, test):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"Estas son las opciones disponibles para pruebas de imagenología, selecciona una de ellas."
+                        "text": f"MedicPlus cumple con pruebas de imagenología como Eco y RX🩻, selecciona una de ellas."
                     },
                     "action": {
                         "buttons":[
@@ -104,7 +104,7 @@ def select_service_lab(numero, test):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"La {test} tiene un costo de 30$💸, desea agendar la visita al laboratorio💉? Su confirmacion la agendaré al personal para indicarle disponibilidad📝 "
+                        "text": f"La {test} tiene un costo de 30$💸, ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
                     },
                     "action": {
                         "buttons":[
@@ -157,7 +157,7 @@ def confirm_imaging(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"La prueba de RX tiene un costo de 30$💸, desea agendar la visita al laboratorio💉? Su confirmacion la agendaré al personal para indicarle disponibilidad📝 "
+                    "text": f"La prueba de RX tiene un costo de 30$💸, ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
                 },
                 "action": {
                     "buttons":[
@@ -189,7 +189,7 @@ def confirm_imaging(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"La Prueba de ECO tiene un costo de 30$💸, desea agendar la visita al laboratorio💉? Su confirmacion la agendaré al personal para indicarle disponibilidad📝 "
+                    "text": f"La Prueba de ECO tiene un costo de 30$💸, ¿Desea agendar la visita al laboratorio💉? Su confirmación la agendaré al personal para indicarle disponibilidad📝 "
                 },
                 "action": {
                     "buttons":[
@@ -224,7 +224,7 @@ def confirm_visit_lab(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": f"He programado tu visita al laboratorio y he contactado con el personal de cita, el cual, te indicarán la disponibilidad lo antes posible📢📝"
+                "text": f"He programado tu visita al laboratorio y he contactado con el personal de cita. Pronto te indicarán la disponibilidad de tu solicitud📢📝"
             },
             "action": {
                 "buttons":[

@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -74,7 +74,7 @@ def get_municipality(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idmunicipio1",
-                            "title": "Juan Griego"
+                            "title": "Juangriego"
                         }
                     },
                     {
@@ -173,7 +173,7 @@ def confirm_service(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "El tiempo de respuesta es de 30 minutos ⏳⏰ y el costo es de $30💵, ¿desea confirmar el servicio?"
+                "text": "El tiempo de respuesta es de 30 minutos ⏳⏰ y el costo es de $30💵, ¿Desea confirmar el servicio?"
             },
             "action": {
                 "buttons":[
@@ -215,7 +215,7 @@ def accept_domiciliary(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "El Servicio ha sido confirmado 🩺, un equipo medico va en camino🚑"
+                "text": "El Servicio de atención médica domiciliaria ha sido confirmado 🩺, un equipo medico va en camino🚑"
             },
             "action": {
                 "buttons":[

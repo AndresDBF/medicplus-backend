@@ -26,7 +26,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -50,7 +50,7 @@ def get_list_municipalities(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Dime el municipio al que requieras tu traslado y me pondré en contacto en breves minutos con una unidad disponible🚑\n1. La Asunción\n2. Juangriego\n3. Porlamar\n4. Pampatar\n5. Santa Ana\n6. Punta de Piedra\n7. Altagracia"
+            "body": "Indicame el municipio donde requieres tu traslado y me pondré en contacto en breves minutos con una unidad disponible🚑\n1. La Asunción\n2. Juangriego\n3. Porlamar\n4. Pampatar\n5. Santa Ana\n6. Punta de Piedra\n7. Altagracia"
         }
     }   
     enviar_mensajes_whatsapp(data)
@@ -70,7 +70,7 @@ def select_municipalities(numero, texto):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"El costo del traslado desde el municipio {location} es de 30$, ¿Desea confirmar de inmediato el traslado de la unidad?.🚑"
+                    "text": f"El costo del traslado desde el municipio {location} es de 30$, ¿Deseas confirmar de inmediato el traslado de la unidad?.🚑"
                 },
                 "action": {
                     "buttons":[
@@ -117,24 +117,17 @@ def confirm_ambulance(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": f"He generado una alarma inmediata a una unidad disponible 📢 en breves minutos será contactado por nuestro personal para el cobro del translado de la ambulancia📲💸"
+                "text": f"He generado una alarma inmediata a una unidad disponible 📢 en breves minutos serás contactado por nuestro personal para el cobro del translado de la ambulancia📲💸"
             },
             "action": {
                 "buttons":[
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "idconfirmvisit",
-                            "title": "Confirmar Visita"
+                            "id": "idvolver",
+                            "title": "Volver al Inicio"
                         }
                     },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idcancelvisit",
-                            "title": "Cancelar Visita"
-                        }
-                    }
                 ]
             }
         }

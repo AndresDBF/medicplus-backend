@@ -339,8 +339,6 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif "idcancelambulance" in texto:
         cancel_ambulance(numero)
         return True
-        
-    
     
     else:
         print("entra en el else final donde no entiende ningun mensaje ")

@@ -27,7 +27,7 @@ def enviar_mensajes_whatsapp (data):
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer EAAOJtyjmw9EBO6uqJ5DXrNx0Ead4zZBAYLWw9KJ5JbRY8MiaYNj7wQmctyt3C5FzosjRnikFQbmU4ajsJ46HlbXygDodryt1i8Qp4zfEd4rPRMFwXpzZBBUdFE79YA9yD9qT70i6I2FFbyyEP1hKOCa6yeBZCzYJdm7Ea3I56sMGZCKbqsvIFrOvSX1cVmyjZAu7zsxhd72E6oYZC3CAWw8gZDZD"
+        "Authorization": "Bearer EAAOJtyjmw9EBOZByqoX5nS8L2dJbFNigZCdtgEBFBD9oo4gm1hCZCc9I5KT9IsgO64RnsVrwCap3SvIbEiSbjxgxlnzcupQWwStLVaMivkKJt6sTP7DZBZA8dDFteWPpVPncZCaKbRoxWxHt4uLZAYpXmSOTSFNfiKuDDgNuZBMJVbaDZBTV0iNYZAOYUWn87K4xWF5BCk3ZB0O74L0bDY1fuUZD"
     }
     
     connection = http.client.HTTPSConnection("graph.facebook.com")
@@ -55,7 +55,7 @@ def question_affilate(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": f"Gracias por seleccionar nuestro servicio de Atención Médica Inmediata👨🏼‍⚕️, Primeramente me gustaria que me indicaras si eres Afiliado de Medic Plus🩺"
+                "text": f"Gracias por seleccionar nuestro servicio de Atención Médica Inmediata👨🏼‍⚕️, indicame si eres Afiliado de MedicPlus🩺"
             },
             
             "action": {
@@ -98,7 +98,7 @@ def get_info_identification_attention_primary(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Estoy para brindarte la atención médica al instante 🚑🩺\n\n Por favor me indicas tu número de identidad y buscaré en el sistema que tipo de afiliado eres.👨🏻‍💻"
+            "body": "Por favor me indicas tu número de identidad y buscaré en el sistema que tipo de afiliado eres.👨🏻‍💻"
         }
     }    
     print("envia el mensaje principal")
@@ -193,7 +193,7 @@ def get_info_primary_attention(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "¿Desea Generar una Alarma para ser llamado?📞 \n\nSí seleccionas Si☑️ en minutos recibirás una llamadas de uno de nuestros operadores disponibles, con el fin de cubrir tu atención médica inmediata.👨🏼‍⚕️ \n\nSí seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️."
+                "text": "¿Deseas Generar una Alarma para ser llamado?📞 \n\nSí seleccionas Si☑️ en minutos recibirás una llamadas de uno de nuestros operadores disponibles que cubriran tu servicio👨🏼‍⚕️ \n\nSí seleccionas No❌ daremos por cancelada tu petición. \n\nPuedes volver a la pantalla principal Presionando el botón Volver al inicio↩️."
             },
             "action": {
                 "buttons":[
@@ -270,7 +270,7 @@ def confirm_call(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "He generado la alarma hacia nuestros operadores 📢 Tomando en cuenta tu número telefónico📱, recibirás una llamada en los proximos minutos📞⌚"
+                "text": "He generado la alarma hacia nuestros operadores 📢, recibirás una llamada en los proximos minutos📞⌚"
             },
             "action": {
                 "buttons":[
