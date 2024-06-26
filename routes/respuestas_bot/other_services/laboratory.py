@@ -252,7 +252,7 @@ def cancel_visit_lab(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": f"Tu visita ha sido Cancelada ❌ Puedo Agendarte otra visita a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorios📍"
+                "text": f"Tu visita ha sido Cancelada ❌ Puedo Agendarte otra visita a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorio📍"
             },
             "action": {
                 "buttons":[

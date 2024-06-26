@@ -163,7 +163,7 @@ def get_services(numero):
                 {
                     "type": "reply",
                     "reply": {
-                        "id": "ambula",
+                        "id": "idambula",
                         "title": "Ambulancia"
                     }
                 },

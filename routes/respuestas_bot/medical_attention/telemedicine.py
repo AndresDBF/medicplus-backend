@@ -263,7 +263,7 @@ def cancel_telemedicine(numero):
                     {
                         "type": "reply",
                         "reply": {
-                            "id": "ambula",
+                            "id": "idambula",
                             "title": "Ambulancia"
                         }
                     },
