@@ -25,6 +25,7 @@ from routes.respuestas_bot.other_services.medic_consult import get_list_speciali
 from routes.respuestas_bot.other_services.laboratory import get_service_lab, select_service_lab, send_service_location, confirm_visit_lab, cancel_visit_lab, confirm_domiciliary_lab, cancel_domiciliary_lab
 from routes.respuestas_bot.other_services.ambulance import get_list_municipalities, select_municipalities, confirm_ambulance, cancel_ambulance
 from routes.respuestas_bot.other_services.call_oper import question_operator, confirm_oper, cancel_oper
+from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, verify_rx, verify_eco, confirm_rx, confirm_eco, cancel_test
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -262,9 +263,11 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     #LABORATORIOS
     elif user_lab["state"] == "WAITING_FOR_TEST":
+        print("entra para enviar send_service_location")
         send_service_location(numero, texto)
         return True
     elif user_lab["state"] == "WAITING_FOR_LOCATION":
+        print("entra en selec service lab")
         select_service_lab(numero, texto)
         return True   
     
@@ -339,6 +342,32 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif "iddeclineconsult" in texto:
         cancel_consult(numero)
         return True
+
+#------------------------------------------------IMAGENOLOGIA----------------------------------------------------------------------- 
+    elif "idimagenologia" in texto:
+        get_eco_or_rx(numero)
+        return True
+    #seleccionando eco o rx
+    elif "idtestrx" in texto:
+        verify_rx(numero)
+        return True
+    elif "idtesteco" in texto:
+        verify_eco(numero)
+        return True
+    #confirmar el rx
+    elif "idconfirmrx" in texto:
+        confirm_rx(numero)
+        return True
+   
+    #confirmar el eco
+    elif "idconfirmeco" in texto:
+        confirm_eco(numero)
+        return True
+    
+    #cancelar solicitud
+    elif "idcanceleco" in texto or "idcancelrx" in texto:
+        cancel_test(numero)
+        return True
 #------------------------------------------------LLAMAR UN OPERADOR-----------------------------------------------------------------------
     
     elif "idcalloper" in texto:
@@ -358,15 +387,19 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         get_service_lab(numero)
         return True
     elif "idconfirmvisit" in texto:
+        print("entra en que confirma la visita al laboratorio")
         confirm_visit_lab(numero)
         return True
     elif "idcancelvisit" in texto:
+        print("entra en que cancela la visita al laboratorio")
         cancel_visit_lab(numero)
         return True
     elif "idconfirmequip" in texto:
+        print("entra en que confirma el domicilio del laboratorio")
         confirm_domiciliary_lab(numero)
         return True
     elif "idcancelequip" in texto:
+        print("entra en que cancela el domicilio del laboratorio")
         cancel_domiciliary_lab(numero)
         return True
     

@@ -50,7 +50,7 @@ def get_service_lab(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Selecciona el número correspondiente a la prueba que deseas adquirir🧬💉\n1. Prueba de Sangre.\n2. Prueba de Orina\n3. Prueba de Eces.\n4. Prueba de COVID-19.\n5. Placa de Torax\n6. Imagenologia."
+            "body": "Selecciona el número correspondiente a la prueba que deseas adquirir🧬💉\n1. Prueba de Sangre.\n2. Prueba de Orina\n3. Prueba de Eces.\n4. Prueba de COVID-19.\n5. Placa de Torax."
         }
     }   
     enviar_mensajes_whatsapp(data)
@@ -74,7 +74,7 @@ def send_service_location(numero, test):
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "idconfirmdomi",
+                                "id": "idconfirmdomilab",
                                 "title": "Pedir Domicilio"
                             }
                         },
@@ -108,45 +108,47 @@ def send_service_location(numero, test):
         return True 
 
 def select_service_lab(numero, texto):
-    if texto == "idconfirmdomi":
-        update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_LAB', confirm_domi=True)
-    
-        with engine.connect() as conn:
+    with engine.connect() as conn:
             test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)
                                 .order_by(user_state_laboratory.c.created_at.asc())).scalar()
+    if texto == "idvisitlab":
+        print("entra en el if de selec service lab")
+        update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_LAB', confirm_domi=False)
         
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"La {test.test} tiene un costo de 30$💸 , ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmvisit",
-                                    "title": "Confirmar Visita"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idcancelvisit",
-                                    "title": "Cancelar Visita"
-                                }
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": f"La {test} tiene un costo de 30$💸 , ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconfirmvisit",
+                                "title": "Confirmar Visita"
                             }
-                        ]
-                    }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idcancelvisit",
+                                "title": "Cancelar Visita"
+                            }
+                        }
+                    ]
                 }
-            }  
-            enviar_mensajes_whatsapp(data)
-            return True
+            }
+        }  
+        enviar_mensajes_whatsapp(data)
+        return True
     else:
+        update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_LAB', confirm_domi=True)
+        print("entra en el else de selec service lab")
         data = {
                 "messaging_product": "whatsapp",
                 "to": numero,
@@ -154,7 +156,7 @@ def select_service_lab(numero, texto):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"La {test.test} tiene un costo de 30$ junto con una recarga de 10$ del domicilio 💸, ¿Deseas confirmar el traslado del equipo médico💉?"
+                        "text": f"La {test} tiene un costo de 30$ junto con una recarga de 10$ del domicilio 💸, ¿Deseas confirmar el traslado del equipo médico💉?"
                     },
                     "action": {
                         "buttons":[

@@ -82,7 +82,7 @@ def get_user_state_lab(numero):
         result = conn.execute(select(user_state_laboratory).where(user_state_laboratory.c.numero == numero)).fetchone()
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "test", "eco", "rx", "fecha_y_hora"]
+            columns = ["numero", "state", "test", "domicilio","fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
         
@@ -474,9 +474,9 @@ def update_user_state_lab(numero, state, test=None, confirm_domi=None):
                     conn.commit()
                 return True       
             elif confirm_domi:
-                print("entra en confirmar el domicilio")
+                print("entra en el elif de confirmar y actualizar el domicilio")
                 conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)
-                             .values(domicilio=True))
+                             .values(numero=numero, state=state, domicilio=True))
                 conn.commit()
             else:
                 print("entra en el else donde no consigue parametros")
