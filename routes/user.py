@@ -5,9 +5,11 @@ from models.usuarios import usuarios
 from models.user_roles import user_roles
 from models.user_state_register import user_state_register
 from models.user_state_attention import user_state_attention
+from models.user_state_domiciliary import user_state_domiciliary
 from models.user_state_especiality import user_state_especiality
 from models.user_state_lab import user_state_laboratory
 from models.user_state_ambulance import user_state_ambulance
+
 
 from sqlalchemy import select, insert, update
 
@@ -55,6 +57,20 @@ def get_user_state_especiality(numero):
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
         
+            return result_dict
+        else:
+            return {"consult": None}
+
+#para tomar el status de la solicitud de atencion domiciliaria
+def get_user_state_domiciliary(numero):
+    print("---------------------entra en get_user_state_domiciliary---------------------")
+    with engine.connect() as conn:
+        result = conn.execute(select(user_state_domiciliary).where(user_state_domiciliary.c.numero == numero)).fetchone()
+        if result is not None:
+            # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
+            columns = ["numero", "state", "location", "confirm", "fecha_y_hora"]
+            result_dict = dict(zip(columns, result))
+            result_dict["consult"] = True
             return result_dict
         else:
             return {"consult": None}
@@ -202,6 +218,100 @@ def get_user_state_identification_register(numero, state, cedula=None):
         else:
            
             conn.execute(user_state_attention.insert().values(numero=numero, state=state))
+            conn.commit()
+            return True
+
+#para la solicitud de atencion medica domiciliaria 
+#QUEDA PENDIENTE REALIZAR ESTA FUNCION PARA CAMBIAR LOS BOTONES DE LA DOMICILIARIA
+def update_user_state_domiciliary(numero, state, municipalities=None, confirm=None):
+    with engine.connect() as conn:
+        print("---------------------entra en update_user_state_lab---------------------")
+        print("el numero: ", numero)
+        print("el status: ", state)
+        print("el municipio: ", municipalities)
+        
+        result = get_user_state_ambulance(numero)
+        
+        if result["consult"] is not None:
+            if municipalities:
+                print("entra en el if de test")
+                if municipalities not in ["1", "2", "3", "4", "5", "6", "7"]:
+                    return False
+                elif municipalities == "1":
+                    print("entra en 1")
+                    conn.execute(
+                        update(user_state_ambulance)
+                        .where(user_state_ambulance.c.numero == numero)
+                        .values(numero=numero, state=state, location='La Asunción')
+                    )
+                    conn.commit()
+                elif municipalities == "2":
+                    print("entra en 2")
+                    conn.execute(
+                        update(user_state_ambulance)
+                        .where(user_state_ambulance.c.numero == numero)
+                        .values(numero=numero, state=state, location='Juangriego')
+                    )
+                    conn.commit()
+                elif municipalities == "3":
+                    print("entra en 3")
+                    conn.execute(
+                        update(user_state_ambulance)
+                        .where(user_state_ambulance.c.numero == numero)
+                        .values(numero=numero, state=state, location='Porlamar')
+                    )
+                    conn.commit()
+                elif municipalities == "4":
+                    print("entra en 4")
+                    conn.execute(
+                        update(user_state_ambulance)
+                        .where(user_state_ambulance.c.numero == numero)
+                        .values(numero=numero, state=state, location='Pampatar')
+                    )
+                    conn.commit()
+                elif municipalities == "5":
+                    print("entra en 5")
+                    conn.execute(
+                        update(user_state_ambulance)
+                        .where(user_state_ambulance.c.numero == numero)
+                        .values(numero=numero, state=state, location='Santa Ana')
+                    )
+                    conn.commit()
+                elif municipalities == "6":
+                    print("entra en 6")
+                    conn.execute(
+                        update(user_state_ambulance)
+                        .where(user_state_ambulance.c.numero == numero)
+                        .values(numero=numero, state=state, location='Punta de Piedra')
+                    )
+                    conn.commit()
+                elif municipalities == "7":
+                    print("entra en 7")
+                    conn.execute(
+                        update(user_state_ambulance)
+                        .where(user_state_ambulance.c.numero == numero)
+                        .values(numero=numero, state=state, location='Altagracia')
+                    )
+                    conn.commit()
+                return True                
+            elif confirm:
+                print("entra en confirmacion")
+                conn.execute(user_state_ambulance.update().where(user_state_ambulance.c.numero == numero)
+                            .values(numero=numero, state=state, confirm=True))
+                conn.commit()
+                return True
+            else:
+                print("entra en el else donde no consigue parametros")
+                conn.execute(
+                    update(user_state_ambulance)
+                    .where(user_state_ambulance.c.numero == numero)
+                    .values(numero=numero, state=state)
+                )
+                conn.commit()
+                return True
+        else:   
+            print("entra en el else ")        
+            conn.execute(user_state_ambulance.insert().values(numero=numero, state=state))
             conn.commit()
             return True
 
@@ -394,6 +504,7 @@ def update_user_state_lab(numero, state, test=None, rx_or_eco=None):
             conn.commit()
             return True
 
+#para la solicitud de una ambulancia 
 def update_user_state_ambulance(numero, state, municipalities=None, confirm=None):
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_lab---------------------")

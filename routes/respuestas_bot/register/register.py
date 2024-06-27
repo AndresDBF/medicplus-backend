@@ -1,4 +1,3 @@
-
 import json
 import http
 from database.connection import engine
@@ -98,6 +97,105 @@ def get_plan(numero):
         enviar_mensajes_whatsapp(data)
         get_user_state_identification_register(numero, 'INIT')
         return True
+
+#funcion en caso de que quiera pedir los planes y ya se encuentre registrado
+def is_affiliate(numero):
+    with engine.connect() as conn:
+        user = conn.execute(select(usuarios.c.plan).select(usuarios).where(usuarios.c.tel_usu==numero)).first()
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "text",
+        "text": {
+            "preview_url": False,
+            "body": f"Contamos con tu registro en nuestro sistema como afiliado de Medic Plus con el plan {user.plan}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
+        }
+    }
+    print("envia el mensaje principal 1")
+    enviar_mensajes_whatsapp(data)
+    
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": "Atenciones Médicas"
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idatenmedicpri",
+                            "title": "Inmediata"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idtelemed",
+                            "title": "Telemedicina"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idatenmeddomi",
+                            "title": "Domiciliaria"
+                        }
+                    },
+                ]
+            }
+        }
+    }
+    print("envia el mensaje principal 2")
+    enviar_mensajes_whatsapp(data)
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": "Otros Servicios."
+            },
+            "action": {
+            "buttons":[
+                {
+                    "type": "reply",
+                    "reply": {
+                        "id": "idconmed",
+                        "title": "Consultas Médicas"
+                    }
+                },
+                {
+                    "type": "reply",
+                    "reply": {
+                        "id": "idlabori",
+                        "title": "Laboratorio"
+                    }
+                },
+                {
+                    "type": "reply",
+                    "reply": {
+                        "id": "idambula",
+                        "title": "Ambulancia"
+                    }
+                },
+            ]
+        }
+    }
+    }
+                
+    print("envia el mensaje principal 3")
+    enviar_mensajes_whatsapp(data)
+    return True
+
 
 def insert_plan(numero, texto):
     result = get_user_state_register(numero, 'WAITING_FOR_NAME', plan=texto)

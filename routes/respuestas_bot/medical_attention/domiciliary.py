@@ -42,9 +42,21 @@ def enviar_mensajes_whatsapp (data):
         print(f"Exception: {e}")
         agregar_mensajes_log(f"Exception al enviar mensaje: {e}")
     finally:
-        connection.close()
+        connection.close() 
         
 def get_municipality(numero):
+    """ data = {
+        "messaging_product": "whatsapp",
+        "to": numero,
+        "text": {
+            "preview_url": False,
+            "body": "Indicame el municipio donde requieres tu traslado y me pondré en contacto en breves minutos con una unidad disponible🚑\n1. La Asunción\n2. Juangriego\n3. Porlamar\n4. Pampatar\n5. Santa Ana\n6. Punta de Piedra\n7. Altagracia"
+        }
+    }   
+    enviar_mensajes_whatsapp(data)
+    update_user_state_ambulance(numero, 'WAITING_FOR_MUNICIPALITI')
+    return True """
+
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",

@@ -14,7 +14,8 @@ from routes.user import get_user_state, get_user_state_register, verify_user, ge
 
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan_service, cancel_button, goodbye_message
-from routes.respuestas_bot.register.register import get_plan, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
+from routes.respuestas_bot.register.register import get_plan, is_affiliate, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
+from routes.respuestas_bot.register.plan import get_list_plan, send_info_plan
 #atenciones medicas
 from routes.respuestas_bot.medical_attention.primary import get_info_identification_attention_primary, get_information_for_identification, get_info_primary_attention, confirm_call, cancel_call, question_affilate
 from routes.respuestas_bot.medical_attention.telemedicine import get_info_identification_telemedicine, send_information_for_telemedicine
@@ -200,6 +201,15 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         insert_email(numero, texto, user_register)
         return True
     
+    elif user_register["state"] == 'REGISTERED':
+        print("entra para ingresar el correo del usuario")
+        is_affiliate(numero)
+        return True
+    
+    #status para la solicitud de planes
+    elif user_register["state"] == "WAITING_FOR_SERVICE_PLAN":
+        send_info_plan(numero, texto)
+        return True
     
     #status al pedir la cedula de identidad 
     #para la atencion medica inmediata
@@ -244,7 +254,10 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     elif "idplanes" in texto:
         print("entra en planes")
-        get_plan_service(numero)
+        get_list_plan(numero)
+        return True
+    elif "idconfirmplan" in texto:
+        insert_plan(numero, texto)
         return True
     
 #---------------------------respuestas a selecciones de los servicios-------------------------
