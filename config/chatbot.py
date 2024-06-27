@@ -10,12 +10,12 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 
-from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification,get_user_state_especiality, get_user_state_lab, get_user_state_ambulance, get_user_state_identification_register, update_user_state_especiality, update_user_state_lab, update_user_state_ambulance
+from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_domiciliary, get_user_state_especiality, get_user_state_lab, get_user_state_ambulance, get_user_state_identification_register, update_user_state_domiciliary, update_user_state_especiality, update_user_state_lab, update_user_state_ambulance
 
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan_service, cancel_button, goodbye_message
 from routes.respuestas_bot.register.register import get_plan, is_affiliate, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
-from routes.respuestas_bot.register.plan import get_list_plan, send_info_plan
+from routes.respuestas_bot.register.plan import get_list_plan, send_info_plan, send_name_affiliate
 #atenciones medicas
 from routes.respuestas_bot.medical_attention.primary import get_info_identification_attention_primary, get_information_for_identification, get_info_primary_attention, confirm_call, cancel_call, question_affilate
 from routes.respuestas_bot.medical_attention.telemedicine import get_info_identification_telemedicine, send_information_for_telemedicine
@@ -96,7 +96,7 @@ saludos = [
     'hola', 'buenas', 'buenos', 'hi', 'hello', 'hey', 
     'saludos', 'buenos días', 'buenas tardes', 'buenas noches', 
     'qué tal', 'holi', 'holis', 'qué onda', 'cómo estás', 
-    'qué pasa', 'qué hay', 'qué cuentas', 'buen día', 'ayuda', 'necesito', 'consejo', 'cita', 'informacion', 'quiero'
+    'qué pasa', 'qué hay', 'qué cuentas', 'buen día', 'informacion'
 ]
 
 cancelaciones = [
@@ -118,6 +118,9 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     #consulta para tomar el status del usuario en la solicitud de consulta 
     user_consult = get_user_state_especiality(numero)
+    
+    #consulta para tomar el status del usuario en la solicitud de atencion medica domiciliaria 
+    user_team_medic = get_user_state_domiciliary(numero)
     
     #consulta para tomar el status del usuario en la solicitud de laboratorios
     user_lab = get_user_state_lab(numero) 
@@ -143,6 +146,9 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     if user_ambulance["consult"] is None:
         update_user_state_ambulance(numero, 'INIT')
+    
+    if user_team_medic["consult"] is None:
+        update_user_state_domiciliary(numero, 'INIT')
         
     print("pasa el if del user null")
     print("este es el user state: ", user_id)
@@ -150,6 +156,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     print("este es el user consult: ", user_consult)
     print("este es el user lab: ", user_lab)
     print("este es el user ambulance: ", user_ambulance)
+    print("este es el user team medic: ", user_team_medic)
     
     
     texto = texto.lower()
@@ -157,6 +164,22 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     if "idvolver" in texto:
         return_button(numero)
+        return True
+    
+    #----------------------------seleccion de las primeras opciones de servicios o planes --------------------------------------------------
+    elif "idservicios" in texto:
+        print("entra en seleccion de servicios")
+        get_services(numero)
+        return True
+    
+    elif "idplanes" in texto:
+        print("entra en planes")
+        get_list_plan(numero)
+        return True
+    
+    elif "idconfirmplan" in texto:
+        print("entra en idconfirmplan")
+        send_name_affiliate(numero)
         return True
 
 #---------------------------------VALIDANDO LOS BOTONES ---------------------------------------------------------------------
@@ -201,13 +224,11 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         insert_email(numero, texto, user_register)
         return True
     
-    elif user_register["state"] == 'REGISTERED':
-        print("entra para ingresar el correo del usuario")
-        is_affiliate(numero)
-        return True
+
     
     #status para la solicitud de planes
-    elif user_register["state"] == "WAITING_FOR_SERVICE_PLAN":
+    elif user_register["state"] == "WAITING_FOR_SERVICE_PLAN" or texto == "idplanes":
+        print("entra en ver los planes")
         send_info_plan(numero, texto)
         return True
     
@@ -224,6 +245,11 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         print("entra para mostrar la respuesta de telemedina")
         send_information_for_telemedicine(numero,texto)   
         return True
+   
+    #para atencion medica domiciliaria 
+    elif user_team_medic["state"] == "WAITING_FOR_MUNICIPALITI_DOMI":
+        confirm_service(numero, texto)
+        return True    
     
     
     #para las solicitudes de consultas 
@@ -244,20 +270,6 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     #AMBULANCIAS 
     elif user_ambulance["state"] == "WAITING_FOR_MUNICIPALITI":
         select_municipalities(numero, texto)
-        return True
-
-#----------------------------seleccion de las primeras opciones de servicios o planes --------------------------------------------------
-    elif "idservicios" in texto:
-        print("entra en seleccion de servicios")
-        get_services(numero)
-        return True
-    
-    elif "idplanes" in texto:
-        print("entra en planes")
-        get_list_plan(numero)
-        return True
-    elif "idconfirmplan" in texto:
-        insert_plan(numero, texto)
         return True
     
 #---------------------------respuestas a selecciones de los servicios-------------------------
@@ -306,10 +318,6 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif "idatenmeddomi" in texto:
         print("entra en atencion medica domiciliaria")
         get_municipality(numero)
-        return True
-    elif "idmunicipio" in texto:
-        print("entra en la confirmacion de servicio por municipio")
-        confirm_service(numero)
         return True
     elif "idconfirmdomiciliary" in texto:
         print("entra en confirmar domicilio")

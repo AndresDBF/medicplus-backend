@@ -308,7 +308,7 @@ def insert_identification(numero, texto):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda ingresar el número de cedula utilizando solamente números y que sean un mininmo de 7 para continuar con el proceso🤖👨🏻‍💻"
+                "body": "No comprendí muy bien tu respuesta, recuerda ingresar el número de cedula utilizando solamente números y que sean un minimo de 7 para continuar con el proceso🤖👨🏻‍💻"
             }
         }
         enviar_mensajes_whatsapp(data)

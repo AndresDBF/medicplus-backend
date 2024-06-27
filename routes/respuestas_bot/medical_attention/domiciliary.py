@@ -3,7 +3,7 @@ import http
 from database.connection import engine
 from models.usuarios import usuarios
 from models.log import log
-from routes.user import get_user_state, get_user_state_register
+from routes.user import get_user_state, get_user_state_register, get_user_state_domiciliary, update_user_state_domiciliary
 from routes.user import verify_user
 from datetime import datetime
 from sqlalchemy import insert, select
@@ -43,182 +43,80 @@ def enviar_mensajes_whatsapp (data):
         agregar_mensajes_log(f"Exception al enviar mensaje: {e}")
     finally:
         connection.close() 
-        
+
 def get_municipality(numero):
-    """ data = {
+    data = {
         "messaging_product": "whatsapp",
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Indicame el municipio donde requieres tu traslado y me pondré en contacto en breves minutos con una unidad disponible🚑\n1. La Asunción\n2. Juangriego\n3. Porlamar\n4. Pampatar\n5. Santa Ana\n6. Punta de Piedra\n7. Altagracia"
+            "body": "Indicame el municipio donde requieres tu traslado y me pondré en contacto en breves minutos con el equipo médico disponible🚑\n1. La Asunción\n2. Juangriego\n3. Porlamar\n4. Pampatar\n5. Santa Ana\n6. Punta de Piedra\n7. Altagracia"
         }
     }   
     enviar_mensajes_whatsapp(data)
-    update_user_state_ambulance(numero, 'WAITING_FOR_MUNICIPALITI')
-    return True """
+    update_user_state_domiciliary(numero, 'WAITING_FOR_MUNICIPALITI_DOMI')
+    return True 
 
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": "Puedo Proporcionarte 3 lotes de opciones📝 que puedes escoger facilmente para requerir de nuestros servicios domiciliarios\n\nSelecciona una de las siguientes ubicaciones y te brindaré los detalles correspondientes📍👨🏻‍💻."
-        }
-    }
-    
-    print("envia el mensaje principal 1")
-    enviar_mensajes_whatsapp(data)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "Zona norte"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idmunicipio1",
-                            "title": "Juangriego"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idmunicipio2",
-                            "title": "Santa Ana"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idmunicipio3",
-                            "title": "Altagracia"
-                        }
-                    },
-                ]
+def confirm_service(numero, location):
+    result = update_user_state_domiciliary(numero, 'WAITING_CONFIRM_MEDIC',municipalities=location)
+    if result == True:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "El tiempo de respuesta es de 30 minutos ⏳⏰ y el costo es de $30💵, ¿Desea confirmar el servicio?"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconfirmdomiciliary",
+                                "title": "Si"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "iddeclinedomiciliary",
+                                "title": "No"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idvolver",
+                                "title": "Volver"
+                            }
+                        },
+                    ]
+                }
             }
         }
-    }
-    print("envia el mensaje principal 2")
-    enviar_mensajes_whatsapp(data)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "Sureste"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idmunicipio4",
-                            "title": "Porlamar"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idmunicipio5",
-                            "title": "Pampatar"
-                        }
-                    },
-                ]
+        print("envia el mensaje principal 2")
+        enviar_mensajes_whatsapp(data)
+        return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
             }
         }
-    }       
-    print("envia el mensaje principal 3")
-    enviar_mensajes_whatsapp(data)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "Suroeste"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idmunicipio6",
-                            "title": "La Asunción"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idmunicipio7",
-                            "title": "Punta de Piedras"
-                        }
-                    },
-                ]
-            }
-        }
-    }       
-    print("envia el mensaje principal 4")
-    enviar_mensajes_whatsapp(data)
-    return True
-
-def confirm_service(numero):
-    
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "El tiempo de respuesta es de 30 minutos ⏳⏰ y el costo es de $30💵, ¿Desea confirmar el servicio?"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idconfirmdomiciliary",
-                            "title": "Si"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "iddeclinedomiciliary",
-                            "title": "No"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idvolver",
-                            "title": "Volver"
-                        }
-                    },
-                ]
-            }
-        }
-    }
-    print("envia el mensaje principal 2")
-    enviar_mensajes_whatsapp(data)
-    return True
+        enviar_mensajes_whatsapp(data)
+        update_user_state_domiciliary(numero, "WAITING_FOR_MUNICIPALITI_DOMI")
+        return True 
     
 def accept_domiciliary(numero):
+    get_user_state_domiciliary(numero, 'CONFIRM_MEDIC_TEAM')
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -247,6 +145,7 @@ def accept_domiciliary(numero):
     return True
 
 def decline_domiciliary(numero):
+    get_user_state_domiciliary(numero, 'CANCEL_MEDIC_TEAM')
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",

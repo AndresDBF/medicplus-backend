@@ -68,7 +68,8 @@ def get_list_plan(numero):
     return True
 
 def send_info_plan(numero, plan):
-    result = get_user_state_register(numero, 'CONFIRM_PLAN', plan=plan)
+    result = get_user_state_register(numero, 'INIT', plan=plan)
+    print("esto trae el result dentro de send info plan: ", result)
     if result == True:
         with engine.connect() as conn:
             get_plan = conn.execute(user_state_register.select().where(user_state_register.c.numero==numero)).first()
@@ -126,3 +127,121 @@ def send_info_plan(numero, plan):
         enviar_mensajes_whatsapp(data)
         get_user_state_register(numero, 'WAITING_FOR_SERVICE_PLAN')
         return True   
+    
+def send_name_affiliate(numero):
+    print("entra en send_name_affiliate")
+    with engine.connect() as conn:
+        user = conn.execute(select(usuarios.c.plan).select_from(usuarios).where(usuarios.c.tel_usu==numero)).scalar()
+        print("este es el user ", user)
+    if user:
+        print("entra en el if")
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": f"Contamos con tu registro en nuestro sistema como afiliado de Medic Plus con el plan {user}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
+            }
+        }
+        print("envia el mensaje principal 1")
+        enviar_mensajes_whatsapp(data)
+        
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "Atenciones Médicas"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idatenmedicpri",
+                                "title": "Inmediata"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idtelemed",
+                                "title": "Telemedicina"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idatenmeddomi",
+                                "title": "Domiciliaria"
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        print("envia el mensaje principal 2")
+        enviar_mensajes_whatsapp(data)
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "Otros Servicios."
+                },
+                "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idconmed",
+                            "title": "Consultas Médicas"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idlabori",
+                            "title": "Laboratorio"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idambula",
+                            "title": "Ambulancia"
+                        }
+                    },
+                ]
+            }
+        }
+        }
+                    
+        print("envia el mensaje principal 3")
+        enviar_mensajes_whatsapp(data)
+        return True
+    else:
+        print("entra en el else")
+        get_user_state_register(numero, 'WAITING_FOR_NAME')
+
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "Comencemos con el registro para afiliados de Medicplus, Por favor envía tus nombres completos:"
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        return True
+    

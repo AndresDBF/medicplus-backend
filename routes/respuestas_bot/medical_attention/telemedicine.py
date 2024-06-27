@@ -49,7 +49,7 @@ def get_info_identification_telemedicine(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Por favor me indicas tu numero de identidad y buscare en el sistema que tipo de afiliado eres.👨🏻‍💻"
+            "body": "Por favor me indicas tu número de identidad y buscare en el sistema que tipo de afiliado eres.👨🏻‍💻"
         }
     }    
     print("envia el mensaje principal")

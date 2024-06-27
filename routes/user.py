@@ -240,78 +240,78 @@ def update_user_state_domiciliary(numero, state, municipalities=None, confirm=No
                 elif municipalities == "1":
                     print("entra en 1")
                     conn.execute(
-                        update(user_state_ambulance)
-                        .where(user_state_ambulance.c.numero == numero)
+                        update(user_state_domiciliary)
+                        .where(user_state_domiciliary.c.numero == numero)
                         .values(numero=numero, state=state, location='La Asunción')
                     )
                     conn.commit()
                 elif municipalities == "2":
                     print("entra en 2")
                     conn.execute(
-                        update(user_state_ambulance)
-                        .where(user_state_ambulance.c.numero == numero)
+                        update(user_state_domiciliary)
+                        .where(user_state_domiciliary.c.numero == numero)
                         .values(numero=numero, state=state, location='Juangriego')
                     )
                     conn.commit()
                 elif municipalities == "3":
                     print("entra en 3")
                     conn.execute(
-                        update(user_state_ambulance)
-                        .where(user_state_ambulance.c.numero == numero)
+                        update(user_state_domiciliary)
+                        .where(user_state_domiciliary.c.numero == numero)
                         .values(numero=numero, state=state, location='Porlamar')
                     )
                     conn.commit()
                 elif municipalities == "4":
                     print("entra en 4")
                     conn.execute(
-                        update(user_state_ambulance)
-                        .where(user_state_ambulance.c.numero == numero)
+                        update(user_state_domiciliary)
+                        .where(user_state_domiciliary.c.numero == numero)
                         .values(numero=numero, state=state, location='Pampatar')
                     )
                     conn.commit()
                 elif municipalities == "5":
                     print("entra en 5")
                     conn.execute(
-                        update(user_state_ambulance)
-                        .where(user_state_ambulance.c.numero == numero)
+                        update(user_state_domiciliary)
+                        .where(user_state_domiciliary.c.numero == numero)
                         .values(numero=numero, state=state, location='Santa Ana')
                     )
                     conn.commit()
                 elif municipalities == "6":
                     print("entra en 6")
                     conn.execute(
-                        update(user_state_ambulance)
-                        .where(user_state_ambulance.c.numero == numero)
+                        update(user_state_domiciliary)
+                        .where(user_state_domiciliary.c.numero == numero)
                         .values(numero=numero, state=state, location='Punta de Piedra')
                     )
                     conn.commit()
                 elif municipalities == "7":
                     print("entra en 7")
                     conn.execute(
-                        update(user_state_ambulance)
-                        .where(user_state_ambulance.c.numero == numero)
+                        update(user_state_domiciliary)
+                        .where(user_state_domiciliary.c.numero == numero)
                         .values(numero=numero, state=state, location='Altagracia')
                     )
                     conn.commit()
                 return True                
             elif confirm:
                 print("entra en confirmacion")
-                conn.execute(user_state_ambulance.update().where(user_state_ambulance.c.numero == numero)
+                conn.execute(user_state_domiciliary.update().where(user_state_domiciliary.c.numero == numero)
                             .values(numero=numero, state=state, confirm=True))
                 conn.commit()
                 return True
             else:
                 print("entra en el else donde no consigue parametros")
                 conn.execute(
-                    update(user_state_ambulance)
-                    .where(user_state_ambulance.c.numero == numero)
+                    update(user_state_domiciliary)
+                    .where(user_state_domiciliary.c.numero == numero)
                     .values(numero=numero, state=state)
                 )
                 conn.commit()
                 return True
         else:   
             print("entra en el else ")        
-            conn.execute(user_state_ambulance.insert().values(numero=numero, state=state))
+            conn.execute(user_state_domiciliary.insert().values(numero=numero, state=state))
             conn.commit()
             return True
 

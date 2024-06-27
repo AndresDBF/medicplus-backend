@@ -117,7 +117,7 @@ def confirm_ambulance(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": f"He generado una alarma inmediata a una unidad disponible 📢 en breves minutos serás contactado por nuestro personal para el cobro del translado de la ambulancia📲💸"
+                "text": f"He generado una alarma inmediata a una unidad disponible 📢 en breves minutos serás contactado por nuestro personal para el cobro del traslado de la ambulancia📲💸"
             },
             "action": {
                 "buttons":[
