@@ -173,7 +173,7 @@ def save_appointment(numero, nombre_medico):
                             "type": "reply",
                             "reply": {
                                 "id": "idvolver",
-                                "title": "Volver"
+                                "title": "Volver al Inicio"
                             }
                         },
                     ]
@@ -218,7 +218,7 @@ def confirm_consult(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idvolver",
-                            "title": "Volver"
+                            "title": "Volver al Inicio"
                         }
                     },
                 ]
@@ -248,7 +248,7 @@ def cancel_consult(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idvolver",
-                            "title": "Volver"
+                            "title": "Volver al Inicio"
                         }
                     },
                 ]

@@ -90,7 +90,7 @@ def confirm_service(numero, location):
                             "type": "reply",
                             "reply": {
                                 "id": "idvolver",
-                                "title": "Volver"
+                                "title": "Volver al Inicio"
                             }
                         },
                     ]
@@ -116,7 +116,7 @@ def confirm_service(numero, location):
         return True 
     
 def accept_domiciliary(numero):
-    get_user_state_domiciliary(numero, 'CONFIRM_MEDIC_TEAM')
+    update_user_state_domiciliary(numero, 'CONFIRM_MEDIC_TEAM', confirm=True)
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -133,7 +133,7 @@ def accept_domiciliary(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idvolver",
-                            "title": "Volver"
+                            "title": "Volver al Inicio"
                         }
                     },
                 ]
@@ -145,7 +145,7 @@ def accept_domiciliary(numero):
     return True
 
 def decline_domiciliary(numero):
-    get_user_state_domiciliary(numero, 'CANCEL_MEDIC_TEAM')
+    update_user_state_domiciliary(numero, 'CANCEL_MEDIC_TEAM', confirm=False)
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",

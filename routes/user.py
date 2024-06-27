@@ -225,12 +225,12 @@ def get_user_state_identification_register(numero, state, cedula=None):
 #QUEDA PENDIENTE REALIZAR ESTA FUNCION PARA CAMBIAR LOS BOTONES DE LA DOMICILIARIA
 def update_user_state_domiciliary(numero, state, municipalities=None, confirm=None):
     with engine.connect() as conn:
-        print("---------------------entra en update_user_state_lab---------------------")
+        print("---------------------entra en update_user_state_domiciliary---------------------")
         print("el numero: ", numero)
         print("el status: ", state)
         print("el municipio: ", municipalities)
         
-        result = get_user_state_ambulance(numero)
+        result = get_user_state_domiciliary(numero)
         
         if result["consult"] is not None:
             if municipalities:
@@ -410,7 +410,7 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
             return True
     
 #para la solicitud de una prueba de laboratorio
-def update_user_state_lab(numero, state, test=None, rx_or_eco=None):
+def update_user_state_lab(numero, state, test=None, confirm_domi=None):
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_lab---------------------")
         print("el numero: ", numero)
@@ -422,7 +422,7 @@ def update_user_state_lab(numero, state, test=None, rx_or_eco=None):
         if result["consult"] is not None:
             if test:
                 print("entra en el if de test")
-                if test not in ["1", "2", "3", "4", "5", "6"]:
+                if test not in ["1", "2", "3", "4", "5"]:
                     return False
                 elif test == "1":
                     print("entra en 1")
@@ -472,23 +472,12 @@ def update_user_state_lab(numero, state, test=None, rx_or_eco=None):
                         .values(numero=numero, state=state, test='Imagenología')
                     )
                     conn.commit()
-                return True                
-            elif rx_or_eco:
-                print("entra en eco o rayos x")
-                if rx_or_eco not in ["ideco", "idrayosrx"]:
-                    print("entra en el if del regex")
-                    return False
-                print("pasa el if del regex")
-                if rx_or_eco == "ideco":
-                    conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero == numero)
-                                .values(numero=numero, state=state, eco=True, rx=False))
-                    conn.commit()
-                else:
-                    conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero == numero)
-                                .values(numero=numero, state=state, eco=False, rx=True))
-                    conn.commit()
-                print("actualiza los datos")
-                return True
+                return True       
+            elif confirm_domi:
+                print("entra en confirmar el domicilio")
+                conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)
+                             .values(domicilio=True))
+                conn.commit()
             else:
                 print("entra en el else donde no consigue parametros")
                 conn.execute(

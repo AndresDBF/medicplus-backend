@@ -104,7 +104,7 @@ def send_info_plan(numero, plan):
                             "type": "reply",
                             "reply": {
                                 "id": "idvolver",
-                                "title": "Volver"
+                                "title": "Volver al Inicio"
                             }
                         },
                     ]
@@ -187,6 +187,72 @@ def send_name_affiliate(numero):
         }
         print("envia el mensaje principal 2")
         enviar_mensajes_whatsapp(data)
+        
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "Citas y Pruebas"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconmed",
+                                "title": "Consultas Médicas"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idimagenologia",
+                                "title": "Imagenología"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+                    
+        print("envia el mensaje principal 3")
+        enviar_mensajes_whatsapp(data)
+
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "Citas y Pruebas"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconmed",
+                                "title": "Consultas Médicas"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idimagenologia",
+                                "title": "Imagenología"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
         data = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
@@ -198,34 +264,34 @@ def send_name_affiliate(numero):
                     "text": "Otros Servicios."
                 },
                 "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idconmed",
-                            "title": "Consultas Médicas"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idlabori",
-                            "title": "Laboratorio"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idambula",
-                            "title": "Ambulancia"
-                        }
-                    },
-                ]
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idcalloper",
+                                "title": "Llamar un Operador"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idlabori",
+                                "title": "Laboratorio"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idambula",
+                                "title": "Ambulancia"
+                            }
+                        },
+                    ]
+                }
             }
         }
-        }
                     
-        print("envia el mensaje principal 3")
+        print("envia el mensaje principal 4")
         enviar_mensajes_whatsapp(data)
         return True
     else:

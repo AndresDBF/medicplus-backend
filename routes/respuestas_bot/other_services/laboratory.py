@@ -57,13 +57,64 @@ def get_service_lab(numero):
     update_user_state_lab(numero, 'WAITING_FOR_TEST')
     return True
 
-def select_service_lab(numero, test):
-    result =  update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_LAB', test=test)
+def send_service_location(numero, test):
+    result = update_user_state_lab(numero, 'WAITING_FOR_LOCATION', test)
     if result == True:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": f"MedicPlus cuenta con servicio domiciliario para la implementación de pruebas de laboratorios, por lo que un equipo médico capacitado realizará el trabajo desde la comodidad de tu casa 🏠👨🏼‍⚕️¿Deseas solicitar un domicilio o prefieres visitar nuestro laboratorio?."
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconfirmdomi",
+                                "title": "Pedir Domicilio"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idvisitlab",
+                                "title": "Visitar Laboratorio"
+                            }
+                        }
+                    ]
+                }
+            }
+        }  
+        enviar_mensajes_whatsapp(data)
+        return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        print("a punto de llamar a la funcion en el else de respuesta incorrecta")
+        update_user_state_lab(numero, "WAITING_FOR_TEST")
+        return True 
+
+def select_service_lab(numero, texto):
+    if texto == "idconfirmdomi":
+        update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_LAB', confirm_domi=True)
+    
         with engine.connect() as conn:
             test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)
                                 .order_by(user_state_laboratory.c.created_at.asc())).scalar()
-        if test == "Imagenología":
+        
             data = {
                 "messaging_product": "whatsapp",
                 "to": numero,
@@ -71,40 +122,7 @@ def select_service_lab(numero, test):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"MedicPlus cumple con pruebas de imagenología como Eco y RX🩻, selecciona una de ellas."
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "ideco",
-                                    "title": "Eco"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idrayosrx",
-                                    "title": "RX"
-                                }
-                            }
-                        ]
-                    }
-                }
-            }  
-            enviar_mensajes_whatsapp(data)
-            update_user_state_lab(numero=numero, state='WAITING_FOR_SELECT_TEST')
-            return True
-        else:  
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"La {test} tiene un costo de 30$💸, ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
+                        "text": f"La {test.test} tiene un costo de 30$💸 , ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
                     },
                     "action": {
                         "buttons":[
@@ -130,91 +148,39 @@ def select_service_lab(numero, test):
             return True
     else:
         data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
-            }
-        }
-        enviar_mensajes_whatsapp(data)
-        print("a punto de llamar a la funcion en el else de respuesta incorrecta")
-        update_user_state_lab(numero, "WAITING_FOR_TEST")
-        return True 
-
-def confirm_imaging(numero):
-    update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_IMAGING')
-    with engine.connect() as conn:
-        imaging = conn.execute(select(user_state_laboratory.c.eco).select_from(user_state_laboratory)
-                               .where(user_state_laboratory.c.numero==numero)).scalar()
-    if imaging == False:
-        data = {
-            "messaging_product": "whatsapp",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": f"La prueba de RX tiene un costo de 30$💸, ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
-                },
-                "action": {
-                    "buttons":[
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idconfirmvisit",
-                                "title": "Confirmar Visita"
+                "messaging_product": "whatsapp",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": f"La {test.test} tiene un costo de 30$ junto con una recarga de 10$ del domicilio 💸, ¿Deseas confirmar el traslado del equipo médico💉?"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idconfirmequip",
+                                    "title": "Confirmar"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idcancelequip",
+                                    "title": "Cancelar"
+                                }
                             }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idcancelvisit",
-                                "title": "Cancelar Visita"
-                            }
-                        }
-                    ]
+                        ]
+                    }
                 }
-            }
-        }  
-        enviar_mensajes_whatsapp(data)
-        return True 
-    else:
-        data = {
-            "messaging_product": "whatsapp",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": f"La Prueba de ECO tiene un costo de 30$💸, ¿Desea agendar la visita al laboratorio💉? Su confirmación la agendaré al personal para indicarle disponibilidad📝 "
-                },
-                "action": {
-                    "buttons":[
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idconfirmvisit",
-                                "title": "Confirmar Visita"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idcancelvisit",
-                                "title": "Cancelar Visita"
-                            }
-                        }
-                    ]
-                }
-            }
-        }  
+            }  
         enviar_mensajes_whatsapp(data)
         return True
-        
+     
 
+#para la confirmacion en caso de visitar el lugar 
 def confirm_visit_lab(numero):
     update_user_state_lab(numero=numero, state="CONFIRM_VISIT_LAB")
     data = {
@@ -232,7 +198,34 @@ def confirm_visit_lab(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idvolver",
-                            "title": "Volver"
+                            "title": "Volver al Inicio"
+                        }
+                    }
+                ]
+            }
+        }
+    }  
+    enviar_mensajes_whatsapp(data)
+    return True
+#para la confirmacion en caso de pedir el domicilio 
+def confirm_domiciliary_lab(numero):
+    update_user_state_lab(numero=numero, state="CONFIRM_DOMICILIARY_LAB")
+    data = {
+        "messaging_product": "whatsapp",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": f"He notificado al personal de citas sobre tu solicitud📢📝, pronto serás contactado por uno de ellos para realizar el proceso de cobro"
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idvolver",
+                            "title": "Volver al Inicio"
                         }
                     }
                 ]
@@ -242,6 +235,7 @@ def confirm_visit_lab(numero):
     enviar_mensajes_whatsapp(data)
     return True
 
+#para la cancelacion en caso de visitar el lugar
 def cancel_visit_lab(numero):
     update_user_state_lab(numero, 'CANCEL_VISIT_LAB')
     data = {
@@ -260,7 +254,7 @@ def cancel_visit_lab(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idvolver",
-                            "title": "Volver"
+                            "title": "Volver al Inicio"
                         }
                     },
                 ]
@@ -271,4 +265,31 @@ def cancel_visit_lab(numero):
     return True
 
 
-     
+#cancelar en caso de pedir el domicilio 
+def cancel_domiciliary_lab(numero):
+    update_user_state_lab(numero, 'CANCEL_DOMICILIARY_LAB')
+    data = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": numero,
+        "type": "interactive",
+        "interactive":{
+            "type": "button",
+            "body": {
+                "text": f"Tu domicilio ha sido Cancelado ❌ Puedo Agendarte otra prueba a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorio📍"
+            },
+            "action": {
+                "buttons":[
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idvolver",
+                            "title": "Volver al Inicio"
+                        }
+                    },
+                ]
+            }
+        }
+    }          
+    enviar_mensajes_whatsapp(data)
+    return True

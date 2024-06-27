@@ -133,7 +133,7 @@ def confirm_ambulance(numero):
         }
     }
     enviar_mensajes_whatsapp(data)
-    update_user_state_ambulance(numero, "CONFIRM_AMBULANCE")
+    update_user_state_ambulance(numero, "CONFIRM_AMBULANCE", confirm=True)
     return True 
 
 def cancel_ambulance(numero):
@@ -153,7 +153,7 @@ def cancel_ambulance(numero):
                         "type": "reply",
                         "reply": {
                             "id": "idvolver",
-                            "title": "Volver"
+                            "title": "Volver al Inicio"
                         }
                     },
                 ]
@@ -161,5 +161,5 @@ def cancel_ambulance(numero):
         }
     }  
     enviar_mensajes_whatsapp(data)
-    update_user_state_ambulance(numero, "CANCEL_AMBULANCE")
+    update_user_state_ambulance(numero, "CANCEL_AMBULANCE", confirm=False)
     return True 
