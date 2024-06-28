@@ -1,12 +1,16 @@
 import json
 import http
+import pytz
 from database.connection import engine
 from models.usuarios import usuarios
+from models.data_aten_med_domi import data_aten_med_domi
+from models.user_state_domiciliary import user_state_domiciliary
 from models.log import log
 from routes.user import get_user_state, get_user_state_register, get_user_state_domiciliary, update_user_state_domiciliary
 from routes.user import verify_user
 from datetime import datetime
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, text
+from datetime import datetime, time
 
 
 def agregar_mensajes_log(texto):
@@ -45,61 +49,134 @@ def enviar_mensajes_whatsapp (data):
         connection.close() 
 
 def get_municipality(numero):
+    
+    number = 0
+    
+    with engine.connect() as conn:
+        list_munic= conn.execute(text("select * from data_aten_med_domi where hor_diu = True;")).fetchall()
+        print("esto muestra el list imag ", list_munic)
+    # Crear un diccionario de mapeo de números a tipos de servicios exactos
+    service_map = {}
+    data_list = []
+    for munic in list_munic:
+        number += 1
+        service_map[number] = munic.des_dom  # Mapear número a nombre exacto del servicio
+        data_list.append(f"\n{number}. {munic.des_dom.title()}")
     data = {
         "messaging_product": "whatsapp",
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Indicame el municipio donde requieres tu traslado y me pondré en contacto en breves minutos con el equipo médico disponible🚑\n1. La Asunción\n2. Juangriego\n3. Porlamar\n4. Pampatar\n5. Santa Ana\n6. Punta de Piedra\n7. Altagracia"
+            "body": f"Indicame el número del municipio donde requieres tu traslado y me pondré en contacto en breves minutos con el equipo médico disponible🚑 \n{''.join(data_list)}"
         }
-    }   
+    } 
     enviar_mensajes_whatsapp(data)
     update_user_state_domiciliary(numero, 'WAITING_FOR_MUNICIPALITI_DOMI')
-    return True 
+    return True
 
 def confirm_service(numero, location):
     result = update_user_state_domiciliary(numero, 'WAITING_CONFIRM_MEDIC',municipalities=location)
     if result == True:
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": "El tiempo de respuesta es de 30 minutos ⏳⏰ y el costo es de $30💵, ¿Desea confirmar el servicio?"
-                },
-                "action": {
-                    "buttons":[
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idconfirmdomiciliary",
-                                "title": "Si"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "iddeclinedomiciliary",
-                                "title": "No"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idvolver",
-                                "title": "Volver al Inicio"
-                            }
-                        },
-                    ]
+        with engine.connect() as conn: 
+            domiciliary = conn.execute(user_state_domiciliary.select().where(user_state_domiciliary.c.numero==numero)
+                                       .order_by(user_state_domiciliary.c.created_at.asc())).first()
+        venezuela_tz = pytz.timezone('America/Caracas')
+    
+        # Obtener la hora actual en la zona horaria de Venezuela
+        now = datetime.now(venezuela_tz)
+        
+        
+        morning_limit = time(6, 0)  # 6:00 AM
+        evening_limit = time(19, 0)  # 7:00 PM
+        
+       
+        if now.time() >= evening_limit or now.time() <= morning_limit: 
+            with engine.connect() as conn:
+                municipality = conn.execute(data_aten_med_domi.select()
+                                            .where(data_aten_med_domi.c.des_dom==domiciliary.location)
+                                            .where(data_aten_med_domi.c.hor_diu==True)).first()
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}💵, ¿Desea confirmar el servicio?"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idconfirmdomiciliary",
+                                    "title": "Confirmar Servicio"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "iddeclinedomiciliary",
+                                    "title": "Cancelar Servicio"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idvolver",
+                                    "title": "Volver al Inicio"
+                                }
+                            },
+                        ]
+                    }
                 }
             }
-        }
-        print("envia el mensaje principal 2")
-        enviar_mensajes_whatsapp(data)
-        return True
+            print("envia el mensaje principal 2")
+            enviar_mensajes_whatsapp(data)
+            return True
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}💵, ¿Desea confirmar el servicio?"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idconfirmdomiciliary",
+                                    "title": "Confirmar Servicio"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "iddeclinedomiciliary",
+                                    "title": "Cancelar Servicio"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idvolver",
+                                    "title": "Volver al Inicio"
+                                }
+                            },
+                        ]
+                    }
+                }
+            }
+            print("envia el mensaje principal 2")
+            enviar_mensajes_whatsapp(data)
+            return True
+            
     else:
         data = {
             "messaging_product": "whatsapp",

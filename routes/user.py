@@ -87,7 +87,7 @@ def get_user_state_domiciliary(numero):
         result = conn.execute(select(user_state_domiciliary).where(user_state_domiciliary.c.numero == numero)).fetchone()
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "location", "confirm", "fecha_y_hora"]
+            columns = ["numero", "state", "location", "precio", "confirm", "fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
             return result_dict
@@ -126,6 +126,7 @@ def get_user_state_ambulance(numero):
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------
         
 #funciones para maneras status del usuario durante la conversacion con el bot 
+
 #para el registro
 def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None, cedula=None, email=None):
     print("---------------------entra en get_user_state_register---------------------")
@@ -241,7 +242,6 @@ def get_user_state_identification_register(numero, state, cedula=None):
             return True
 
 #para la solicitud de atencion medica domiciliaria 
-#QUEDA PENDIENTE REALIZAR ESTA FUNCION PARA CAMBIAR LOS BOTONES DE LA DOMICILIARIA
 def update_user_state_domiciliary(numero, state, municipalities=None, confirm=None):
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_domiciliary---------------------")
@@ -253,65 +253,28 @@ def update_user_state_domiciliary(numero, state, municipalities=None, confirm=No
         
         if result["consult"] is not None:
             if municipalities:
-                print("entra en el if de test")
-                if municipalities not in ["1", "2", "3", "4", "5", "6", "7"]:
+                if municipalities not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]:
                     return False
-                elif municipalities == "1":
-                    print("entra en 1")
-                    conn.execute(
-                        update(user_state_domiciliary)
-                        .where(user_state_domiciliary.c.numero == numero)
-                        .values(numero=numero, state=state, location='La Asunción')
-                    )
-                    conn.commit()
-                elif municipalities == "2":
-                    print("entra en 2")
-                    conn.execute(
-                        update(user_state_domiciliary)
-                        .where(user_state_domiciliary.c.numero == numero)
-                        .values(numero=numero, state=state, location='Juangriego')
-                    )
-                    conn.commit()
-                elif municipalities == "3":
-                    print("entra en 3")
-                    conn.execute(
-                        update(user_state_domiciliary)
-                        .where(user_state_domiciliary.c.numero == numero)
-                        .values(numero=numero, state=state, location='Porlamar')
-                    )
-                    conn.commit()
-                elif municipalities == "4":
-                    print("entra en 4")
-                    conn.execute(
-                        update(user_state_domiciliary)
-                        .where(user_state_domiciliary.c.numero == numero)
-                        .values(numero=numero, state=state, location='Pampatar')
-                    )
-                    conn.commit()
-                elif municipalities == "5":
-                    print("entra en 5")
-                    conn.execute(
-                        update(user_state_domiciliary)
-                        .where(user_state_domiciliary.c.numero == numero)
-                        .values(numero=numero, state=state, location='Santa Ana')
-                    )
-                    conn.commit()
-                elif municipalities == "6":
-                    print("entra en 6")
-                    conn.execute(
-                        update(user_state_domiciliary)
-                        .where(user_state_domiciliary.c.numero == numero)
-                        .values(numero=numero, state=state, location='Punta de Piedra')
-                    )
-                    conn.commit()
-                elif municipalities == "7":
-                    print("entra en 7")
-                    conn.execute(
-                        update(user_state_domiciliary)
-                        .where(user_state_domiciliary.c.numero == numero)
-                        .values(numero=numero, state=state, location='Altagracia')
-                    )
-                    conn.commit()
+                
+                number = 0
+    
+                with engine.connect() as conn:
+                    list_munic= conn.execute(text("select * from data_aten_med_domi where hor_diu = True;")).fetchall()
+                    print("esto muestra el list imag ", list_munic)
+                # Crear un diccionario de mapeo de números a tipos de municipios exactos
+                munic_map = {}
+                
+                for munic in list_munic:
+                    number += 1
+                    munic_map[number] = munic.des_dom  # Mapear número a nombre exacto del municipio
+                   
+                selected_munic = munic_map[int(municipalities)]
+                list_munic= conn.execute(text(f"select * from data_aten_med_domi where hor_diu = True and des_dom='{selected_munic}';")).first()
+                print("entra en el if de municipalities")
+                conn.execute(user_state_domiciliary.update().where(user_state_domiciliary.c.numero==numero)
+                             .values(numero=numero, state=state, location=selected_munic, precio=list_munic.pre_amd))
+                conn.commit()
+                
                 return True                
             elif confirm:
                 print("entra en confirmacion")
@@ -447,21 +410,26 @@ def update_user_state_lab(numero, state, test=None, opcion=None, confirm_domi=No
         result = get_user_state_lab(numero)        
         if result["consult"] is not None:
             if test:
+                print("entra en test")
                 conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)
                             .values(numero=numero, state=state, test=test))
                 conn.commit()
                 return True
             if opcion:
+                print("entra en opcion: ", opcion)
                 number = 0
                 find_test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory)
                                          .where(user_state_laboratory.c.numero==numero).order_by(user_state_laboratory.c.created_at.asc())).scalar()
+                print("esto trae el find test: ", find_test)
+                
                 list_tests = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{find_test}%'")).fetchall()
+                print("esto trae el list tests: ", list_tests)
                 service_map = {}
                 data_list = []
                 for info_test in list_tests:
                     number += 1
-                    service_map[number] = info_test.tip_con  # Mapear número a nombre exacto del servicio
-                    data_list.append(f"\n{number}. {info_test.tip_con.title()}")
+                    service_map[number] = info_test.tip_pru  # Mapear número a nombre exacto del servicio
+                    data_list.append(f"\n{number}. {info_test.tip_pru.title()}")
                 selected_service = service_map[int(opcion)]
                 verify_test = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{selected_service}%'")).first()
                 conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)

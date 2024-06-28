@@ -9,6 +9,7 @@ from models.data_aten_med_domi import data_aten_med_domi
 from models.data_consultas import data_consultas
 from models.data_imagenologia import data_imagenologia
 from models.data_laboratorios import data_laboratorios
+from models.data_aten_med_domi import data_aten_med_domi
 
 from sqlalchemy import text, select, insert
 
@@ -523,12 +524,37 @@ async def insert_baremo():
 
 
     ]
+    
+    query_domi = [
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (1, True, 'ANTOLIN', 70);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (2, False, 'ANTOLIN', 80);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (3, True, 'ARISMENDI', 60);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (4, False, 'ARISMENDI', 70);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (5, True, 'DIAZ', 70);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (6, False, 'DIAZ', 80);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (7, True, 'GARCIA', 60);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (8, False, 'GARCIA', 70);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (9, True, 'GOMEZ', 70);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (10, False, 'GOMEZ', 80);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (11, True, 'MANEIRO', 55);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (12, False, 'MANEIRO', 60);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (13, True, 'MARCANO', 70);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (14, False, 'MARCANO', 80);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (15, True, 'MARIÑO', 50);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (16, False, 'MARIÑO', 55);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (17, True, 'PENINSULA DE MACANAO', 80);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (18, False, 'PENINSULA DE MACANAO', 90);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (19, True, 'TUBORES', 80);",
+        "insert into data_aten_med_domi (id, dom_diu, loc_dom, pre_dom) values (20, False, 'TUBORES', 90);"
+    ]
+    
     with engine.connect() as conn:
         data1 = conn.execute(data_aten_med_domi.select()).fetchall()
         data2 = conn.execute(data_consultas.select()).fetchall()
         data3 = conn.execute(data_imagenologia.select()).fetchall()
         data4 = conn.execute(data_laboratorios.select()).fetchall()
-       
+        data5 =  conn.execute(data_aten_med_domi.select()).fetchall()
+        
         if len(data1) < 1:   
             print("entra en el if 1")
             try:
@@ -566,5 +592,15 @@ async def insert_baremo():
                 print("ingresa los terceros datos")
             except Exception as e:
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Ha ocurrido un error: {e}")
+        if len(data5) < 1:
+            print("entra en el if 5")
+            try:
+                for query in query_domi:
+                    conn.execute(text(query))
+                    conn.commit()
+                print("ingresa los terceros datos")
+            except Exception as e:
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Ha ocurrido un error: {e}")
+        
         
     return JSONResponse(content={"message": "datos insertados"}, status_code=status.HTTP_201_CREATED)

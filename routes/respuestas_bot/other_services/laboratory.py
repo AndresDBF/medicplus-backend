@@ -50,7 +50,7 @@ def get_service_lab(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Puedo ayudarte en brindar información necesaria de las pruebas de laboratorio que podemos ofrecer en MedicPlus 👨🏼‍⚕️escribeme que tipo de pruebas deseas realizarte🧬💉 Cumpliré con mi trabajo en buscar en sistema y te diré si dispongo de la prueba que ncesitas👨🏻‍💻."
+            "body": "Puedo ayudarte en brindar información necesaria de las pruebas de laboratorio que podemos ofrecer en MedicPlus 👨🏼‍⚕️escribeme que tipo de pruebas deseas realizarte con su nombre específico🧬💉 Cumpliré con mi trabajo en buscar en sistema y te diré si dispongo de la prueba que necesitas👨🏻‍💻."
         }
     }   
     enviar_mensajes_whatsapp(data)
@@ -109,8 +109,8 @@ def get_list_service_lab(numero, texto):
         update_user_state_lab(numero, 'WAITING_FOR_SELECT_TEST', test=texto)
         return True
 
-def send_service_location(numero, test):
-    result = update_user_state_lab(numero, 'WAITING_FOR_LOCATION', opcion=test)
+def send_service_location(numero, texto):
+    result = update_user_state_lab(numero, 'WAITING_FOR_LOCATION', opcion=texto)
     if result == True:
         data = {
             "messaging_product": "whatsapp",
@@ -163,7 +163,7 @@ def select_service_lab(numero, texto):
     with engine.connect() as conn:
             test = conn.execute(select(user_state_laboratory.c.opcion, user_state_laboratory.c.precio)
                                 .select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)
-                                .order_by(user_state_laboratory.c.created_at.asc())).scalar()
+                                .order_by(user_state_laboratory.c.created_at.asc())).first()
     if texto == "idvisitlab":
         print("entra en el if de selec service lab")
         update_user_state_lab(numero=numero, state='WAITING_FOR_CONFIRM_LAB', confirm_domi=False)

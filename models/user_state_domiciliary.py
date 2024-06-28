@@ -7,6 +7,7 @@ user_state_domiciliary = Table("user_state_domiciliary", meta_data,
               Column("numero", String(30), primary_key=True),
               Column("state", String(191), nullable=False),
               Column("location", String(80), nullable=True),
+              Column("precio", Integer, nullable=True),
               Column("confirm", Boolean, nullable=False, default=False),
               Column("created_at", TIMESTAMP, nullable=False, server_default=func.now())
 )

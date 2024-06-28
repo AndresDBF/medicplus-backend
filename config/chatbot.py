@@ -103,7 +103,7 @@ saludos = [
 
 cancelaciones = [
     'cancelar', 'cancela', 'atras', 'retrocede', 'no quiero', 'olvida', 'olvidalo', 'llevame',
-    'lleveme', 'lleve', 'ir', 'inicio','menu','opciones', 'de nuevo'
+    'lleveme', 'lleve', 'ir', 'inicio','menu','opciones', 'de nuevo', 'regresar', 'devolverme', 'devolver', 'volver', 'retrocerder'
 ]
 
 despedidadas = [
@@ -204,7 +204,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         return True
     
     elif any(re.search(r'\b' + despedir + r'\b', texto) for despedir in despedidadas):
-        print("entra en las cancelaciones")
+        print("entra en las despedidas")
         goodbye_message(numero)
         return True
 #-------------------------------------validamos los status de las variables --------------------------------------------------------------
@@ -277,6 +277,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     #LABORATORIOS
     elif user_lab["state"] == "WAITING_FOR_TEST":
+        print("entra para seleccionar la prueba")
         get_list_service_lab(numero, texto)
         return True
     elif user_lab["state"] == "WAITING_FOR_SELECT_TEST":
