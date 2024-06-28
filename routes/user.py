@@ -9,9 +9,13 @@ from models.user_state_domiciliary import user_state_domiciliary
 from models.user_state_especiality import user_state_especiality
 from models.user_state_lab import user_state_laboratory
 from models.user_state_ambulance import user_state_ambulance
+from models.user_state_imaging import user_state_imaging
+
+from models.data_consultas import data_consultas
+from models.data_imagenologia import data_imagenologia
 
 
-from sqlalchemy import select, insert, update
+from sqlalchemy import select, insert, update, text
 
 #para tomar el status del registro
 def get_user_state(numero):
@@ -53,7 +57,22 @@ def get_user_state_especiality(numero):
         result = conn.execute(select(user_state_especiality).where(user_state_especiality.c.numero == numero)).fetchone()
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "nom_esp", "especiality", "fecha_y_hora"]
+            columns = ["numero", "state", "nom_esp", "num_esp", "precio", "nombre_medico", "fecha_y_hora"]
+            result_dict = dict(zip(columns, result))
+            result_dict["consult"] = True
+        
+            return result_dict
+        else:
+            return {"consult": None}
+
+#para tomar el status de imagenologia
+def get_user_state_imaging(numero):
+    print("---------------------entra en get_user_state_especiality---------------------")
+    with engine.connect() as conn:
+        result = conn.execute(select(user_state_imaging).where(user_state_imaging.c.numero == numero)).fetchone()
+        if result is not None:
+            # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
+            columns = ["numero", "state", "opcion", "nombre", "fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
         
@@ -328,61 +347,19 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
         if result["consult"] is not None:
           
             if especialidad:
+                 
                 print("entra en el if de especialidad")
-                if especialidad not in ["1", "2", "3", "4", "5", "6"]:
+                verify_esp = conn.execute(data_consultas.select().where(data_consultas.c.id==especialidad)).first()
+                print("esto trae el verify_esp: ", verify_esp)
+                if not verify_esp:
+                    print("entra en el if")
                     return False
-                elif especialidad == "1":
-                    print("entra en 1")
-                    conn.execute(
-                        update(user_state_especiality)
-                        .where(user_state_especiality.c.numero == numero)
-                        .values(numero=numero, state=state, nom_esp='Medicina General')
-                    )
-                    conn.commit()
-                elif especialidad == "2":
-                    print("entra en 2")
-                    conn.execute(
-                        update(user_state_especiality)
-                        .where(user_state_especiality.c.numero == numero)
-                        .values(numero=numero, state=state, nom_esp='Pediatría')
-                    )
-                    conn.commit()
-                elif especialidad == "3":
-                    print("entra en 3")
-                    conn.execute(
-                        update(user_state_especiality)
-                        .where(user_state_especiality.c.numero == numero)
-                        .values(numero=numero, state=state, nom_esp='Traumatología')
-                    )
-                    conn.commit()
-                elif especialidad == "4":
-                    print("entra en 4")
-                    conn.execute(
-                        update(user_state_especiality)
-                        .where(user_state_especiality.c.numero == numero)
-                        .values(numero=numero, state=state, nom_esp='Neumonología')
-                    )
-                    conn.commit()
-                elif especialidad == "5":
-                    print("entra en 5")
-                    conn.execute(
-                        update(user_state_especiality)
-                        .where(user_state_especiality.c.numero == numero)
-                        .values(numero=numero, state=state, nom_esp='Neurología')
-                    )
-                    conn.commit()
-                elif especialidad == "6":
-                    print("entra en 6")
-                    conn.execute(
-                        update(user_state_especiality)
-                        .where(user_state_especiality.c.numero == numero)
-                        .values(numero=numero, state=state, nom_esp='Cardiología')
-                    )
-                    conn.commit()
-                
-
-                
-                return True                
+                else:
+                    print("entra en el else")
+                    conn.execute(user_state_especiality.update().where(user_state_especiality.c.numero == numero)
+                             .values(numero=numero, state=state, nom_esp=verify_esp.tip_con, num_esp=especialidad, precio=verify_esp.pre_con))
+                    conn.commit() 
+                    return True
             elif nombre_medico:
                 print("entra en nombre medico")
                 if not re.fullmatch(r'^\d+$', nombre_medico):
@@ -390,7 +367,7 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
                     return False
                 print("pasa el if del regex")
                 conn.execute(user_state_especiality.update().where(user_state_especiality.c.numero == numero)
-                             .values(numero=numero, state=state, especiality=nombre_medico))
+                             .values(numero=numero, state=state, nombre_medico=nombre_medico))
                 conn.commit()
                 print("actualiza los datos")
                 return True
@@ -408,7 +385,49 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
             conn.execute(user_state_especiality.insert().values(numero=numero, state=state))
             conn.commit()
             return True
-    
+
+#para la solicitud de imagenologia
+def update_user_state_imaging(numero, state, test=None, confirm=None):
+    with engine.connect() as conn:
+        print("---------------------entra en update_user_state_lab---------------------")
+        print("el numero: ", numero)
+        print("el status: ", state)
+        print("la prueba: ", test)
+        number = 0
+        result = get_user_state_lab(numero)
+        list_imag = conn.execute(text("select distinct tip_con from data_imagenologia;")).fetchall()
+        # Crear un diccionario de mapeo de números a tipos de servicios exactos
+        service_map = {}
+        data_list = []
+        for imag in list_imag:
+            number += 1
+            service_map[number] = imag.tip_con  # Mapear número a nombre exacto del servicio
+            data_list.append(f"\n{number}. {imag.tip_con.title()}")
+            
+        
+        if result["consult"] is not None:
+            if test:
+                selected_service = service_map[int(test)]
+                verify_test = conn.execute(data_imagenologia.select().where(data_imagenologia.c.tip_con==selected_service)).first()
+                if not verify_test:
+                    return False
+                else:
+                    conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
+                                 .values(numero=numero, state=state, opcion=test, nombre=verify_test.tip_con))
+                    conn.commit()
+                    return True
+            else:
+                conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
+                            .values(numero=numero, state=state))
+                conn.commit()
+                return True
+        else:   
+            print("entra en el else ")        
+            conn.execute(user_state_laboratory.insert().values(numero=numero, state=state))
+            conn.commit()
+            return True
+
+
 #para la solicitud de una prueba de laboratorio
 def update_user_state_lab(numero, state, test=None, confirm_domi=None):
     with engine.connect() as conn:

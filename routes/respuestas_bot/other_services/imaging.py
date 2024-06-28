@@ -4,10 +4,14 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 from models.user_state_lab import user_state_laboratory
-from routes.user import get_user_state_lab, update_user_state_lab
+from models.user_state_imaging import user_state_imaging
+
+from models.data_imagenologia import data_imagenologia
+from routes.user import get_user_state_imaging, update_user_state_imaging
 
 from datetime import datetime
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, text
+
 
 def agregar_mensajes_log(texto):
     try:
@@ -46,110 +50,88 @@ def enviar_mensajes_whatsapp (data):
  
  
 def get_eco_or_rx(numero):
+    number = 0
+    
+    with engine.connect() as conn:
+        list_imag = conn.execute(text("select distinct tip_con from data_imagenologia;")).fetchall()
+    # Crear un diccionario de mapeo de números a tipos de servicios exactos
+    service_map = {}
+    data_list = []
+    for imag in list_imag:
+        number += 1
+        service_map[number] = imag.tip_con  # Mapear número a nombre exacto del servicio
+        data_list.append(f"\n{number}. {imag.tip_con.title()}")
     data = {
         "messaging_product": "whatsapp",
-        "recipient_type": "individual",
         "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": f"MedicPlus cuenta con servicios de Imagenología como Eco y Rx🩻 selecciona una de ellas:"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idtestrx",
-                            "title": "Prueba de RX"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idtesteco",
-                            "title": "Prueba de Eco"
-                        }
-                    },
-                ]
-            }
+        "text": {
+            "preview_url": False,
+            "body": f"MedicPlus cuenta con servicios de Imagenología tales como: \n{''.join(data_list)} \n\nSelecciona una de ellas🩻"
         }
     } 
     enviar_mensajes_whatsapp(data)
-    return True
-
-
-def verify_rx(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": f"La prueba de RX tiene un costo de 30$💸 ¿Desea agendar la visita a nuestro laboratorio?"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idconfirmrx",
-                            "title": "Agendar Visita"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idcancelrx",
-                            "title": "Cancelar Visita"
-                        }
-                    },
-                ]
-            }
-        }
-    } 
-    enviar_mensajes_whatsapp(data)
+    update_user_state_imaging(numero, 'WAITING_FOR_IMAGING')
     return True
     
-
-def verify_eco(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": f"La prueba de Eco tiene un costo de 30$💸 ¿Desea agendar la visita a nuestro laboratorio?"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idconfirmeco",
-                            "title": "Agendar Visita"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idcanceleco",
-                            "title": "Cancelar Visita"
-                        }
-                    },
-                ]
+def verify_imaging(numero, texto):
+    result = update_user_state_imaging(numero, 'CONFIRM_VISIT_IMAGING', test=texto)
+    if result == True:
+        with engine.connect() as conn:
+            test = conn.execute(user_state_imaging.select().where(user_state_imaging.c.numero==numero)
+                                .where(user_state_imaging.c.opcion==texto).order_by(user_state_imaging.c.created_at.asc())).first()
+            name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con={test.nombre}")).scalar()
+            min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con={test.nombre}")).scalar()
+            max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con={test.nombre}")).scalar()
+            
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": f"La prueba de {name_test} tiene un costo minimo de {min_price}$ y un maximo de {max_price}$💸 \n Al agendar la visita, te pondria en contacto con el personal encargado donde podrás especificarle el tipo de prueba que necesitas📞¿Desea agendar la visita a nuestro laboratorio?"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconfirmvisitimag",
+                                "title": "Agendar Visita"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idcancelvisitimag",
+                                "title": "Cancelar Visita"
+                            }
+                        },
+                    ]
+                }
+            }
+        } 
+        enviar_mensajes_whatsapp(data)
+        
+        return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
             }
         }
-    } 
-    enviar_mensajes_whatsapp(data)
-    return True
-
-def confirm_rx(numero):
+        enviar_mensajes_whatsapp(data)
+        update_user_state_imaging(numero, "WAITING_FOR_IMAGING")
+        return True 
+    
+def confirm_visit_imag(numero):
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -158,34 +140,7 @@ def confirm_rx(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": f"He notificado al personal de citas sobre tu solicitud de prueba de RX📢📝, pronto serás contactado por uno de ellos📞"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idvolver",
-                            "title": "Volver al Inicio"
-                        }
-                    }
-                ]
-            }
-        }
-    } 
-    enviar_mensajes_whatsapp(data)
-    return True
-
-def confirm_eco(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": f"He notificado al personal de citas sobre tu solicitud de prueba de Eco📢📝, pronto serás contactado por uno de ellos📞"
+                "text": f"He notificado al personal de citas sobre tu solicitud📢📝, pronto serás contactado por uno de ellos📞"
             },
             "action": {
                 "buttons":[

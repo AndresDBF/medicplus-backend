@@ -10,7 +10,7 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 
-from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_domiciliary, get_user_state_especiality, get_user_state_lab, get_user_state_ambulance, get_user_state_identification_register, update_user_state_domiciliary, update_user_state_especiality, update_user_state_lab, update_user_state_ambulance
+from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_domiciliary, get_user_state_especiality, get_user_state_imaging, get_user_state_lab, get_user_state_ambulance, get_user_state_identification_register, update_user_state_domiciliary, update_user_state_especiality, update_user_state_lab, update_user_state_ambulance, update_user_state_imaging
 
 #rutas para respuestas del bot 
 from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan_service, cancel_button, goodbye_message
@@ -25,7 +25,7 @@ from routes.respuestas_bot.other_services.medic_consult import get_list_speciali
 from routes.respuestas_bot.other_services.laboratory import get_service_lab, select_service_lab, send_service_location, confirm_visit_lab, cancel_visit_lab, confirm_domiciliary_lab, cancel_domiciliary_lab
 from routes.respuestas_bot.other_services.ambulance import get_list_municipalities, select_municipalities, confirm_ambulance, cancel_ambulance
 from routes.respuestas_bot.other_services.call_oper import question_operator, confirm_oper, cancel_oper
-from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, verify_rx, verify_eco, confirm_rx, confirm_eco, cancel_test
+from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, verify_imaging, cancel_test, confirm_visit_imag
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -121,6 +121,9 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     #consulta para tomar el status del usuario en la solicitud de consulta 
     user_consult = get_user_state_especiality(numero)
     
+    #consulta para tomar el status del usuario en la solicitud de consulta 
+    user_imaging = get_user_state_imaging(numero)
+    
     #consulta para tomar el status del usuario en la solicitud de atencion medica domiciliaria 
     user_team_medic = get_user_state_domiciliary(numero)
     
@@ -143,6 +146,9 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     if user_consult["consult"] is None:
         update_user_state_especiality(numero, "INIT")
     
+    if user_imaging["consult"] is None:
+        update_user_state_imaging(numero, 'INIT')
+    
     if user_lab["consult"] is None:
         update_user_state_lab(numero, "INIT")
     
@@ -151,6 +157,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     if user_team_medic["consult"] is None:
         update_user_state_domiciliary(numero, 'INIT')
+    
         
     print("pasa el if del user null")
     print("este es el user state: ", user_id)
@@ -261,6 +268,10 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         save_appointment(numero, texto)
         return True
     
+    #para las solicitudes de imagenologia 
+    elif user_imaging["state"] == "WAITING_FOR_IMAGING":
+        verify_imaging(numero, texto)
+    
     #LABORATORIOS
     elif user_lab["state"] == "WAITING_FOR_TEST":
         print("entra para enviar send_service_location")
@@ -347,27 +358,14 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     elif "idimagenologia" in texto:
         get_eco_or_rx(numero)
         return True
-    #seleccionando eco o rx
-    elif "idtestrx" in texto:
-        verify_rx(numero)
-        return True
-    elif "idtesteco" in texto:
-        verify_eco(numero)
-        return True
-    #confirmar el rx
-    elif "idconfirmrx" in texto:
-        confirm_rx(numero)
-        return True
    
-    #confirmar el eco
-    elif "idconfirmeco" in texto:
-        confirm_eco(numero)
+    elif "idconfirmvisitimag" in texto:
+        confirm_visit_imag(numero)
         return True
-    
-    #cancelar solicitud
-    elif "idcanceleco" in texto or "idcancelrx" in texto:
+    elif "idcancelvisitimag" in texto:
         cancel_test(numero)
         return True
+  
 #------------------------------------------------LLAMAR UN OPERADOR-----------------------------------------------------------------------
     
     elif "idcalloper" in texto:

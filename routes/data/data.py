@@ -93,23 +93,23 @@ async def insert_baremo():
         "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (13, 'DOPPLER', 'TIROIDES', 45);",
         "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (14, 'DOPPLER', 'TRANSVAGINAL', 45);",
         "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (15, 'DOPPLER', 'VENOSO (1 EXTREMIDAD)', 50);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (16, 'DOPPLER', 'VENOSO (2 EXTREMIDADES)', 100);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (17, 'ECOCARDIOGRAMA', 'PARTES BLANDAS', 20);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (16, 'DOPPLER', 'VENOSO (2 EXTREMIDADES)', 100);",        
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (17, 'ECO PARTES BLANDAS', 'PARTES BLANDAS', 20);",
         "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (18, 'ECOCARDIOGRAMA', 'ECOCARDIOGRAMA', 45);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (19, 'ECOCARDIOGRAMA', 'RENAL PELVICO', 45);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (20, 'ECOCARDIOGRAMA', 'ABDOMINAL', 30);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (21, 'ECOCARDIOGRAMA', 'ABDOMINO PELVICO', 50);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (22, 'ECOCARDIOGRAMA', 'MAMARIO', 30);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (23, 'ECOCARDIOGRAMA', 'MIEMBRO INFERIOR', 60);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (24, 'ECOCARDIOGRAMA', 'MIEMBRO SUPERIOR', 60);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (25, 'ECOCARDIOGRAMA', 'OBSTETRICO', 20);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (26, 'ECOCARDIOGRAMA', 'PELVICO', 20);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (27, 'ECOCARDIOGRAMA', 'RENAL', 20);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (28, 'ECOCARDIOGRAMA', 'RENAL PROSTATICO', 50);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (29, 'ECOCARDIOGRAMA', 'RENAL VESICAL', 50);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (30, 'ECOCARDIOGRAMA', 'TESTICULAR', 30);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (31, 'ECOCARDIOGRAMA', 'TIROIDEO', 30);",
-        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (32, 'ECOCARDIOGRAMA', 'TRANSVAGINAL', 35);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (19, 'ECOSOGRAMA', 'RENALES Y PELVICOS', 45);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (20, 'ECOSONOGRAMA', 'ABDOMINAL', 30);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (21, 'ECOSONOGRAMA', 'ABDOMINO PELVICO', 50);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (22, 'ECOSONOGRAMA', 'MAMARIO', 30);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (23, 'ECOSONOGRAMA', 'MIEMBRO INFERIOR', 60);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (24, 'ECOSONOGRAMA', 'MIEMBRO SUPERIOR', 60);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (25, 'ECOSONOGRAMA', 'OBSTETRICO', 20);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (26, 'ECOSONOGRAMA', 'PELVICO', 20);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (27, 'ECOSONOGRAMA', 'RENAL', 20);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (28, 'ECOSONOGRAMA', 'RENAL PROSTATICO', 50);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (29, 'ECOSONOGRAMA', 'RENAL VESICAL', 50);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (30, 'ECOSONOGRAMA', 'TESTICULAR', 30);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (31, 'ECOSONOGRAMA', 'TIROIDEO', 30);",
+        "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (32, 'ECOSONOGRAMA', 'TRANSVAGINAL', 35);",
         "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (33, 'RX', 'ABDOMEN SIMPLE 1P', 16);",
         "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (34, 'RX', 'ABDOMEN SIMPLE 1P BALON GASTRICO', 16);",
         "INSERT INTO data_imagenologia (id, tip_con, des_pru, pre_pru) VALUES (35, 'RX', 'ABDOMEN SIMPLE 2P', 24);",
@@ -227,12 +227,7 @@ async def insert_baremo():
         data1 = conn.execute(data_aten_med_domi.select()).fetchall()
         data2 = conn.execute(data_consultas.select()).fetchall()
         data3 = conn.execute(data_imagenologia.select()).fetchall()
-        print("el data 1", data1)
-        print("--------------------------------")
-        print("el data 2", data2)
-        print("--------------------------------")
-        print("el data 3", data3)
-        print("--------------------------------")
+       
         if len(data1) < 1:   
             print("entra en el if 1")
             try:

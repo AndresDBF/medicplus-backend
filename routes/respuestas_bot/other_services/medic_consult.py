@@ -73,62 +73,19 @@ def get_list_speciality(numero):
 def get_names_especialitys(numero, especialidad):
     
     result = update_user_state_especiality(numero=numero, state='WAITING_FOR_NAME_ESP', especialidad=especialidad)
+    with engine.connect() as conn:
+        especialidad = conn.execute(user_state_especiality.select().where(user_state_especiality.c.numero==numero)
+                                    .where(user_state_especiality.c.num_esp==especialidad).order_by(user_state_especiality.c.created_at.asc())).first()
+        
     if result == True:
-        if especialidad == "1":
-            data = {
+        data = {
                 "messaging_product": "whatsapp",
                 "to": numero,
                 "text": {
                     "preview_url": False,
-                    "body": "A continuación te daré los nombres de los médicos generales disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️\n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
+                    "body": f"Has escogido la opcion: {especialidad.nom_esp.title()} A continuación te daré los nombres de los especialistas disponibles, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️\n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
                 }
-            }   
-        elif especialidad == "2":
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "text": {
-                    "preview_url": False,
-                    "body": "A continuación te daré los nombres de los especialistas en Pediatría disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️ \n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
-                }
-            }   
-        elif especialidad == "3":
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "text": {
-                    "preview_url": False,
-                    "body": "A continuación te daré los nombres de los especialistas en Traumatología disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️ \n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
-                }
-            }   
-        elif especialidad == "4":
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "text": {
-                    "preview_url": False,
-                    "body": "A continuación te daré los nombres de los especialistas en Neumología disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️ \n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
-                }
-            }   
-            
-        elif especialidad == "5":
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "text": {
-                    "preview_url": False,
-                    "body": "A continuación te daré los nombres de los especialistas en Neurología disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️ \n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
-                }
-            }   
-        elif especialidad == "6":
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "text": {
-                    "preview_url": False,
-                    "body": "A continuación te daré los nombres de los especialistas en Cardiología disponibles que tenemos para tí, escribe el número correspondiente al cuál, deseas agendar la cita 📝👨🏼‍⚕️ \n1. Doctor 1\n2. Doctor 2\n3. Doctor 3\n4. Doctor 4"
-                }
-            }   
+        } 
         enviar_mensajes_whatsapp(data)
         return True
     else:
@@ -150,11 +107,13 @@ def save_appointment(numero, nombre_medico):
     print("entra en save_appointment")
     print("a punto de llamar a la funcion para la variable especiality")
     especiality = update_user_state_especiality(numero=numero, state='WAITING_FOR_CONFIRM', nombre_medico=nombre_medico)
-    
+    print("sale de update_user_state_especiality")
     if especiality == True:
+        print("entra en el if ")
         with engine.connect() as conn:
             name_esp = conn.execute(user_state_especiality.select().where(user_state_especiality.c.numero==numero).order_by(user_state_especiality.c.created_at.asc())).first()
-            print("esto trae name_esp: ", name_esp)            
+            print("esto trae name_esp: ", name_esp)     
+            name_consult = name_esp.nom_esp.title()       
         data = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
@@ -163,7 +122,7 @@ def save_appointment(numero, nombre_medico):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"El costo total de la consulta es de 30$💸\n¿Deseas Agendar la cita con el especialista en {name_esp.nom_esp}?  \n\nSi confirmas la consulta, transferiré tu solicitud hacia la persona encargada de citas.\n\nPuedes cancelar la solicitud presionando el boton No❌ o Volver al inicio↩️"
+                    "text": f"El costo total de la {name_consult} es de {name_esp.precio}$💸\n¿Deseas Agendar la cita?  \n\nSi confirmas la consulta, transferiré tu solicitud hacia la persona encargada de citas.\n\nPuedes cancelar la solicitud presionando el boton No❌ o Volver al inicio↩️"
                 },
                 "action": {
                     "buttons":[
