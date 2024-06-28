@@ -10,6 +10,9 @@ from models.roles import roles
 from models.usuarios import usuarios
 from models.user_roles import user_roles
 from models.user_state_register import user_state_register
+from models.data_aten_med_domi import data_aten_med_domi
+from models.data_consultas import data_consultas
+from models.data_imagenologia import data_imagenologia
 from config.chatbot import chatbot
 
 from routes.data.data import data

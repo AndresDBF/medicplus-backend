@@ -3,11 +3,13 @@ from sqlalchemy.sql.functions import func
 from database.connection import engine, meta_data
 
 # Tabla para almacenar el estado del usuario
-user_state_attention = Table("user_state_attention", meta_data,
-              Column("numero", String(30), primary_key=True),
-              Column("state", String(191), nullable=False),
-              Column("cedula", String(20), nullable=True),
+data_imagenologia = Table("data_imagenologia", meta_data,
+              Column("id", Integer, primary_key=True),
+              Column("tip_con", String(191), nullable=False),
+              Column("des_pru", String(191), nullable=False),
+              Column("pre_pru", Integer, nullable=False),
               Column("created_at", TIMESTAMP, nullable=False, server_default=func.now())
 )
 
 meta_data.create_all(engine, checkfirst=True)
+

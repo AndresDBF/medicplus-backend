@@ -4,6 +4,7 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 from models.user_state_especiality import user_state_especiality
+from models.data_consultas import data_consultas
 from routes.user import verify_user, get_user_state_identification, get_user_state_identification_register, update_user_state_especiality, get_user_state_especiality
 
 from datetime import datetime
@@ -45,15 +46,26 @@ def enviar_mensajes_whatsapp (data):
         connection.close()
     
 def get_list_speciality(numero):
+    number = 0
+    
+    with engine.connect() as conn:
+        list_consult = conn.execute(data_consultas.select()).fetchall()
+    data_list = []
+    for consult in list_consult:
+        number = number + 1
+        name_consult = consult.tip_con.title()
+        data_list.append(f"\n{number}. {name_consult}")
+        
     print("entra en el mensaje de consultas medicas ")
     data = {
         "messaging_product": "whatsapp",
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Gracias por escoger nuestro servicio de Consultas Médicas 🩻 \n\Indicame el número de algunas de nuestras especialidades disponibles y en breves minutos podré agendar tu cita📆. Estas son nuestras especialidades disponibles:\n1. Médico General\n2. Pediatría \n3. Traumatología \n4. Neumología \n5. Neurología \n6. Cardiología \n"
+            "body": f"Gracias por escoger nuestro servicio de Consultas Médicas 🩻 \nIndícame el número de algunas de nuestras especialidades disponibles y en breves minutos podré agendar tu cita 📆. Estas son nuestras especialidades disponibles:\n{''.join(data_list)}"
         }
     }   
+    
     enviar_mensajes_whatsapp(data)
     update_user_state_especiality(numero, 'WAITING_FOR_SPECIALITY')
     return True
