@@ -7,7 +7,7 @@ from models.user_state_lab import user_state_laboratory
 from routes.user import get_user_state_lab, update_user_state_lab
 
 from datetime import datetime
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, text
 
 def agregar_mensajes_log(texto):
     try:
@@ -50,15 +50,67 @@ def get_service_lab(numero):
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Selecciona el número correspondiente a la prueba que deseas adquirir🧬💉\n1. Prueba de Sangre.\n2. Prueba de Orina\n3. Prueba de Eces.\n4. Prueba de COVID-19.\n5. Placa de Torax."
+            "body": "Puedo ayudarte en brindar información necesaria de las pruebas de laboratorio que podemos ofrecer en MedicPlus 👨🏼‍⚕️escribeme que tipo de pruebas deseas realizarte🧬💉 Cumpliré con mi trabajo en buscar en sistema y te diré si dispongo de la prueba que ncesitas👨🏻‍💻."
         }
     }   
     enviar_mensajes_whatsapp(data)
     update_user_state_lab(numero, 'WAITING_FOR_TEST')
     return True
 
+
+def get_list_service_lab(numero, texto):
+    # Crear un diccionario de mapeo de números a tipos de servicios exactos
+    with engine.connect() as conn:
+        list_tests = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{texto}%'")).fetchall()
+    if len(list_tests) < 1:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": f"No he logrado conseguir en sistema la prueba que me indicas❌ puedes volver a indicarme otra prueba que desees o volver al inicio ↩️"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idvolver",
+                                "title": "Volver al Inicio"
+                            }
+                        }
+                    ]
+                }
+            }
+        }  
+        enviar_mensajes_whatsapp(data)
+        update_user_state_lab(numero, 'WAITING_FOR_TEST')
+        return True
+    else:
+        
+        number=0
+        service_map = {}
+        data_list = []
+        for test in list_tests:
+            number += 1
+            service_map[number] = test.tip_pru  
+            data_list.append(f"\n{number}. {test.tip_pru.title()}")
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "text": {
+                "preview_url": False,
+                "body": f"He encontrado la prueba que necesitas en sistema 👨🏻‍💻 a continuacion te muestro los nombres y precios disponibles: \n{''.join(data_list)} \n\nSelecciona una de ellas💉"
+            }
+        } 
+        enviar_mensajes_whatsapp(data)
+        update_user_state_lab(numero, 'WAITING_FOR_SELECT_TEST', test=texto)
+        return True
+
 def send_service_location(numero, test):
-    result = update_user_state_lab(numero, 'WAITING_FOR_LOCATION', test)
+    result = update_user_state_lab(numero, 'WAITING_FOR_LOCATION', opcion=test)
     if result == True:
         data = {
             "messaging_product": "whatsapp",
@@ -109,7 +161,8 @@ def send_service_location(numero, test):
 
 def select_service_lab(numero, texto):
     with engine.connect() as conn:
-            test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)
+            test = conn.execute(select(user_state_laboratory.c.opcion, user_state_laboratory.c.precio)
+                                .select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)
                                 .order_by(user_state_laboratory.c.created_at.asc())).scalar()
     if texto == "idvisitlab":
         print("entra en el if de selec service lab")
@@ -122,7 +175,7 @@ def select_service_lab(numero, texto):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"La {test} tiene un costo de 30$💸 , ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
+                    "text": f"La prueba de {test.opcion} tiene un costo de {test.precio}$💸 , ¿Deseas agendar la visita al laboratorio💉? Tu confirmación la agendaré al personal para indicarle disponibilidad📝 "
                 },
                 "action": {
                     "buttons":[
@@ -156,7 +209,7 @@ def select_service_lab(numero, texto):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"La {test} tiene un costo de 30$ junto con una recarga de 10$ del domicilio 💸, ¿Deseas confirmar el traslado del equipo médico💉?"
+                        "text": f"La prueba de {test.opcion} tiene un costo de {test.precio}$💸 con un costo adicional del domicilio 💸, contactaré con el personal de citas quien te podrá brindar mas informacion al respecto una vez aceptes la solicitud. ¿Deseas confirmar el traslado del equipo médico💉?"
                     },
                     "action": {
                         "buttons":[

@@ -54,6 +54,7 @@ def get_eco_or_rx(numero):
     
     with engine.connect() as conn:
         list_imag = conn.execute(text("select distinct tip_con from data_imagenologia;")).fetchall()
+        print("esto muestra el list imag ", list_imag)
     # Crear un diccionario de mapeo de números a tipos de servicios exactos
     service_map = {}
     data_list = []
@@ -79,10 +80,12 @@ def verify_imaging(numero, texto):
         with engine.connect() as conn:
             test = conn.execute(user_state_imaging.select().where(user_state_imaging.c.numero==numero)
                                 .where(user_state_imaging.c.opcion==texto).order_by(user_state_imaging.c.created_at.asc())).first()
-            name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con={test.nombre}")).scalar()
-            min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con={test.nombre}")).scalar()
-            max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con={test.nombre}")).scalar()
-            
+            name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{test.nombre}'")).scalar()
+            min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
+            max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
+        print("el name_test: ", name_test) 
+        print("el min_price: ", min_price)
+        print("el max_price: ", max_price)
         data = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",

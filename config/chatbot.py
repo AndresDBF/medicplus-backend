@@ -22,7 +22,7 @@ from routes.respuestas_bot.medical_attention.telemedicine import get_info_identi
 from routes.respuestas_bot.medical_attention.domiciliary import get_municipality, confirm_service, accept_domiciliary, decline_domiciliary
 #otros servicios
 from routes.respuestas_bot.other_services.medic_consult import get_list_speciality, get_names_especialitys, save_appointment, confirm_consult, cancel_consult
-from routes.respuestas_bot.other_services.laboratory import get_service_lab, select_service_lab, send_service_location, confirm_visit_lab, cancel_visit_lab, confirm_domiciliary_lab, cancel_domiciliary_lab
+from routes.respuestas_bot.other_services.laboratory import get_service_lab, select_service_lab, send_service_location, confirm_visit_lab, cancel_visit_lab, confirm_domiciliary_lab, cancel_domiciliary_lab, get_list_service_lab
 from routes.respuestas_bot.other_services.ambulance import get_list_municipalities, select_municipalities, confirm_ambulance, cancel_ambulance
 from routes.respuestas_bot.other_services.call_oper import question_operator, confirm_oper, cancel_oper
 from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, verify_imaging, cancel_test, confirm_visit_imag
@@ -147,6 +147,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         update_user_state_especiality(numero, "INIT")
     
     if user_imaging["consult"] is None:
+        print("entra en consult none")
         update_user_state_imaging(numero, 'INIT')
     
     if user_lab["consult"] is None:
@@ -166,6 +167,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     print("este es el user lab: ", user_lab)
     print("este es el user ambulance: ", user_ambulance)
     print("este es el user team medic: ", user_team_medic)
+    print("este es el user imaging: ", user_imaging)
     
     
     texto = texto.lower()
@@ -270,13 +272,18 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     #para las solicitudes de imagenologia 
     elif user_imaging["state"] == "WAITING_FOR_IMAGING":
+        print("entra en verify_imaging")
         verify_imaging(numero, texto)
     
     #LABORATORIOS
     elif user_lab["state"] == "WAITING_FOR_TEST":
+        get_list_service_lab(numero, texto)
+        return True
+    elif user_lab["state"] == "WAITING_FOR_SELECT_TEST":
         print("entra para enviar send_service_location")
         send_service_location(numero, texto)
         return True
+    
     elif user_lab["state"] == "WAITING_FOR_LOCATION":
         print("entra en selec service lab")
         select_service_lab(numero, texto)
@@ -356,6 +363,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
 
 #------------------------------------------------IMAGENOLOGIA----------------------------------------------------------------------- 
     elif "idimagenologia" in texto:
+        print("entra en idimaginologia")
         get_eco_or_rx(numero)
         return True
    

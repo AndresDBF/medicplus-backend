@@ -67,7 +67,7 @@ def get_user_state_especiality(numero):
 
 #para tomar el status de imagenologia
 def get_user_state_imaging(numero):
-    print("---------------------entra en get_user_state_especiality---------------------")
+    print("---------------------entra en get_user_state_imaging---------------------")
     with engine.connect() as conn:
         result = conn.execute(select(user_state_imaging).where(user_state_imaging.c.numero == numero)).fetchone()
         if result is not None:
@@ -101,7 +101,7 @@ def get_user_state_lab(numero):
         result = conn.execute(select(user_state_laboratory).where(user_state_laboratory.c.numero == numero)).fetchone()
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "test", "domicilio","fecha_y_hora"]
+            columns = ["numero", "state", "opcion", "test", "precio", "domicilio","fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
         
@@ -389,13 +389,14 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
 #para la solicitud de imagenologia
 def update_user_state_imaging(numero, state, test=None, confirm=None):
     with engine.connect() as conn:
-        print("---------------------entra en update_user_state_lab---------------------")
+        print("---------------------entra en update_user_state_imaging---------------------")
         print("el numero: ", numero)
         print("el status: ", state)
         print("la prueba: ", test)
         number = 0
-        result = get_user_state_lab(numero)
+        result = get_user_state_imaging(numero)
         list_imag = conn.execute(text("select distinct tip_con from data_imagenologia;")).fetchall()
+        print("el list imag: ", list_imag)
         # Crear un diccionario de mapeo de números a tipos de servicios exactos
         service_map = {}
         data_list = []
@@ -406,93 +407,68 @@ def update_user_state_imaging(numero, state, test=None, confirm=None):
             
         
         if result["consult"] is not None:
+            print("encuentra datos del status")
             if test:
+                print("entra en test")
                 selected_service = service_map[int(test)]
-                verify_test = conn.execute(data_imagenologia.select().where(data_imagenologia.c.tip_con==selected_service)).first()
+                print("el select_service: ", selected_service)
+                verify_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{selected_service}'")).scalar()
+                print("el verify_test: ", verify_test)
                 if not verify_test:
+                    print("entra en el if")
                     return False
                 else:
+                    print("entra en el else")
                     conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
-                                 .values(numero=numero, state=state, opcion=test, nombre=verify_test.tip_con))
+                                 .values(numero=numero, state=state, opcion=test, nombre=verify_test))
                     conn.commit()
                     return True
             else:
+                print("entra en el else de que no consiguio parametros")
                 conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
                             .values(numero=numero, state=state))
                 conn.commit()
                 return True
         else:   
             print("entra en el else ")        
-            conn.execute(user_state_laboratory.insert().values(numero=numero, state=state))
+            conn.execute(user_state_imaging.insert().values(numero=numero, state=state))
             conn.commit()
             return True
 
 
 #para la solicitud de una prueba de laboratorio
-def update_user_state_lab(numero, state, test=None, confirm_domi=None):
+def update_user_state_lab(numero, state, test=None, opcion=None, confirm_domi=None):
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_lab---------------------")
         print("el numero: ", numero)
         print("el status: ", state)
         print("la prueba: ", test)
         
-        result = get_user_state_lab(numero)
-        
+        result = get_user_state_lab(numero)        
         if result["consult"] is not None:
             if test:
-                print("entra en el if de test")
-                if test not in ["1", "2", "3", "4", "5"]:
-                    return False
-                elif test == "1":
-                    print("entra en 1")
-                    conn.execute(
-                        update(user_state_laboratory)
-                        .where(user_state_laboratory.c.numero == numero)
-                        .values(numero=numero, state=state, test='Prueba de Sangre')
-                    )
-                    conn.commit()
-                elif test == "2":
-                    print("entra en 2")
-                    conn.execute(
-                        update(user_state_laboratory)
-                        .where(user_state_laboratory.c.numero == numero)
-                        .values(numero=numero, state=state, test='Prueba de Orina')
-                    )
-                    conn.commit()
-                elif test == "3":
-                    print("entra en 3")
-                    conn.execute(
-                        update(user_state_laboratory)
-                        .where(user_state_laboratory.c.numero == numero)
-                        .values(numero=numero, state=state, test='Prueba de Eces')
-                    )
-                    conn.commit()
-                elif test == "4":
-                    print("entra en 4")
-                    conn.execute(
-                        update(user_state_laboratory)
-                        .where(user_state_laboratory.c.numero == numero)
-                        .values(numero=numero, state=state, test='Prueba de COVID-19')
-                    )
-                    conn.commit()
-                elif test == "5":
-                    print("entra en 5")
-                    conn.execute(
-                        update(user_state_laboratory)
-                        .where(user_state_laboratory.c.numero == numero)
-                        .values(numero=numero, state=state, test='Placa de Torax')
-                    )
-                    conn.commit()
-                elif test == "6":
-                    print("entra en 6")
-                    conn.execute(
-                        update(user_state_laboratory)
-                        .where(user_state_laboratory.c.numero == numero)
-                        .values(numero=numero, state=state, test='Imagenología')
-                    )
-                    conn.commit()
-                return True       
-            elif confirm_domi:
+                conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)
+                            .values(numero=numero, state=state, test=test))
+                conn.commit()
+                return True
+            if opcion:
+                number = 0
+                find_test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory)
+                                         .where(user_state_laboratory.c.numero==numero).order_by(user_state_laboratory.c.created_at.asc())).scalar()
+                list_tests = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{find_test}%'")).fetchall()
+                service_map = {}
+                data_list = []
+                for info_test in list_tests:
+                    number += 1
+                    service_map[number] = info_test.tip_con  # Mapear número a nombre exacto del servicio
+                    data_list.append(f"\n{number}. {info_test.tip_con.title()}")
+                selected_service = service_map[int(opcion)]
+                verify_test = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{selected_service}%'")).first()
+                conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)
+                            .values(numero=numero, state=state, opcion=verify_test.tip_pru, precio=verify_test.pre_pru))
+                conn.commit()
+                return True
+            if confirm_domi:
                 print("entra en el elif de confirmar y actualizar el domicilio")
                 conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)
                              .values(numero=numero, state=state, domicilio=True))
