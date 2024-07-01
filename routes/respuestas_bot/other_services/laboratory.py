@@ -156,7 +156,7 @@ def send_service_location(numero, texto):
         }
         enviar_mensajes_whatsapp(data)
         print("a punto de llamar a la funcion en el else de respuesta incorrecta")
-        update_user_state_lab(numero, "WAITING_FOR_TEST")
+        update_user_state_lab(numero, "WAITING_FOR_SELECT_TEST")
         return True 
 
 def select_service_lab(numero, texto):

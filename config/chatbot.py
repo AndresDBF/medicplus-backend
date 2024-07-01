@@ -412,6 +412,7 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
 #------------------------------------------------AMBULANCIAS----------------------------------------------------------------------------
     elif "idambula" in texto:
+        print("entra en idambula")
         get_list_municipalities(numero)
         return True
     elif "idconfirmambulance" in texto:

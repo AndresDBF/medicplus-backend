@@ -103,7 +103,7 @@ def confirm_service(numero, location):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}💵, ¿Desea confirmar el servicio?"
+                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}$💵, ¿Desea confirmar el servicio?"
                     },
                     "action": {
                         "buttons":[
@@ -136,6 +136,10 @@ def confirm_service(numero, location):
             enviar_mensajes_whatsapp(data)
             return True
         else:
+            with engine.connect() as conn:
+                municipality = conn.execute(data_aten_med_domi.select()
+                                            .where(data_aten_med_domi.c.des_dom==domiciliary.location)
+                                            .where(data_aten_med_domi.c.hor_diu==True)).first()
             data = {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
@@ -144,7 +148,7 @@ def confirm_service(numero, location):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}💵, ¿Desea confirmar el servicio?"
+                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}$💵, ¿Desea confirmar el servicio?"
                     },
                     "action": {
                         "buttons":[

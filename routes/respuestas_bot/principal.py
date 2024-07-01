@@ -9,7 +9,8 @@ from models.user_state_especiality import user_state_especiality
 from models.user_state_lab import user_state_laboratory
 from models.user_state_imaging import user_state_imaging
 from models.user_state_ambulance import user_state_ambulance
-from routes.user import verify_user, get_user_state_identification_register, get_user_state_register, update_user_state_especiality, update_user_state_lab
+from models.user_state_domiciliary import user_state_domiciliary
+from routes.user import verify_user, get_user_state_identification_register, get_user_state_register, update_user_state_especiality, update_user_state_lab, update_user_state_ambulance, update_user_state_domiciliary, update_user_state_imaging
 from datetime import datetime
 from sqlalchemy import insert, select
 
@@ -297,6 +298,7 @@ def return_button(numero):
         verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
         verify_imaging = conn.execute(select(user_state_imaging.c.state).select_from(user_state_imaging).where(user_state_imaging.c.numero==numero)).scalar()
         verify_ambulance = conn.execute(select(user_state_ambulance.c.state).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).scalar()
+        verify_domiciliary = conn.execute(select(user_state_domiciliary.c.state).select_from(user_state_domiciliary).where(user_state_domiciliary.c.numero==numero)).scalar()
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -317,11 +319,15 @@ def return_button(numero):
         if verify_imaging:
             if verify_imaging != ['CONFIRM_VISIT_IMAGING']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT')
+                update_user_state_imaging(numero, 'INIT')
         if verify_ambulance:
             if verify_ambulance not in ['CONFIRM_AMBULANCE', 'CANCEL_AMBULANCE']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT') 
+                update_user_state_ambulance(numero, 'INIT') 
+        if verify_domiciliary:
+            if verify_ambulance not in ['CONFIRM_MEDIC_TEAM', 'CANCEL_MEDIC_TEAM']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_domiciliary(numero, 'INIT') 
                 
     return True
 
@@ -366,6 +372,7 @@ def cancel_button(numero):
         verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
         verify_imaging = conn.execute(select(user_state_imaging.c.state).select_from(user_state_imaging).where(user_state_imaging.c.numero==numero)).scalar()
         verify_ambulance = conn.execute(select(user_state_ambulance.c.state).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).scalar()
+        verify_domiciliary = conn.execute(select(user_state_domiciliary.c.state).select_from(user_state_domiciliary).where(user_state_domiciliary.c.numero==numero)).scalar()
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -386,11 +393,16 @@ def cancel_button(numero):
         if verify_imaging:
             if verify_imaging != ['CONFIRM_VISIT_IMAGING']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT')
+                update_user_state_imaging(numero, 'INIT')
         if verify_ambulance:
             if verify_ambulance not in ['CONFIRM_AMBULANCE', 'CANCEL_AMBULANCE']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT') 
+                update_user_state_ambulance(numero, 'INIT') 
+        if verify_domiciliary:
+            if verify_ambulance not in ['CONFIRM_MEDIC_TEAM', 'CANCEL_MEDIC_TEAM']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_domiciliary(numero, 'INIT') 
+                
     return True
 
 def message_not_found(numero):
@@ -447,6 +459,7 @@ def decline_action(numero):
         verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
         verify_imaging = conn.execute(select(user_state_imaging.c.state).select_from(user_state_imaging).where(user_state_imaging.c.numero==numero)).scalar()
         verify_ambulance = conn.execute(select(user_state_ambulance.c.state).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).scalar()
+        verify_domiciliary = conn.execute(select(user_state_domiciliary.c.state).select_from(user_state_domiciliary).where(user_state_domiciliary.c.numero==numero)).scalar()
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -467,11 +480,16 @@ def decline_action(numero):
         if verify_imaging:
             if verify_imaging != ['CONFIRM_VISIT_IMAGING']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT')
+                update_user_state_imaging(numero, 'INIT')
         if verify_ambulance:
             if verify_ambulance not in ['CONFIRM_AMBULANCE', 'CANCEL_AMBULANCE']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT') 
+                update_user_state_ambulance(numero, 'INIT') 
+        if verify_domiciliary:
+            if verify_ambulance not in ['CONFIRM_MEDIC_TEAM', 'CANCEL_MEDIC_TEAM']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_domiciliary(numero, 'INIT') 
+                
     return True
 
 def goodbye_message(numero):
@@ -492,6 +510,7 @@ def goodbye_message(numero):
         verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
         verify_imaging = conn.execute(select(user_state_imaging.c.state).select_from(user_state_imaging).where(user_state_imaging.c.numero==numero)).scalar()
         verify_ambulance = conn.execute(select(user_state_ambulance.c.state).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).scalar()
+        verify_domiciliary = conn.execute(select(user_state_domiciliary.c.state).select_from(user_state_domiciliary).where(user_state_domiciliary.c.numero==numero)).scalar()
         if verify_register:
             if verify_register != "REGISTERED":
                 print("entra en el if para reiniciar status de registro")
@@ -512,10 +531,15 @@ def goodbye_message(numero):
         if verify_imaging:
             if verify_imaging != ['CONFIRM_VISIT_IMAGING']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT')
+                update_user_state_imaging(numero, 'INIT')
         if verify_ambulance:
             if verify_ambulance not in ['CONFIRM_AMBULANCE', 'CANCEL_AMBULANCE']:
                 print("entra en el if para reiniciar status de consulta")
-                update_user_state_lab(numero, 'INIT') 
+                update_user_state_ambulance(numero, 'INIT') 
+        if verify_domiciliary:
+            if verify_ambulance not in ['CONFIRM_MEDIC_TEAM', 'CANCEL_MEDIC_TEAM']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_domiciliary(numero, 'INIT') 
+                
     return True
 

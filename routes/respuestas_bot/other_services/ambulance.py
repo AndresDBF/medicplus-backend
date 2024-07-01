@@ -7,7 +7,7 @@ from models.user_state_ambulance import user_state_ambulance
 from routes.user import get_user_state_ambulance, update_user_state_ambulance
 
 from datetime import datetime
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, text
 
 def agregar_mensajes_log(texto):
     try:
@@ -45,12 +45,23 @@ def enviar_mensajes_whatsapp (data):
         connection.close()
  
 def get_list_municipalities(numero):
+    with engine.connect() as conn:
+        list_munic= conn.execute(text("select * from data_aten_med_domi where hor_diu = True;")).fetchall()
+        print("esto muestra el list imag ", list_munic)
+    # Crear un diccionario de mapeo de números a tipos de servicios exactos
+    service_map = {}
+    data_list = []
+    number = 0
+    for munic in list_munic:
+        number += 1
+        service_map[number] = munic.des_dom  # Mapear número a nombre exacto del servicio
+        data_list.append(f"\n{number}. {munic.des_dom.title()}")
     data = {
         "messaging_product": "whatsapp",
         "to": numero,
         "text": {
             "preview_url": False,
-            "body": "Indicame el municipio donde requieres tu traslado y me pondré en contacto en breves minutos con una unidad disponible🚑\n1. La Asunción\n2. Juangriego\n3. Porlamar\n4. Pampatar\n5. Santa Ana\n6. Punta de Piedra\n7. Altagracia"
+            "body": f"Indicame el municipio donde requieres tu traslado y me pondré en contacto en breves minutos con una unidad disponible🚑\n{''.join(data_list)}"
         }
     }   
     enviar_mensajes_whatsapp(data)
@@ -58,10 +69,10 @@ def get_list_municipalities(numero):
     return True
 
 def select_municipalities(numero, texto):
-    result = update_user_state_ambulance(numero, 'WAITING_CONFIRM_AMBULANCE',texto)
+    result = update_user_state_ambulance(numero, 'WAITING_CONFIRM_AMBULANCE',municipalities=texto)
     if result == True:
         with engine.connect() as conn:
-            location = conn.execute(select(user_state_ambulance.c.location).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).scalar()
+            location = conn.execute(select(user_state_ambulance.c.location, user_state_ambulance.c.precio).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).first()
         
         data = {
             "messaging_product": "whatsapp",
@@ -70,7 +81,7 @@ def select_municipalities(numero, texto):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"El costo del traslado desde el municipio {location} es de 30$, ¿Deseas confirmar de inmediato el traslado de la unidad?.🚑"
+                    "text": f"El costo del traslado desde el municipio {location.location} es de {location.precio}$, ¿Deseas confirmar de inmediato el traslado de la unidad?.🚑"
                 },
                 "action": {
                     "buttons":[
