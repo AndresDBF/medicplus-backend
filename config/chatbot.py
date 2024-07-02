@@ -9,11 +9,12 @@ from database.connection import engine
 
 from models.log import log
 from models.usuarios import usuarios
+from models.user_state_register import user_state_register
 
 from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_domiciliary, get_user_state_especiality, get_user_state_imaging, get_user_state_lab, get_user_state_ambulance, get_user_state_identification_register, update_user_state_domiciliary, update_user_state_especiality, update_user_state_lab, update_user_state_ambulance, update_user_state_imaging
 
 #rutas para respuestas del bot 
-from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, get_plan_service, cancel_button, goodbye_message
+from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, cancel_button, goodbye_message
 from routes.respuestas_bot.register.register import get_plan, is_affiliate, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
 from routes.respuestas_bot.register.plan import get_list_plan, send_info_plan, send_name_affiliate
 #atenciones medicas
@@ -30,12 +31,16 @@ from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
 
+from googletrans import Translator
+
 chatbot = APIRouter(tags=["Login"], responses={status.HTTP_404_NOT_FOUND: {"message": "Direccion No encontrada"}})
 
 # Configuración de plantillas y archivos estáticos
 templates = Jinja2Templates(directory="templates")
 
 TOKEN_ANDERCODE = "ANDERCODE"
+
+translate_to_english = False
 
 @chatbot.get("/")
 async def index(request: Request):
@@ -48,39 +53,49 @@ async def index(request: Request):
 async def webhook(req: Request):
     try:
         req_data = await req.json()
-       
+        
         
         for entry in req_data.get('entry', []):
             for change in entry.get('changes', []):
                 value = change.get('value', {})
                 messages = value.get('messages', [])
+                contacts = value.get('contacts',[])
+                for contact in contacts: 
+                    name_contact = contact["profile"]["name"]
                 for message in messages:
-                    print("esto trae el message: ", message)
+                   
                     agregar_mensajes_log({"message": message})
                     numero = message['from']
                     if "type" in message:
                         tipo = message["type"]
                         if tipo == "interactive":
-                            print("entra en interactive")
+                   
                             tipo_interactivo = message["interactive"]["type"]
                             if tipo_interactivo == "button_reply":
                                 text = message["interactive"]["button_reply"]["id"]
+                               
                                 print(f"esto se pasa al contestar mensajes whats app: el texto {text} y el numero {numero}")
                                 agregar_mensajes_log({"numero": numero})
                                 agregar_mensajes_log({"tipo": tipo})
                                 agregar_mensajes_log({"mensaje": text})
-                                contestar_mensajes_whatsapp(text, numero)
+                                contestar_mensajes_whatsapp(text, name_contact, numero)
                             elif tipo_interactivo == "list_reply":
                                 text = message["interactive"]["list_reply"]["id"]
-                                contestar_mensajes_whatsapp(text, numero)
+                                agregar_mensajes_log({"numero": numero})
+                                agregar_mensajes_log({"tipo": tipo})
+                                agregar_mensajes_log({"mensaje": text})
+                                contestar_mensajes_whatsapp(text, name_contact, numero)
                         elif "text" in message:
                             print("entra en text")
                             text = message["text"]["body"]
+                            # Activar/desactivar traducción según la palabra clave
+                            
+                                
                             print(f"esto se pasa al contestar mensajes whats app: el texto {text} y el numero {numero}")
                             agregar_mensajes_log({"numero": numero})
                             agregar_mensajes_log({"tipo": tipo})
                             agregar_mensajes_log({"mensaje": text})
-                            contestar_mensajes_whatsapp(text, numero)
+                            contestar_mensajes_whatsapp(text, name_contact, numero)
                         
         return JSONResponse(content={'message': 'EVENT_RECEIVED'})
     except Exception as e:
@@ -95,15 +110,25 @@ async def verify_token(hub_mode: str = Query(..., alias='hub.mode'), hub_challen
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")        
 
 saludos = [
-    'hola', 'buenas', 'buenos', 'hi', 'hello', 'hey', 
+    'hola', 'buenas', 'buenos', 
     'saludos', 'buenos días', 'buenas tardes', 'buenas noches', 
     'qué tal', 'holi', 'holis', 'qué onda', 'cómo estás', 
     'qué pasa', 'qué hay', 'qué cuentas', 'buen día', 'informacion'
 ]
 
+saludos_ingles = ["hello", "hello", "good",
+ "greetings", "good morning", "good afternoon", "good evening",
+ "how are you", "holi", "holis", "whats up", "how are you",
+ "what's up", "what's up", "what's up", "good day", "information"]
+
 cancelaciones = [
     'cancelar', 'cancela', 'atras', 'retrocede', 'no quiero', 'olvida', 'olvidalo', 'llevame',
     'lleveme', 'lleve', 'ir', 'inicio','menu','opciones', 'de nuevo', 'regresar', 'devolverme', 'devolver', 'volver', 'retrocerder'
+]
+
+cancelaciones_ingles = [
+    "cancel", "cancel", "back", "go back", "I don't want to", "forget", "forget it", "take me",
+ "take me", "take me", "go", "home",  "options", "again", "return", "return me", "return", "return"
 ]
 
 despedidadas = [
@@ -111,7 +136,10 @@ despedidadas = [
     'hablamos luego', 'hablamos despues', 'cumplido', 'cumplir', 'terminar','terminado'
 ]
 
-def contestar_mensajes_whatsapp(texto: str, numero):
+despedidas_ingles = ["goodbye", "bye", "bye", "see you later", "see you", "see you soon", "thank you", "grateful",
+ "we'll talk later", "we'll talk later", "accomplished", "comply", "finish", "finished"]
+
+def contestar_mensajes_whatsapp(texto: str, name_contact, numero):
     #consulta para tomar el status del usuario cuando ingrese la cedula 
     user_id = get_user_state_identification(numero)
     
@@ -171,6 +199,22 @@ def contestar_mensajes_whatsapp(texto: str, numero):
     
     
     texto = texto.lower()
+    with engine.connect() as conn:    
+        if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos_ingles):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=True))
+            conn.commit()
+            principal_message(numero)
+            return True
+        elif any(re.search(r'\b' + cancelar + r'\b', texto) for cancelar in cancelaciones_ingles):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=True))
+            conn.commit()
+            cancel_button(numero)
+            return True
+        elif any(re.search(r'\b' + despedir + r'\b', texto) for despedir in despedidas_ingles):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=True))
+            conn.commit()
+            goodbye_message(numero)
+            return True
 #-------------------------------------valida primero el idvolver por si algun proceso no fue completado----------------------------------
     
     if "idvolver" in texto:
@@ -194,22 +238,29 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         return True
 
 #---------------------------------VALIDANDO LOS BOTONES ---------------------------------------------------------------------
-    elif any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
-        print("entra en el mensaje principal")
-        principal_message(numero)
-        return True
-    elif any(re.search(r'\b' + cancelar + r'\b', texto) for cancelar in cancelaciones):
-        print("entra en las cancelaciones")
-        cancel_button(numero)
-        return True
-    
-    elif any(re.search(r'\b' + despedir + r'\b', texto) for despedir in despedidadas):
-        print("entra en las despedidas")
-        goodbye_message(numero)
-        return True
+    with engine.connect() as conn:    
+        if any(re.search(r'\b' + saludo + r'\b', texto) for saludo in saludos):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=False))
+            conn.commit()
+            print("entra en el mensaje principal")
+            principal_message(numero)
+            return True
+        elif any(re.search(r'\b' + cancelar + r'\b', texto) for cancelar in cancelaciones):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=False))
+            conn.commit()
+            print("entra en las cancelaciones")
+            cancel_button(numero)
+            return True
+        
+        elif any(re.search(r'\b' + despedir + r'\b', texto) for despedir in despedidadas):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=False))
+            conn.commit()
+            print("entra en las despedidas")
+            goodbye_message(numero)
+            return True
 #-------------------------------------validamos los status de las variables --------------------------------------------------------------
     #status del registro
-    elif user_register["state"] == 'WAITING_FOR_PLAN':
+    if user_register["state"] == 'WAITING_FOR_PLAN':
         print("entra para ingresar el plan")
         insert_plan(numero, texto)
         return True
@@ -381,10 +432,10 @@ def contestar_mensajes_whatsapp(texto: str, numero):
         question_operator(numero)
         return True
     elif "idconfirmoper" in texto:
-        confirm_call(numero)
+        confirm_oper(numero, name_contact)
         return True
     elif "idcanceloper" in texto:
-        cancel_call(numero)
+        cancel_oper(numero)
         return True
             
     

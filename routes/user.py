@@ -27,7 +27,7 @@ def get_user_state(numero):
         
         if result is not None:
             # Asumiendo que result tiene los campos en este orden: numero, state, nombre, apellido, cedula, email, fecha_y_hora
-            columns = ["numero", "state", "plan", "nombre", "apellido", "cedula", "email", "fecha_y_hora"]
+            columns = ["numero", "state", "language", "plan", "nombre", "apellido", "cedula", "email", "fecha_y_hora"]
             result_dict = dict(zip(columns, result))
             result_dict["consult"] = True
             return result_dict

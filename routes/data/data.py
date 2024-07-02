@@ -65,18 +65,17 @@ async def insert_baremo():
         "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (2, 'CONSULTA CIRUGIA GENERAL', 30);",
         "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (3, 'CONSULTA DERMATOLOGIA', 40);",
         "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (4, 'CONSULTA GASTROENTEROLOGIA', 30);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (5, 'CONSULTA GINECOLOGIA', 25);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (6, 'CONSULTA GINEOBSTETRICIA', 25);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (7, 'CONSULTA MASTOLOGIA', 50);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (8, 'CONSULTA MEDICINA GENERAL', 15);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (9, 'CONSULTA MEDICINA INTERNA', 25);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (10, 'CONSULTA NEFROLOGIA', 30);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (11, 'CONSULTA NUTRICIONISTA', 30);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (12, 'CONSULTA OFTALMOLOGIA', 30);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (13, 'CONSULTA OTORRINOLARINGOLOGIA', 40);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (14, 'CONSULTA PEDIATRIA', 25);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (15, 'CONSULTA TRAUMATOLOGIA', 30);",
-        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (16, 'CONSULTA UROLOGIA', 30);"
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (5, 'CONSULTA GINECOLOGIA Y GINEOBSTETRICIA', 25);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (6, 'CONSULTA MASTOLOGIA', 50);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (7, 'CONSULTA MEDICINA GENERAL', 15);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (8, 'CONSULTA MEDICINA INTERNA', 25);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (9, 'CONSULTA NEFROLOGIA', 30);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (10, 'CONSULTA NUTRICIONISTA', 30);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (11, 'CONSULTA OFTALMOLOGIA', 30);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (12, 'CONSULTA OTORRINOLARINGOLOGIA', 40);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (13, 'CONSULTA PEDIATRIA', 25);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (14, 'CONSULTA TRAUMATOLOGIA', 30);",
+        "INSERT INTO data_consultas(id, tip_con, pre_con) VALUES (15, 'CONSULTA UROLOGIA', 30);"
     ]
     
     query_imagenologia = [

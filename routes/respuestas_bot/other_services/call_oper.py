@@ -75,7 +75,7 @@ def question_operator(numero):
     enviar_mensajes_whatsapp(data)
     return True
 
-def confirm_oper(numero):
+def confirm_oper(numero, name_contact):
     data = {
         "messaging_product": "whatsapp",
         "to": numero,
@@ -99,7 +99,36 @@ def confirm_oper(numero):
         }
     }  
     enviar_mensajes_whatsapp(data)
-    return True
+    with engine.connect() as conn:
+        user_affiliate = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
+    if user_affiliate:
+        #enviando un mensaje al operador 
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": "584123939200",
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": f"Hola👋🏼 Soy MedicBot 🤖 asistente virtual de MedicPlus, Un usuario afiliado ha solicitado el servicio de un operador para cubrir una solicitud, te he escogido para atender a su llamado☎️ su nombre de afiliado se encuentra registrado como: {user_affiliate.nom_usu} {user_affiliate.ape_usu} y su número de teléfono es: +{numero} \n\nMuchas gracias por tu tiempo✅ "
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        return True
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": "584123939200",
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": f"Hola👋🏼 Soy MedicBot 🤖 asistente virtual de MedicPlus, Un usuario ha solicitado el servidor de un operador para cubrir una solicitud, te he escogido para atender a su llamado☎️ su nombre de Whats app es: {name_contact} y su numero de telefono es: +{numero} \n\nMuchas gracias por tu tiempo✅ "
+            }
+        }
+        enviar_mensajes_whatsapp(data)
+        return True
+        
 
 def cancel_oper(numero):
     data = {

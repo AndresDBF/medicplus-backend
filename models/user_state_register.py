@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Table, String, Integer, CHAR, TIMESTAMP
+from sqlalchemy import Column, Table, String, Integer, CHAR, TIMESTAMP, Boolean
 from sqlalchemy.sql.functions import func
 from database.connection import engine, meta_data
 
@@ -6,6 +6,7 @@ from database.connection import engine, meta_data
 user_state_register = Table("user_state_register", meta_data,
               Column("numero", String(30), primary_key=True),
               Column("state", String(191), nullable=False),
+              Column("language", Boolean, nullable=False, default=False),
               Column("plan", String(1), nullable=True),
               Column("nombre", String(80), nullable=True),
               Column("apellido", String(80), nullable=True),

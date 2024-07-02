@@ -44,8 +44,14 @@ def enviar_mensajes_whatsapp (data):
         agregar_mensajes_log(f"Exception al enviar mensaje: {e}")
     finally:
         connection.close()
-        
+
+def verify_language(numero):
+    with engine.connect() as conn:
+        result = conn.execute(select(user_state_register.c.language).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
+    return result    
+   
 def get_list_plan(numero):
+    
     number = 0
     
     with engine.connect() as conn:
