@@ -407,7 +407,7 @@ def contestar_mensajes_whatsapp(texto: str, name_contact, numero):
         get_list_speciality(numero)
         return True
     elif "idconfirmconsult" in texto:
-        confirm_consult(numero)
+        confirm_consult(numero, name_contact)
         return True
     elif "iddeclineconsult" in texto:
         cancel_consult(numero)

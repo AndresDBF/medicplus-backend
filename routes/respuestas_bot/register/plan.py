@@ -10,6 +10,7 @@ from routes.user import get_user_state, get_user_state_register, get_user_state_
 from routes.user import verify_user
 from datetime import datetime
 from sqlalchemy import insert, select, text
+from googletrans import Translator
 
 def agregar_mensajes_log(texto):
     try:
@@ -51,7 +52,7 @@ def verify_language(numero):
     return result    
    
 def get_list_plan(numero):
-    
+    language = verify_language(numero)
     number = 0
     
     with engine.connect() as conn:
@@ -64,16 +65,29 @@ def get_list_plan(numero):
         number += 1
         service_map[number] = plan.tip_pla  # Mapear número a nombre exacto del servicio
         data_list.append(f"\n{number}. {plan.tip_pla}")
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "text",
-        "text": {
-            "preview_url": False,
-            "body": f"Puedo proporcionarte la información suficiente sobre nuestros planes para afiliados de MedicPlus🩺👨🏼‍⚕️, escribe el número correspondiente a uno de ellos para poder ayudarte👨🏻‍💻\n{''.join(data_list)}"
+    if language: 
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": f"Puedo proporcionarte la información suficiente sobre nuestros planes para afiliados de MedicPlus🩺👨🏼‍⚕️, escribe el número correspondiente a uno de ellos para poder ayudarte👨🏻‍💻\n{''.join(data_list)}"
+            }
         }
-    }
+        
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": f"Puedo proporcionarte la información suficiente sobre nuestros planes para afiliados de MedicPlus🩺👨🏼‍⚕️, escribe el número correspondiente a uno de ellos para poder ayudarte👨🏻‍💻\n{''.join(data_list)}"
+            }
+        }
     
     enviar_mensajes_whatsapp(data)
     get_user_state_identification_register(numero,'INIT')
@@ -87,6 +101,7 @@ def get_list_plan(numero):
     return True
 
 def send_info_plan(numero, plan):
+    language = verify_language(numero)
     result = get_user_state_register(numero, 'INIT', plan=plan)
     print("esto trae el result dentro de send info plan: ", result)
     if result == True:
@@ -368,6 +383,7 @@ def send_info_plan(numero, plan):
         return True   
     
 def send_name_affiliate(numero):
+    language = verify_language(numero)
     print("entra en send_name_affiliate")
     with engine.connect() as conn:
         user = conn.execute(select(usuarios.c.plan).select_from(usuarios).where(usuarios.c.tel_usu==numero)).scalar()

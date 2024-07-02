@@ -4,6 +4,7 @@ from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
 from models.user_state_especiality import user_state_especiality
+from models.user_state_especiality import user_state_especiality
 from models.data_consultas import data_consultas
 from routes.user import verify_user, get_user_state_identification, get_user_state_identification_register, update_user_state_especiality, get_user_state_especiality
 
@@ -170,7 +171,7 @@ def save_appointment(numero, nombre_medico):
         update_user_state_especiality(numero, "WAITING_FOR_NAME_ESP")
         return True 
 
-def confirm_consult(numero):
+def confirm_consult(numero, name_contact):
     print("llama a la funcion en confirm consult")
     update_user_state_especiality(numero, "CONFIRM_CONSULT")
     data = {
@@ -198,7 +199,38 @@ def confirm_consult(numero):
     }          
     enviar_mensajes_whatsapp(data)
     
-    return True
+    with engine.connect() as conn:
+        user_affiliate = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
+        user_consult = conn.execute(user_state_especiality.select().where(user_state_especiality.c.numero==numero)).first()
+
+        #enviando un mensaje al operador 
+        if user_affiliate:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": "584120404049",
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": f"Hola👋🏼 Soy MedicBot 🤖 asistente virtual de MedicPlus, un nuevo usuario ha agendado una cita para: {user_consult.nom_esp.title()}☎️ te he seleccionado para cumplir la agenda de su cita. Su nombre de afiliado se encuentra registrado como: {user_affiliate.nom_usu} {user_affiliate.ape_usu} y su número de teléfono es: +{numero} \n\nMuchas gracias por tu tiempo✅ "
+                }
+            }
+            enviar_mensajes_whatsapp(data)
+            return True
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": "584120404049",
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": f"Hola👋🏼 Soy MedicBot 🤖 asistente virtual de MedicPlus, un nuevo usuario ha agendado una cita para: {user_consult.nom_esp.title()}☎️ te he seleccionado para cumplir la agenda de su cita. Su nombre de whats app se encuentra registrado como: {name_contact} y su número de teléfono es: +{numero} \n\nMuchas gracias por tu tiempo✅ "
+                }
+            }
+            enviar_mensajes_whatsapp(data)
+            return True
+            
 
 def cancel_consult(numero):
     print("llama a la funcion en cancel_consult")

@@ -96,7 +96,7 @@ def get_list_service_lab(numero, texto):
         for test in list_tests:
             number += 1
             service_map[number] = test.tip_pru  
-            data_list.append(f"\n{number}. {test.tip_pru.title()}")
+            data_list.append(f"\n{number}. {test.tip_pru.title()}: {test.pre_pru}$")
         data = {
             "messaging_product": "whatsapp",
             "to": numero,
