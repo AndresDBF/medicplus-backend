@@ -163,7 +163,7 @@ def is_affiliate(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "Citas y Pruebas"
+                "text": "Citas y Estudios"
             },
             "action": {
                 "buttons":[
@@ -172,6 +172,13 @@ def is_affiliate(numero):
                         "reply": {
                             "id": "idconmed",
                             "title": "Consultas Médicas"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idlabori",
+                            "title": "Laboratorio"
                         }
                     },
                     {
@@ -197,37 +204,6 @@ def is_affiliate(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "Citas y Pruebas"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idconmed",
-                            "title": "Consultas Médicas"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idimagenologia",
-                            "title": "Imagenología"
-                        }
-                    }
-                ]
-            }
-        }
-    }
-
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
                 "text": "Otros Servicios."
             },
             "action": {
@@ -237,13 +213,6 @@ def is_affiliate(numero):
                         "reply": {
                             "id": "idcalloper",
                             "title": "Llamar un Operador"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idlabori",
-                            "title": "Laboratorio"
                         }
                     },
                     {

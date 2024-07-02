@@ -13,6 +13,7 @@ from models.user_state_imaging import user_state_imaging
 
 from models.data_consultas import data_consultas
 from models.data_imagenologia import data_imagenologia
+from models.data_planes import data_planes
 
 
 from sqlalchemy import select, insert, update, text
@@ -138,17 +139,19 @@ def get_user_state_register(numero, state, plan=None, nombre=None, apellido=None
         
         result = get_user_state(numero)
         if result["consult"] is not None:
-            
             if plan:
-                if plan not in ["1","2","3","4","5"]:
+                verify_plan = conn.execute(data_planes.select().where(data_planes.c.id==plan)).first()
+                if not verify_plan:
                     return False
+                else:
                 
-                conn.execute(
-                    update(user_state_register)
-                    .where(user_state_register.c.numero == numero)
-                    .values(state=state, plan=plan)
-                )
-                conn.commit()
+                    conn.execute(
+                        update(user_state_register)
+                        .where(user_state_register.c.numero == numero)
+                        .values(state=state, plan=plan)
+                    )
+                    conn.commit()
+                    return True
                 
             if nombre:
                 if not re.fullmatch(r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$', nombre) or len(nombre) < 3:

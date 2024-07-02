@@ -146,7 +146,7 @@ def get_services(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "Citas y Pruebas"
+                "text": "Citas y Estudios"
             },
             "action": {
                 "buttons":[
@@ -155,6 +155,13 @@ def get_services(numero):
                         "reply": {
                             "id": "idconmed",
                             "title": "Consultas Médicas"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idlabori",
+                            "title": "Laboratorio"
                         }
                     },
                     {
@@ -180,7 +187,7 @@ def get_services(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "Citas y Pruebas"
+                "text": "Citas y Estudios"
             },
             "action": {
                 "buttons":[
@@ -189,6 +196,13 @@ def get_services(numero):
                         "reply": {
                             "id": "idconmed",
                             "title": "Consultas Médicas"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idlabori",
+                            "title": "Laboratorio"
                         }
                     },
                     {
@@ -220,13 +234,6 @@ def get_services(numero):
                         "reply": {
                             "id": "idcalloper",
                             "title": "Llamar un Operador"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idlabori",
-                            "title": "Laboratorio"
                         }
                     },
                     {

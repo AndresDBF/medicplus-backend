@@ -243,7 +243,7 @@ def cancel_telemedicine(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "Citas y Pruebas"
+                "text": "Citas y Estudios"
             },
             "action": {
                 "buttons":[
@@ -252,6 +252,20 @@ def cancel_telemedicine(numero):
                         "reply": {
                             "id": "idconmed",
                             "title": "Consultas Médicas"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idlabori",
+                            "title": "Laboratorio"
+                        }
+                    },
+                    {
+                        "type": "reply",
+                        "reply": {
+                            "id": "idlabori",
+                            "title": "Laboratorio"
                         }
                     },
                     {
@@ -277,37 +291,6 @@ def cancel_telemedicine(numero):
         "interactive":{
             "type": "button",
             "body": {
-                "text": "Citas y Pruebas"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idconmed",
-                            "title": "Consultas Médicas"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idimagenologia",
-                            "title": "Imagenología"
-                        }
-                    }
-                ]
-            }
-        }
-    }
-
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
                 "text": "Otros Servicios."
             },
             "action": {
@@ -317,13 +300,6 @@ def cancel_telemedicine(numero):
                         "reply": {
                             "id": "idcalloper",
                             "title": "Llamar un Operador"
-                        }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idlabori",
-                            "title": "Laboratorio"
                         }
                     },
                     {
