@@ -804,3 +804,70 @@ def goodbye_message(numero):
                 
     return True
 
+def change_english(numero):
+    data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": "I have changed the language to English🩺. How can I help you?📝."
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idservicios",
+                                "title": "Services"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idplanes",
+                                "title": "Plans"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    enviar_mensajes_whatsapp(data)
+    return True
+
+def change_spanish(numero):
+    data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": "He cambiado el idioma a español🩺. ¿Cómo puedo ayudarte? 📝."
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idservicios",
+                                "title": "Servicios"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idplanes",
+                                "title": "Planes"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    enviar_mensajes_whatsapp(data)
+    return True

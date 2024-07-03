@@ -14,7 +14,7 @@ from models.user_state_register import user_state_register
 from routes.user import get_user_state, get_user_state_register, verify_user, get_user_state_identification, get_user_state_domiciliary, get_user_state_especiality, get_user_state_imaging, get_user_state_lab, get_user_state_ambulance, get_user_state_identification_register, update_user_state_domiciliary, update_user_state_especiality, update_user_state_lab, update_user_state_ambulance, update_user_state_imaging
 
 #rutas para respuestas del bot 
-from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, cancel_button, goodbye_message
+from routes.respuestas_bot.principal import principal_message, return_button, message_not_found, get_services, cancel_button, goodbye_message, change_english, change_spanish
 from routes.respuestas_bot.register.register import get_plan, is_affiliate, insert_plan, insert_name, insert_last_name, insert_identification, insert_email
 from routes.respuestas_bot.register.plan import get_list_plan, send_info_plan, send_name_affiliate
 #atenciones medicas
@@ -121,6 +121,13 @@ saludos_ingles = ["hello", "hi", "good",
  "how are you", "holi", "holis", "whats up", "how are you",
  "what's up", "what's up", "what's up", "good day", "information"]
 
+cambio_idioma = ['no entiendo', 'no comprendo', 'no capto', 'cambiame', 'cambia', 'español', 'spanish', 'no se hablar', 'no se escribir', 'no sé hablar',
+    'no sé escribir', 'idioma', 'lenguaje']
+
+cambio_idioma_ingles = ["I don't understand", "I don't understand", "I don't understand", "change me", "change",
+    "english", "ingles","I don't know how to speak", "I don't know how to write", "language"]
+
+
 cancelaciones = [
     'cancelar', 'cancela', 'atras', 'retrocede', 'no quiero', 'olvida', 'olvidalo', 'llevame',
     'lleveme', 'lleve', 'ir', 'inicio','menu','opciones', 'de nuevo', 'regresar', 'devolverme', 'devolver', 'volver', 'retrocerder'
@@ -214,6 +221,17 @@ def contestar_mensajes_whatsapp(texto: str, name_contact, numero):
             conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=True))
             conn.commit()
             goodbye_message(numero)
+            return True
+        #cambio de idiomas pedidos por el usuario 
+        elif any(re.search(r'\b' + cambio_esp + r'\b', texto) for cambio_esp in cambio_idioma):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=False))
+            conn.commit()
+            change_spanish(numero)
+            return True
+        elif any(re.search(r'\b' + cambio_eng + r'\b', texto) for cambio_eng in cambio_idioma_ingles):
+            conn.execute(user_state_register.update().where(user_state_register.c.numero==numero).values(language=True))
+            conn.commit()
+            change_english(numero)
             return True
 #-------------------------------------valida primero el idvolver por si algun proceso no fue completado----------------------------------
     

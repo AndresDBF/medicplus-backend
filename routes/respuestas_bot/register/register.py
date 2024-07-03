@@ -695,6 +695,7 @@ def insert_email(numero, texto, user):
                     }
                 }
             }
+            enviar_mensajes_whatsapp(data)
             with engine.connect() as conn:
                 user_affiliate = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
 
@@ -763,6 +764,7 @@ def insert_email(numero, texto, user):
                     }
                 }
             }
+            enviar_mensajes_whatsapp(data)
             with engine.connect() as conn:
                 user_affiliate = conn.execute(usuarios.select().where(usuarios.c.tel_usu==numero)).first()
 

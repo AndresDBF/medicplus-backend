@@ -99,15 +99,25 @@ def get_eco_or_rx(numero):
     return True
     
 def verify_imaging(numero, texto):
+    translator = Translator()
     language = verify_language(numero)
     result = update_user_state_imaging(numero, 'CONFIRM_VISIT_IMAGING', language=language, test=texto)
     if result == True:
         with engine.connect() as conn:
             test = conn.execute(user_state_imaging.select().where(user_state_imaging.c.numero==numero)
                                 .where(user_state_imaging.c.opcion==texto).order_by(user_state_imaging.c.created_at.asc())).first()
-            name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{test.nombre}'")).scalar()
-            min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
-            max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
+            if language:
+                translate_resp = translator.translate(test.nombre, src='en', dest='es').text
+                name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{translate_resp}'")).scalar()
+                trans_name_test = translator.translate(name_test, src='es', dest='en').text
+                min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con='{translate_resp}'")).scalar()
+                max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con='{translate_resp}'")).scalar()
+            else:
+                
+                name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{test.nombre}'")).scalar()
+                trans_name_test = name_test
+                min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
+                max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
         print("el name_test: ", name_test) 
         print("el min_price: ", min_price)
         print("el max_price: ", max_price)
@@ -120,7 +130,7 @@ def verify_imaging(numero, texto):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"The {name_test} test has a minimum cost of {min_price}$ and a maximum of {max_price}$💸 \n When scheduling the visit, I will put you in contact with the staff in charge where you can specify the type of test you need📞 Do you want to schedule a visit to our laboratory?"
+                        "text": f"The {trans_name_test.title()} test has a minimum cost of {min_price}$ and a maximum of {max_price}$💸 \n When scheduling the visit, I will put you in contact with the staff in charge where you can specify the type of test you need📞 Do you want to schedule a visit to our laboratory?"
                     },
                     "action": {
                         "buttons":[
@@ -151,7 +161,7 @@ def verify_imaging(numero, texto):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": f"La prueba de {name_test} tiene un costo minimo de {min_price}$ y un maximo de {max_price}$💸 \n Al agendar la visita, te pondria en contacto con el personal encargado donde podrás especificarle el tipo de prueba que necesitas📞¿Desea agendar la visita a nuestro laboratorio?"
+                        "text": f"La prueba de {trans_name_test.title()} tiene un costo minimo de {min_price}$ y un maximo de {max_price}$💸 \n Al agendar la visita, te pondria en contacto con el personal encargado donde podrás especificarle el tipo de prueba que necesitas📞¿Desea agendar la visita a nuestro laboratorio?"
                     },
                     "action": {
                         "buttons":[

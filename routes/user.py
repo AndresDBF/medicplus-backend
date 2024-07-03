@@ -310,7 +310,7 @@ def update_user_state_domiciliary(numero, state, municipalities=None, confirm=No
             return True
 
 #para la solicitud de especialidades
-def update_user_state_especiality(numero, state, language, especialidad=None, nombre_medico=None):
+def update_user_state_especiality(numero, state, language=None, especialidad=None, nombre_medico=None):
     translator = Translator()
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_especiality---------------------")
@@ -408,7 +408,7 @@ def update_user_state_imaging(numero, state, language=None, test=None, confirm=N
                     else:
                         tranlated_text = imag.tip_con
                     conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
-                                 .values(numero=numero, state=state, opcion=test, nombre=verify_test))
+                                 .values(numero=numero, state=state, opcion=test, nombre=tranlated_text))
                     conn.commit()
                     return True
             else:
@@ -425,7 +425,7 @@ def update_user_state_imaging(numero, state, language=None, test=None, confirm=N
 
 
 #para la solicitud de una prueba de laboratorio
-def update_user_state_lab(numero, state, language, test=None, opcion=None, confirm_domi=None):
+def update_user_state_lab(numero, state, language=None, test=None, opcion=None, confirm_domi=None):
     translator = Translator()
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_lab---------------------")
@@ -458,7 +458,7 @@ def update_user_state_lab(numero, state, language, test=None, opcion=None, confi
                     print("esto trae el find test: ", find_test)
                     
                 
-                list_tests = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{find_test}%'")).fetchall()
+                list_tests = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{translated_resp}%'")).fetchall()
                 
                 service_map = {}
                 data_list = []
