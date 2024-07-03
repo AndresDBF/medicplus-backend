@@ -5,13 +5,13 @@ from database.connection import engine
 from models.usuarios import usuarios
 from models.data_aten_med_domi import data_aten_med_domi
 from models.user_state_domiciliary import user_state_domiciliary
+from models.user_state_register import user_state_register
 from models.log import log
 from routes.user import get_user_state, get_user_state_register, get_user_state_domiciliary, update_user_state_domiciliary
 from routes.user import verify_user
 from datetime import datetime
 from sqlalchemy import insert, select, text
 from datetime import datetime, time
-
 
 def agregar_mensajes_log(texto):
     try:
@@ -48,8 +48,14 @@ def enviar_mensajes_whatsapp (data):
     finally:
         connection.close() 
 
+def verify_language(numero):
+    with engine.connect() as conn:
+        result = conn.execute(select(user_state_register.c.language).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
+        print(f"--------------el lenguaje: {result}---------------")
+    return result 
+
 def get_municipality(numero):
-    
+    language = verify_language(numero)
     number = 0
     
     with engine.connect() as conn:
@@ -62,19 +68,31 @@ def get_municipality(numero):
         number += 1
         service_map[number] = munic.des_dom  # Mapear número a nombre exacto del servicio
         data_list.append(f"\n{number}. {munic.des_dom.title()}")
-    data = {
-        "messaging_product": "whatsapp",
-        "to": numero,
-        "text": {
-            "preview_url": False,
-            "body": f"Indicame el número del municipio donde requieres tu traslado y me pondré en contacto en breves minutos con el equipo médico disponible🚑 \n{''.join(data_list)}"
+    if language:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "text": {
+                "preview_url": False,
+                "body": f"Tell me the number of the municipality where you require your transfer and I will contact the available medical team in a few minutes🚑 \n{''.join(data_list)}"
+            }
         }
-    } 
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "text": {
+                "preview_url": False,
+                "body": f"Indicame el número del municipio donde requieres tu traslado y me pondré en contacto en breves minutos con el equipo médico disponible🚑 \n{''.join(data_list)}"
+            }
+        }
+         
     enviar_mensajes_whatsapp(data)
     update_user_state_domiciliary(numero, 'WAITING_FOR_MUNICIPALITI_DOMI')
     return True
 
 def confirm_service(numero, location):
+    language = verify_language(numero)
     result = update_user_state_domiciliary(numero, 'WAITING_CONFIRM_MEDIC',municipalities=location)
     if result == True:
         with engine.connect() as conn: 
@@ -95,43 +113,83 @@ def confirm_service(numero, location):
                 municipality = conn.execute(data_aten_med_domi.select()
                                             .where(data_aten_med_domi.c.des_dom==domiciliary.location)
                                             .where(data_aten_med_domi.c.hor_diu==True)).first()
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}$💵, ¿Desea confirmar el servicio?"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmdomiciliary",
-                                    "title": "Confirmar Servicio"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "iddeclinedomiciliary",
-                                    "title": "Cancelar Servicio"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idvolver",
-                                    "title": "Volver al Inicio"
-                                }
-                            },
-                        ]
+            if language:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"The nightly cost to the municipality {domiciliary.location} is {municipality.pre_amd}$💵. Do you want to confirm the service?"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmdomiciliary",
+                                        "title": "Confirm Service"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "iddeclinedomiciliary",
+                                        "title": "Cancel Service"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Back to top"
+                                    }
+                                },
+                            ]
+                        }
                     }
                 }
-            }
+            else:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"El costo nocturno al municipio {domiciliary.location} es de {municipality.pre_amd}$💵, ¿Desea confirmar el servicio?"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmdomiciliary",
+                                        "title": "Confirmar Servicio"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "iddeclinedomiciliary",
+                                        "title": "Cancelar Servicio"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Volver al Inicio"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                
             print("envia el mensaje principal 2")
             enviar_mensajes_whatsapp(data)
             return True
@@ -140,122 +198,233 @@ def confirm_service(numero, location):
                 municipality = conn.execute(data_aten_med_domi.select()
                                             .where(data_aten_med_domi.c.des_dom==domiciliary.location)
                                             .where(data_aten_med_domi.c.hor_diu==True)).first()
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}$💵, ¿Desea confirmar el servicio?"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmdomiciliary",
-                                    "title": "Confirmar Servicio"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "iddeclinedomiciliary",
-                                    "title": "Cancelar Servicio"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idvolver",
-                                    "title": "Volver al Inicio"
-                                }
-                            },
-                        ]
+            if language:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"The daytime cost to the municipality {domiciliary.location} is {municipality.pre_amd}$💵. Do you want to confirm the service?"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmdomiciliary",
+                                        "title": "Confirm Service"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "iddeclinedomiciliary",
+                                        "title": "Cancel Service"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Back to Top"
+                                    }
+                                },
+                            ]
+                        }
                     }
                 }
-            }
+            else:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"El costo diurno al municipio {domiciliary.location} es de {municipality.pre_amd}$💵, ¿Desea confirmar el servicio?"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmdomiciliary",
+                                        "title": "Confirmar Servicio"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "iddeclinedomiciliary",
+                                        "title": "Cancelar Servicio"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Volver al Inicio"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
             print("envia el mensaje principal 2")
             enviar_mensajes_whatsapp(data)
             return True
             
     else:
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
+        if language:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "I didn't understand your answer very well, remember to only use the number corresponding to the options that I have proposed to you🤖👨🏻‍💻"
+                }
             }
-        }
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
+                }
+            }
         enviar_mensajes_whatsapp(data)
         update_user_state_domiciliary(numero, "WAITING_FOR_MUNICIPALITI_DOMI")
         return True 
     
 def accept_domiciliary(numero):
+    language = verify_language(numero)
     update_user_state_domiciliary(numero, 'CONFIRM_MEDIC_TEAM', confirm=True)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive":{
-            "type": "button",
-            "body": {
-                "text": "El Servicio de atención médica domiciliaria ha sido confirmado 🩺, un equipo medico va en camino🚑"
-            },
-            "action": {
-                "buttons":[
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idvolver",
-                            "title": "Volver al Inicio"
-                        }
-                    },
-                ]
+    if language:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "The Home Health Care Service has been confirmed 🩺, a medical team is on the way 🚑"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idvolver",
+                                "title": "Back to Top"
+                            }
+                        },
+                    ]
+                }
             }
         }
-    }
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": "El Servicio de atención médica domiciliaria ha sido confirmado 🩺, un equipo medico va en camino🚑"
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idvolver",
+                                "title": "Volver al Inicio"
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        
     print("envia el mensaje principal 2")
     enviar_mensajes_whatsapp(data)
     return True
 
 def decline_domiciliary(numero):
+    language = verify_language(numero)
     update_user_state_domiciliary(numero, 'CANCEL_MEDIC_TEAM', confirm=False)
-    data = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": numero,
-        "type": "interactive",
-        "interactive": {
-            "type": "button",
-            "body": {
-                "text": "He cancelado el transporte del equipo médico🗑 ¿En que puedo ayudarte nuevamente?📝."
-            },
-            "action": {
-                "buttons": [
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idservicios",
-                            "title": "Servicios"
+    if language:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": "I have canceled the transportation of the medical equipment🗑 How can I help you again?📝."
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idservicios",
+                                "title": "Services"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idplanes",
+                                "title": "Plans"
+                            }
                         }
-                    },
-                    {
-                        "type": "reply",
-                        "reply": {
-                            "id": "idplanes",
-                            "title": "Planes"
-                        }
-                    }
-                ]
+                    ]
+                }
             }
-        }
-    }        
+        }        
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": "He cancelado el transporte del equipo médico🗑 ¿En que puedo ayudarte nuevamente?📝."
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idservicios",
+                                "title": "Servicios"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idplanes",
+                                "title": "Planes"
+                            }
+                        }
+                    ]
+                }
+            }
+        }   
     enviar_mensajes_whatsapp(data)
     return True

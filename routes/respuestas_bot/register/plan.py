@@ -73,7 +73,7 @@ def get_list_plan(numero):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": f"Puedo proporcionarte la información suficiente sobre nuestros planes para afiliados de MedicPlus🩺👨🏼‍⚕️, escribe el número correspondiente a uno de ellos para poder ayudarte👨🏻‍💻\n{''.join(data_list)}"
+                "body": f"I can provide you with enough information about our plans for MedicPlus affiliates🩺👨🏼‍⚕️, write the number corresponding to one of them so I can help you👨🏻‍💻\n{''.join(data_list)}"
             }
         }
         
@@ -109,275 +109,546 @@ def send_info_plan(numero, plan):
             get_plan = conn.execute(select(user_state_register.c.plan).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
             info_plan = conn.execute(select(data_planes.c.tip_pla, data_planes.c.des_pla).select_from(data_planes).where(data_planes.c.id==get_plan)).first()
             #en esta linea vendria la consulta para la tabla donde se guardara la informacion de los planes 
-        if get_plan == "1":
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "document",
-                "document": {
-                    "link": "https://amezquimart.online/static/plan/Telemedicina.pdf",
-                    "caption": "Plan Telemedicina"
-                }
-            }
-            enviar_mensajes_whatsapp(data)
-        
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmplan",
-                                    "title": "Quiero ser Afiliado"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idplanes",
-                                    "title": "Planes"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idvolver",
-                                    "title": "Volver al Inicio"
-                                }
-                            },
-                        ]
+        if language:
+            if get_plan == "1":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/Telemedicina.pdf",
+                        "caption": "Telemedicine Plan"
                     }
                 }
-            }
-            enviar_mensajes_whatsapp(data)
-            return True
-        if get_plan == "2":
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "document",
-                "document": {
-                    "link": "https://amezquimart.online/static/plan/Familiar.pdf",
-                    "caption": "Plan Familiar"
-                }
-            }
-            enviar_mensajes_whatsapp(data)
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmplan",
-                                    "title": "Quiero ser Afiliado"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idplanes",
-                                    "title": "Planes"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idvolver",
-                                    "title": "Volver al Inicio"
-                                }
-                            },
-                        ]
+                enviar_mensajes_whatsapp(data)
+            
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"I attach a pdf file about the plan {get_plan}: {info_plan.tip_pla}, finally you can tell me if you want to be part of the group of MedicPlus Affiliates and we would register in the system based on this plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Be an Affiliate"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Plans"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Back to top"
+                                    }
+                                },
+                            ]
+                        }
                     }
                 }
-            }
-            enviar_mensajes_whatsapp(data)
-            return True
-        if get_plan == "3":
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "document",
-                "document": {
-                    "link": "https://amezquimart.online/static/plan/areaprotegida.pdf",
-                    "caption": "Plan Área Protegida"
-                }
-            }
-            enviar_mensajes_whatsapp(data)
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmplan",
-                                    "title": "Quiero ser Afiliado"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idplanes",
-                                    "title": "Planes"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idvolver",
-                                    "title": "Volver al Inicio"
-                                }
-                            },
-                        ]
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "2":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/Familiar.pdf",
+                        "caption": "Family plan"
                     }
                 }
-            }
-            enviar_mensajes_whatsapp(data)
-            return True
-        if get_plan == "4":
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "document",
-                "document": {
-                    "link": "https://amezquimart.online/static/plan/cobertura_eventos.pdf",
-                    "caption": "Plan Cobertura de Eventos"
-                }
-            }
-            enviar_mensajes_whatsapp(data)
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmplan",
-                                    "title": "Quiero ser Afiliado"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idplanes",
-                                    "title": "Planes"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idvolver",
-                                    "title": "Volver al Inicio"
-                                }
-                            },
-                        ]
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"I attach a pdf file about the plan {get_plan}: {info_plan.tip_pla}, finally you can tell me if you want to be part of the group of MedicPlus Affiliates and we would register in the system based on this plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Be an Affiliate"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Plans"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Back to top"
+                                    }
+                                },
+                            ]
+                        }
                     }
                 }
-            }
-            enviar_mensajes_whatsapp(data)
-            return True
-        if get_plan == "5":
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "document",
-                "document": {
-                    "link": "https://amezquimart.online/static/plan/clinica_empresarial.pdf",
-                    "caption": "Plan Clínica Empresarial"
-                }
-            }
-            enviar_mensajes_whatsapp(data)
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmplan",
-                                    "title": "Quiero ser Afiliado"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idplanes",
-                                    "title": "Planes"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idvolver",
-                                    "title": "Volver al Inicio"
-                                }
-                            },
-                        ]
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "3":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/areaprotegida.pdf",
+                        "caption": "Protected Area Plan"
                     }
                 }
-            }
-            enviar_mensajes_whatsapp(data)
-            return True
-        
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"I attach a pdf file about the plan {get_plan}: {info_plan.tip_pla}, finally you can tell me if you want to be part of the group of MedicPlus Affiliates and we would register in the system based on this plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Be an Affiliate"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Plans"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Back to top"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "4":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/cobertura_eventos.pdf",
+                        "caption": "Event Coverage Plan"
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"I attach a pdf file about the plan {get_plan}: {info_plan.tip_pla}, finally you can tell me if you want to be part of the group of MedicPlus Affiliates and we would register in the system based on this plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Be an Affiliate"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Plans"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Back to top"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "5":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/clinica_empresarial.pdf",
+                        "caption": "Business Clinic Plan"
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"I attach a pdf file about the plan {get_plan}: {info_plan.tip_pla}, finally you can tell me if you want to be part of the group of MedicPlus Affiliates and we would register in the system based on this plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Be an Affiliate"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Plans"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Back to top"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+        else:
+            if get_plan == "1":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/Telemedicina.pdf",
+                        "caption": "Plan Telemedicina"
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+            
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Quiero ser Afiliado"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Planes"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Volver al Inicio"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "2":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/Familiar.pdf",
+                        "caption": "Plan Familiar"
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Quiero ser Afiliado"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Planes"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Volver al Inicio"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "3":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/areaprotegida.pdf",
+                        "caption": "Plan Área Protegida"
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Quiero ser Afiliado"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Planes"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Volver al Inicio"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "4":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/cobertura_eventos.pdf",
+                        "caption": "Plan Cobertura de Eventos"
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Quiero ser Afiliado"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Planes"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Volver al Inicio"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+            if get_plan == "5":
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "document",
+                    "document": {
+                        "link": "https://amezquimart.online/static/plan/clinica_empresarial.pdf",
+                        "caption": "Plan Clínica Empresarial"
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"Te adjunto un archivo pdf sobre el plan {get_plan}: {info_plan.tip_pla}, finalmente puedes indicarme si deseas formar parte del grupo de Afiliados de MedicPlus y realizariamos en registro en el sistema en base a este plan👨‍💻"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmplan",
+                                        "title": "Quiero ser Afiliado"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idplanes",
+                                        "title": "Planes"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idvolver",
+                                        "title": "Volver al Inicio"
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                }
+                enviar_mensajes_whatsapp(data)
+                return True
+            
  
     else:
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": "No comprendí muy bien tu respuesta, recuerda ingresar el número al plan que te he proporcionado para continuar con el proceso🤖👨🏻‍💻"
+        if language:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "I didn't understand your answer very well, remember to enter the number to the plan that I have provided you to continue with the process🤖👨🏻‍💻"
+                }
             }
-        }
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "No comprendí muy bien tu respuesta, recuerda ingresar el número al plan que te he proporcionado para continuar con el proceso🤖👨🏻‍💻"
+                }
+            }
+            
         enviar_mensajes_whatsapp(data)
         get_user_state_register(numero, 'WAITING_FOR_SERVICE_PLAN')
         return True   
@@ -392,148 +663,288 @@ def send_name_affiliate(numero):
         with engine.connect() as conn:
             name_plan = conn.execute(select(data_planes.c.tip_pla).select_from(data_planes).where(data_planes.c.id==user)).scalar()
         print("entra en el if")
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": f"Contamos con tu registro en nuestro sistema como afiliado de Medic Plus con el plan {name_plan}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
+        if language:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": f"We have you registered in our system as a Medic Plus member with the plan {name_plan}.👨🏻‍💻 I can provide you with information about our services, help you schedule an appointment or answer general health questions. Select the option you want to consult!"
+                }
             }
-        }
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": f"Contamos con tu registro en nuestro sistema como afiliado de Medic Plus con el plan {name_plan}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
+                }
+            }
         print("envia el mensaje principal 1")
         enviar_mensajes_whatsapp(data)
-        
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": "Atenciones Médicas"
-                },
-                "action": {
-                    "buttons":[
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idatenmedicpri",
-                                "title": "Inmediata"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idtelemed",
-                                "title": "Telemedicina"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idatenmeddomi",
-                                "title": "Domiciliaria"
-                            }
-                        },
-                    ]
+        if language:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": "Medical Care"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idatenmedicpri",
+                                    "title": "Inmediate"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idtelemed",
+                                    "title": "Telemedicine"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idatenmeddomi",
+                                    "title": "Domiciliary"
+                                }
+                            },
+                        ]
+                    }
                 }
             }
-        }
-        print("envia el mensaje principal 2")
-        enviar_mensajes_whatsapp(data)
-        
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": "Citas y Estudios"
-                },
-                "action": {
-                    "buttons":[
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idconmed",
-                                "title": "Consultas Médicas"
+            print("envia el mensaje principal 2")
+            enviar_mensajes_whatsapp(data)
+            
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": "Appointments and Studies"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idconmed",
+                                    "title": "Medical Consultation"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idlabori",
+                                    "title": "Laboratory"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idimagenologia",
+                                    "title": "Imaging"
+                                }
                             }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idlabori",
-                                "title": "Laboratorio"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idimagenologia",
-                                "title": "Imagenología"
-                            }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
-        }
-                    
-        print("envia el mensaje principal 3")
-        enviar_mensajes_whatsapp(data)
+                        
+            print("envia el mensaje principal 3")
+            enviar_mensajes_whatsapp(data)
 
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "interactive",
-            "interactive":{
-                "type": "button",
-                "body": {
-                    "text": "Otros Servicios."
-                },
-                "action": {
-                    "buttons":[
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idcalloper",
-                                "title": "Llamar un Operador"
-                            }
-                        },
-                        {
-                            "type": "reply",
-                            "reply": {
-                                "id": "idambula",
-                                "title": "Ambulancia"
-                            }
-                        },
-                    ]
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": "Other Services"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idcalloper",
+                                    "title": "Call an Operator"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idambula",
+                                    "title": "Ambulance"
+                                }
+                            },
+                        ]
+                    }
                 }
             }
-        }
-                    
-        print("envia el mensaje principal 4")
-        enviar_mensajes_whatsapp(data)
-        return True
+                        
+            print("envia el mensaje principal 4")
+            enviar_mensajes_whatsapp(data)
+            return True
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": "Atenciones Médicas"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idatenmedicpri",
+                                    "title": "Inmediata"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idtelemed",
+                                    "title": "Telemedicina"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idatenmeddomi",
+                                    "title": "Domiciliaria"
+                                }
+                            },
+                        ]
+                    }
+                }
+            }
+            print("envia el mensaje principal 2")
+            enviar_mensajes_whatsapp(data)
+            
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": "Citas y Estudios"
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idconmed",
+                                    "title": "Consultas Médicas"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idlabori",
+                                    "title": "Laboratorio"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idimagenologia",
+                                    "title": "Imagenología"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+                        
+            print("envia el mensaje principal 3")
+            enviar_mensajes_whatsapp(data)
+
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "interactive",
+                "interactive":{
+                    "type": "button",
+                    "body": {
+                        "text": "Otros Servicios."
+                    },
+                    "action": {
+                        "buttons":[
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idcalloper",
+                                    "title": "Llamar un Operador"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "idambula",
+                                    "title": "Ambulancia"
+                                }
+                            },
+                        ]
+                    }
+                }
+            }
+                        
+            print("envia el mensaje principal 4")
+            enviar_mensajes_whatsapp(data)
+            return True
+            
     else:
         print("entra en el else")
         get_user_state_register(numero, 'WAITING_FOR_NAME')
-
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": numero,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": "Comencemos con el registro para afiliados de Medicplus, Por favor envía tus nombres completos:"
+        if language:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "Let's start with the registration for Medicplus affiliates, please send your full names:"
+                }
             }
-        }
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": numero,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": "Comencemos con el registro para afiliados de Medicplus, Por favor envía tus nombres completos:"
+                }
+            }
         enviar_mensajes_whatsapp(data)
         return True
     

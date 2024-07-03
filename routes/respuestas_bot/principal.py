@@ -742,14 +742,26 @@ def decline_action(numero):
     return True
 
 def goodbye_message(numero):
-    data = {
-        "messaging_product": "whatsapp",
-        "to": numero,
-        "text": {
-            "preview_url": False,
-            "body": "Ha sido un placer ofrecerte mi ayuda 🤖, en MedicPlus cumplimos por velar el bienestar de nuestros Afiliados👨🏼‍⚕️☑️  puedes contactar conmigo cuando desees 📲 y con gusto serás atendido👨🏻‍💻"
-        }
-    }    
+    language = verify_language(numero)
+    if language:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "text": {
+                "preview_url": False,
+                "body": "It has been a pleasure to offer you my help 🤖, at MedicPlus we strive to ensure the well-being of our Affiliates 👨🏼‍⚕️☑️ you can contact me whenever you want 📲 and you will be gladly assisted 👨🏻‍💻"
+            }
+        }    
+    else:
+        data = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "text": {
+                "preview_url": False,
+                "body": "Ha sido un placer ofrecerte mi ayuda 🤖, en MedicPlus cumplimos por velar el bienestar de nuestros Afiliados👨🏼‍⚕️☑️  puedes contactar conmigo cuando desees 📲 y con gusto serás atendido👨🏻‍💻"
+            }
+        } 
+        
     print("envia el mensaje principal")
     enviar_mensajes_whatsapp(data)
     with engine.connect() as conn:

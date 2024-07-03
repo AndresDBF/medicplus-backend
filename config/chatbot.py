@@ -116,7 +116,7 @@ saludos = [
     'qué pasa', 'qué hay', 'qué cuentas', 'buen día', 'informacion'
 ]
 
-saludos_ingles = ["hello", "hello", "good",
+saludos_ingles = ["hello", "hi", "good",
  "greetings", "good morning", "good afternoon", "good evening",
  "how are you", "holi", "holis", "whats up", "how are you",
  "what's up", "what's up", "what's up", "good day", "information"]

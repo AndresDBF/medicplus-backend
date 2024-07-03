@@ -18,6 +18,8 @@ from models.data_planes import data_planes
 
 from sqlalchemy import select, insert, update, text
 
+from googletrans import Translator
+
 #para tomar el status del registro
 def get_user_state(numero):
     print("---------------------entra en get_user_state---------------------")
@@ -308,7 +310,8 @@ def update_user_state_domiciliary(numero, state, municipalities=None, confirm=No
             return True
 
 #para la solicitud de especialidades
-def update_user_state_especiality(numero, state, especialidad=None, nombre_medico=None):
+def update_user_state_especiality(numero, state, language, especialidad=None, nombre_medico=None):
+    translator = Translator()
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_especiality---------------------")
         print("el numero: ", numero)
@@ -328,9 +331,13 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
                     print("entra en el if")
                     return False
                 else:
+                    if language:
+                        name_esp = translator.translate(verify_esp.tip_con, src='es', dest='en').text
+                    else:
+                        name_esp = verify_esp.tip_con
                     print("entra en el else")
                     conn.execute(user_state_especiality.update().where(user_state_especiality.c.numero == numero)
-                             .values(numero=numero, state=state, nom_esp=verify_esp.tip_con, num_esp=especialidad, precio=verify_esp.pre_con))
+                             .values(numero=numero, state=state, nom_esp=name_esp, num_esp=especialidad, precio=verify_esp.pre_con))
                     conn.commit() 
                     return True
             elif nombre_medico:
@@ -360,7 +367,8 @@ def update_user_state_especiality(numero, state, especialidad=None, nombre_medic
             return True
 
 #para la solicitud de imagenologia
-def update_user_state_imaging(numero, state, test=None, confirm=None):
+def update_user_state_imaging(numero, state, language=None, test=None, confirm=None):
+    translator = Translator()
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_imaging---------------------")
         print("el numero: ", numero)
@@ -370,18 +378,19 @@ def update_user_state_imaging(numero, state, test=None, confirm=None):
         result = get_user_state_imaging(numero)
         list_imag = conn.execute(text("select distinct tip_con from data_imagenologia;")).fetchall()
         print("el list imag: ", list_imag)
-        # Crear un diccionario de mapeo de números a tipos de servicios exactos
-        service_map = {}
-        data_list = []
-        for imag in list_imag:
-            number += 1
-            service_map[number] = imag.tip_con  # Mapear número a nombre exacto del servicio
-            data_list.append(f"\n{number}. {imag.tip_con.title()}")
+        
             
         
         if result["consult"] is not None:
             print("encuentra datos del status")
             if test:
+                # Crear un diccionario de mapeo de números a tipos de servicios exactos
+                service_map = {}
+                data_list = []
+                for imag in list_imag:
+                    number += 1
+                    service_map[number] = imag.tip_con  # Mapear número a nombre exacto del servicio
+                    data_list.append(f"\n{number}. {imag.tip_con.title()}")
                 print("entra en test")
                 if int(test) not in service_map:
                     return False
@@ -394,6 +403,10 @@ def update_user_state_imaging(numero, state, test=None, confirm=None):
                     return False
                 else:
                     print("entra en el else")
+                    if language:
+                        tranlated_text = translator.translate(verify_test, src='es', dest='en').text
+                    else:
+                        tranlated_text = imag.tip_con
                     conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
                                  .values(numero=numero, state=state, opcion=test, nombre=verify_test))
                     conn.commit()
@@ -412,7 +425,8 @@ def update_user_state_imaging(numero, state, test=None, confirm=None):
 
 
 #para la solicitud de una prueba de laboratorio
-def update_user_state_lab(numero, state, test=None, opcion=None, confirm_domi=None):
+def update_user_state_lab(numero, state, language, test=None, opcion=None, confirm_domi=None):
+    translator = Translator()
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_lab---------------------")
         print("el numero: ", numero)
@@ -430,9 +444,19 @@ def update_user_state_lab(numero, state, test=None, opcion=None, confirm_domi=No
             if opcion:
                 print("entra en opcion: ", opcion)
                 number = 0
-                find_test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory)
-                                         .where(user_state_laboratory.c.numero==numero).order_by(user_state_laboratory.c.created_at.asc())).scalar()
-                print("esto trae el find test: ", find_test)
+                if language:
+                    
+                    find_test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory)
+                                            .where(user_state_laboratory.c.numero==numero).order_by(user_state_laboratory.c.created_at.asc())).scalar()
+                    translated_resp = translator.translate(find_test, src='en', dest='es').text
+                    print("esto trae el find test: ", find_test)
+                else:
+                    
+                    find_test = conn.execute(select(user_state_laboratory.c.test).select_from(user_state_laboratory)
+                                            .where(user_state_laboratory.c.numero==numero).order_by(user_state_laboratory.c.created_at.asc())).scalar()
+                    translated_resp = find_test
+                    print("esto trae el find test: ", find_test)
+                    
                 
                 list_tests = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{find_test}%'")).fetchall()
                 
@@ -448,8 +472,12 @@ def update_user_state_lab(numero, state, test=None, opcion=None, confirm_domi=No
                 selected_service = service_map[int(opcion)]
                 
                 verify_test = conn.execute(text(f"select * from data_laboratorios where tip_pru like '%{selected_service}%'")).first()
+                if language:
+                    trans_opcion = translator.translate(verify_test.tip_pru, src='es', dest='en').text
+                else:
+                    trans_opcion = verify_test.tip_pru
                 conn.execute(user_state_laboratory.update().where(user_state_laboratory.c.numero==numero)
-                            .values(numero=numero, state=state, opcion=verify_test.tip_pru, precio=verify_test.pre_pru))
+                            .values(numero=numero, state=state, opcion=trans_opcion, precio=verify_test.pre_pru))
                 conn.commit()
                 return True
             if confirm_domi:
