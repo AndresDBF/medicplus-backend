@@ -19,7 +19,7 @@ from config.chatbot import chatbot
 from routes.data.data import data
 
 app = FastAPI()
-app.title = "Documentacion Medic plus"
+app.title = "Documentacion Medicplus"
 
 app.mount("/static/plan", StaticFiles(directory="static/plan"), name="planes")
 

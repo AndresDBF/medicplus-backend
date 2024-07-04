@@ -60,7 +60,7 @@ def get_service_lab(numero):
             "to": numero,
             "text": {
                 "preview_url": False,
-                "body": "I can help you in providing necessary information about the laboratory tests that we can offer at MedicPlus 👨🏼‍⚕️write to me what type of tests you want to perform with your specific name🧬💉 I will do my job in searching the system and I will tell you if I have the test that you need. you need👨🏻‍💻."
+                "body": "I can help you in providing necessary information about the laboratory tests that we can offer at MedicPlus 👨🏼‍⚕️write to me what type of test you want to perform with your specific name🧬💉 I will do my job in searching the system and I will tell you if I have the test that you need. you need👨🏻‍💻."
             }
         }  
     else:
@@ -69,7 +69,7 @@ def get_service_lab(numero):
             "to": numero,
             "text": {
                 "preview_url": False,
-                "body": "Puedo ayudarte en brindar información necesaria de las pruebas de laboratorio que podemos ofrecer en MedicPlus 👨🏼‍⚕️escribeme que tipo de pruebas deseas realizarte con su nombre específico🧬💉 Cumpliré con mi trabajo en buscar en sistema y te diré si dispongo de la prueba que necesitas👨🏻‍💻."
+                "body": "Puedo ayudarte en brindar información necesaria de las pruebas de laboratorio que podemos ofrecer en MedicPlus 👨🏼‍⚕️escribeme que tipo de prueba deseas realizarte con su nombre específico🧬💉 Cumpliré con mi trabajo en buscar en sistema y te diré si dispongo de la prueba que necesitas👨🏻‍💻."
             }
         }  
          
@@ -426,10 +426,17 @@ def confirm_visit_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"I have scheduled your visit to the laboratory and have contacted the appointment staff. They will soon indicate the availability of your request📢📝"
+                    "text": f"I have scheduled your visit to the laboratory and have contacted the appointment staff. They will soon indicate the availability of your request📢📝\n\nDo you want to look for another test?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Search Test"
+                            }
+                        },
                         {
                             "type": "reply",
                             "reply": {
@@ -449,10 +456,17 @@ def confirm_visit_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"He programado tu visita al laboratorio y he contactado con el personal de cita. Pronto te indicarán la disponibilidad de tu solicitud📢📝"
+                    "text": f"He programado tu visita al laboratorio y he contactado con el personal de cita. Pronto te indicarán la disponibilidad de tu solicitud📢📝\n\n¿Deseas buscar alguna otra prueba?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Buscar Prueba"
+                            }
+                        }, 
                         {
                             "type": "reply",
                             "reply": {
@@ -479,10 +493,17 @@ def confirm_domiciliary_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"I have notified the appointment staff about your request📢📝, you will soon be contacted by one of them to carry out the collection process"
+                    "text": f"I have notified the appointment staff about your request📢📝, you will soon be contacted by one of them to carry out the collection process\n\nDo you want to look for another test?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Search Test"
+                            }
+                        },
                         {
                             "type": "reply",
                             "reply": {
@@ -502,10 +523,17 @@ def confirm_domiciliary_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"He notificado al personal de citas sobre tu solicitud📢📝, pronto serás contactado por uno de ellos para realizar el proceso de cobro"
+                    "text": f"He notificado al personal de citas sobre tu solicitud📢📝, pronto serás contactado por uno de ellos para realizar el proceso de cobro.\n\n¿Deseas buscar alguna otra prueba?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Buscar Prueba"
+                            }
+                        }, 
                         {
                             "type": "reply",
                             "reply": {
@@ -534,10 +562,17 @@ def cancel_visit_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"Your visit has been Canceled ❌ I can schedule you another visit to our laboratories whenever you want by locating yourself in the menu and in the Laboratory option 📍"
+                    "text": f"Your visit has been Canceled ❌ I can schedule you another visit to our laboratories whenever you want by locating yourself in the menu and in the Laboratory option 📍\n\nDo you want to look for another test?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Search Test"
+                            }
+                        },
                         {
                             "type": "reply",
                             "reply": {
@@ -558,10 +593,17 @@ def cancel_visit_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"Tu visita ha sido Cancelada ❌ Puedo Agendarte otra visita a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorio📍"
+                    "text": f"Tu visita ha sido Cancelada ❌ Puedo Agendarte otra visita a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorio📍\n\n¿Deseas buscar alguna otra prueba?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Buscar Prueba"
+                            }
+                        }, 
                         {
                             "type": "reply",
                             "reply": {
@@ -590,10 +632,17 @@ def cancel_domiciliary_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"Your address has been Canceled ❌ I can schedule another test for you at our laboratories whenever you want by locating yourself in the menu and in the Laboratory option 📍"
+                    "text": f"Your address has been Canceled ❌ I can schedule another test for you at our laboratories whenever you want by locating yourself in the menu and in the Laboratory option 📍\n\nDo you want to look for another test?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Search Test"
+                            }
+                        },
                         {
                             "type": "reply",
                             "reply": {
@@ -614,10 +663,17 @@ def cancel_domiciliary_lab(numero):
             "interactive":{
                 "type": "button",
                 "body": {
-                    "text": f"Tu domicilio ha sido Cancelado ❌ Puedo Agendarte otra prueba a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorio📍"
+                    "text": f"Tu domicilio ha sido Cancelado ❌ Puedo Agendarte otra prueba a nuestros laboratorios cuando desees ubicandote en el menú y en la opción Laboratorio📍\n\n¿Deseas buscar alguna otra prueba?💉"
                 },
                 "action": {
                     "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idbuscarprueba",
+                                "title": "Buscar Prueba"
+                            }
+                        }, 
                         {
                             "type": "reply",
                             "reply": {

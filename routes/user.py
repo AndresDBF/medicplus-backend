@@ -367,7 +367,7 @@ def update_user_state_especiality(numero, state, language=None, especialidad=Non
             return True
 
 #para la solicitud de imagenologia
-def update_user_state_imaging(numero, state, language=None, test=None, confirm=None):
+def update_user_state_imaging(numero, state, language=None, opcion=None, opcion2=None, test=None,  confirm=None):
     translator = Translator()
     with engine.connect() as conn:
         print("---------------------entra en update_user_state_imaging---------------------")
@@ -383,6 +383,12 @@ def update_user_state_imaging(numero, state, language=None, test=None, confirm=N
         
         if result["consult"] is not None:
             print("encuentra datos del status")
+            if opcion:
+                print("entra en opcion esto es lo que trae opcion: ", opcion)
+                conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
+                             .values(numero=numero, state=state, opcion=opcion))
+                conn.commit()
+                return True
             if test:
                 # Crear un diccionario de mapeo de números a tipos de servicios exactos
                 service_map = {}

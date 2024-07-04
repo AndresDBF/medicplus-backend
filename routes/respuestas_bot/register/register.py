@@ -78,7 +78,7 @@ def get_plan(numero):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": "We have you registered in our system as a Medic Plus member.👨🏻‍💻 I can provide you with information about our services, help you schedule an appointment or answer general health questions. Select the option you want to consult!"
+                        "text": "We have you registered in our system as a MedicPlus member.👨🏻‍💻 I can provide you with information about our services, help you schedule an appointment or answer general health questions. Select the option you want to consult!"
                     },
                     "action": {
                         "buttons":[
@@ -130,7 +130,7 @@ def get_plan(numero):
                 "interactive":{
                     "type": "button",
                     "body": {
-                        "text": "Contamos con tu registro en nuestro sistema como afiliado de Medic Plus.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
+                        "text": "Contamos con tu registro en nuestro sistema como afiliado de MedicPlus.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
                     },
                     "action": {
                         "buttons":[
@@ -170,7 +170,7 @@ def is_affiliate(numero):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": f"We have you registered in our system as a Medic Plus member with the plan {user.plan}.👨🏻‍💻 I can provide you with information about our services, help you schedule an appointment or answer general health questions. Select the option you want to consult!"
+                "body": f"We have you registered in our system as a MedicPlus member with the plan {user.plan}.👨🏻‍💻 I can provide you with information about our services, help you schedule an appointment or answer general health questions. Select the option you want to consult!"
             }
         }
         print("envia el mensaje principal 1")
@@ -299,7 +299,7 @@ def is_affiliate(numero):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": f"Contamos con tu registro en nuestro sistema como afiliado de Medic Plus con el plan {user.plan}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
+                "body": f"Contamos con tu registro en nuestro sistema como afiliado de MedicPlus con el plan {user.plan}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
             }
         }
         print("envia el mensaje principal 1")

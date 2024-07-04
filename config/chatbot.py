@@ -26,7 +26,7 @@ from routes.respuestas_bot.other_services.medic_consult import get_list_speciali
 from routes.respuestas_bot.other_services.laboratory import get_service_lab, select_service_lab, send_service_location, confirm_visit_lab, cancel_visit_lab, confirm_domiciliary_lab, cancel_domiciliary_lab, get_list_service_lab
 from routes.respuestas_bot.other_services.ambulance import get_list_municipalities, select_municipalities, confirm_ambulance, cancel_ambulance
 from routes.respuestas_bot.other_services.call_oper import question_operator, confirm_oper, cancel_oper
-from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, verify_imaging, cancel_test, confirm_visit_imag
+from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, send_tip_imaging, verify_imaging, cancel_test, confirm_visit_imag
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -341,8 +341,12 @@ def contestar_mensajes_whatsapp(texto: str, name_contact, numero):
     
     #para las solicitudes de imagenologia 
     elif user_imaging["state"] == "WAITING_FOR_IMAGING":
+        print("entra en send_tip_imaging")
+        send_tip_imaging(numero, texto)
+    elif user_imaging["state"] == "WAITING_FOR_SEND_IMAGING":
         print("entra en verify_imaging")
         verify_imaging(numero, texto)
+        return True
     
     #LABORATORIOS
     elif user_lab["state"] == "WAITING_FOR_TEST":
@@ -477,6 +481,11 @@ def contestar_mensajes_whatsapp(texto: str, name_contact, numero):
     elif "idcancelequip" in texto:
         print("entra en que cancela el domicilio del laboratorio")
         cancel_domiciliary_lab(numero)
+        return True
+    elif "idbuscarprueba" in texto:
+        print("entra en que quiere otra prueba")
+        update_user_state_lab(numero, 'INIT')
+        get_service_lab(numero)
         return True
     
 #------------------------------------------------AMBULANCIAS----------------------------------------------------------------------------

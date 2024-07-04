@@ -137,7 +137,7 @@ def get_services(numero):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "Below I show you the services that Medic Plus can offer you 🩺, you can select any of them and I will shortly guide you through the steps you must follow according to your request 📌👨🏻‍💻"
+                "body": "Below I show you the services that MedicPlus can offer you 🩺, you can select any of them and I will shortly guide you through the steps you must follow according to your request 📌👨🏻‍💻"
             }
         }
         print("envia el mensaje principal 1")
@@ -265,7 +265,7 @@ def get_services(numero):
             "type": "text",
             "text": {
                 "preview_url": False,
-                "body": "A continuación te enseño los servicios que Medic Plus puede ofrecerte 🩺, puedes seleccionar alguno de ellos y a la brevedad te guiaré los pasos que deberás seguir según tu solicitud📌👨🏻‍💻"
+                "body": "A continuación te enseño los servicios que MedicPlus puede ofrecerte 🩺, puedes seleccionar alguno de ellos y a la brevedad te guiaré los pasos que deberás seguir según tu solicitud📌👨🏻‍💻"
             }
         }
         print("envia el mensaje principal 1")

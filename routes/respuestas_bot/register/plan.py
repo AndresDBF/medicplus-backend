@@ -671,7 +671,7 @@ def send_name_affiliate(numero):
                 "type": "text",
                 "text": {
                     "preview_url": False,
-                    "body": f"We have you registered in our system as a Medic Plus member with the plan {name_plan}.👨🏻‍💻 I can provide you with information about our services, help you schedule an appointment or answer general health questions. Select the option you want to consult!"
+                    "body": f"We have you registered in our system as a MedicPlus member with the plan {name_plan}.👨🏻‍💻 I can provide you with information about our services, help you schedule an appointment or answer general health questions. Select the option you want to consult!"
                 }
             }
         else:
@@ -682,7 +682,7 @@ def send_name_affiliate(numero):
                 "type": "text",
                 "text": {
                     "preview_url": False,
-                    "body": f"Contamos con tu registro en nuestro sistema como afiliado de Medic Plus con el plan {name_plan}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
+                    "body": f"Contamos con tu registro en nuestro sistema como afiliado de MedicPlus con el plan {name_plan}.👨🏻‍💻 Puedo proporcionarte información sobre nuestros servicios, ayudarte a programar una cita o responder preguntas generales de salud. ¡Selecciona la opcion que deseas consultar!"
                 }
             }
         print("envia el mensaje principal 1")
