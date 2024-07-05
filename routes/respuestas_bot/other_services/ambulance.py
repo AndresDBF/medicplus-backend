@@ -1,5 +1,6 @@
 import json
 import http
+import pytz 
 from database.connection import engine
 from models.log import log
 from models.usuarios import usuarios
@@ -9,6 +10,8 @@ from routes.user import get_user_state_ambulance, update_user_state_ambulance
 
 from datetime import datetime
 from sqlalchemy import insert, select, text
+
+from datetime import datetime, time
 
 def agregar_mensajes_log(texto):
     try:
@@ -92,66 +95,143 @@ def select_municipalities(numero, texto):
     if result == True:
         with engine.connect() as conn:
             location = conn.execute(select(user_state_ambulance.c.location, user_state_ambulance.c.precio).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).first()
-        if language:
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"The cost of the transfer from the municipality {location.location} is {location.precio}$. Do you want to immediately confirm the transfer of the unit?.🚑"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmambulance",
-                                    "title": "Confirm Unit"
+        venezuela_tz = pytz.timezone('America/Caracas')
+    
+        # Obtener la hora actual en la zona horaria de Venezuela
+        now = datetime.now(venezuela_tz)
+                
+                
+        morning_limit = time(6, 0)  # 6:00 AM
+        evening_limit = time(19, 0)  # 7:00 PM
+        print("el now ", now)
+        print("el morning_limit: ", morning_limit)
+        print("el evening_limit: ", evening_limit)
+        
+        if now.time() <= evening_limit or now.time() >= morning_limit: 
+            if language:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"The daytime cost of the transfer from the municipality {location.location} is {location.precio}$. Do you want to immediately confirm the transfer of the unit?.🚑"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmambulance",
+                                        "title": "Confirm Unit"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idcancelambulance",
+                                        "title": "Cancel Unit"
+                                    }
                                 }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idcancelambulance",
-                                    "title": "Cancel Unit"
-                                }
-                            }
-                        ]
+                            ]
+                        }
                     }
-                }
-            }  
+                }  
+            else:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"El costo diurno del traslado desde el municipio {location.location} es de {location.precio}$, ¿Deseas confirmar de inmediato el traslado de la unidad?.🚑"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmambulance",
+                                        "title": "Confirmar Unidad"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idcancelambulance",
+                                        "title": "Cancelar Unidad"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }  
+        
         else:
-            data = {
-                "messaging_product": "whatsapp",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"El costo del traslado desde el municipio {location.location} es de {location.precio}$, ¿Deseas confirmar de inmediato el traslado de la unidad?.🚑"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmambulance",
-                                    "title": "Confirmar Unidad"
+            if language:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"The the nightly cost of the transfer from the municipality {location.location} is {location.precio}$. Do you want to immediately confirm the transfer of the unit?.🚑"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmambulance",
+                                        "title": "Confirm Unit"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idcancelambulance",
+                                        "title": "Cancel Unit"
+                                    }
                                 }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idcancelambulance",
-                                    "title": "Cancelar Unidad"
-                                }
-                            }
-                        ]
+                            ]
+                        }
                     }
-                }
-            }  
+                }  
+            else:
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": numero,
+                    "type": "interactive",
+                    "interactive":{
+                        "type": "button",
+                        "body": {
+                            "text": f"El costo nocturno del traslado desde el municipio {location.location} es de {location.precio}$, ¿Deseas confirmar de inmediato el traslado de la unidad?.🚑"
+                        },
+                        "action": {
+                            "buttons":[
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idconfirmambulance",
+                                        "title": "Confirmar Unidad"
+                                    }
+                                },
+                                {
+                                    "type": "reply",
+                                    "reply": {
+                                        "id": "idcancelambulance",
+                                        "title": "Cancelar Unidad"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }  
+        
+            
         enviar_mensajes_whatsapp(data)
         return True
     else:

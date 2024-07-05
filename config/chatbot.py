@@ -26,7 +26,7 @@ from routes.respuestas_bot.other_services.medic_consult import get_list_speciali
 from routes.respuestas_bot.other_services.laboratory import get_service_lab, select_service_lab, send_service_location, confirm_visit_lab, cancel_visit_lab, confirm_domiciliary_lab, cancel_domiciliary_lab, get_list_service_lab
 from routes.respuestas_bot.other_services.ambulance import get_list_municipalities, select_municipalities, confirm_ambulance, cancel_ambulance
 from routes.respuestas_bot.other_services.call_oper import question_operator, confirm_oper, cancel_oper
-from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, send_tip_imaging, verify_imaging, cancel_test, confirm_visit_imag
+from routes.respuestas_bot.other_services.imaging import get_eco_or_rx, send_tip_imaging, verify_imaging, cancel_test, confirm_visit_imag, question_visit_lab
 from routes.respuestas_bot.principal import agregar_mensajes_log
 
 from datetime import datetime
@@ -346,6 +346,10 @@ def contestar_mensajes_whatsapp(texto: str, name_contact, numero):
     elif user_imaging["state"] == "WAITING_FOR_SEND_IMAGING":
         print("entra en verify_imaging")
         verify_imaging(numero, texto)
+        return True
+    elif user_imaging["state"] == "WAITING_FOR_SELECT_IMAGING":
+        print("entra en question_visit_lab")
+        question_visit_lab(numero,texto)
         return True
     
     #LABORATORIOS

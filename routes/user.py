@@ -1,4 +1,5 @@
 import re
+import pytz
 from database.connection import engine
 from models.roles import roles
 from models.usuarios import usuarios
@@ -19,6 +20,8 @@ from models.data_planes import data_planes
 from sqlalchemy import select, insert, update, text
 
 from googletrans import Translator
+
+from datetime import time, datetime
 
 #para tomar el status del registro
 def get_user_state(numero):
@@ -366,6 +369,24 @@ def update_user_state_especiality(numero, state, language=None, especialidad=Non
             conn.commit()
             return True
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #para la solicitud de imagenologia
 def update_user_state_imaging(numero, state, language=None, opcion=None, opcion2=None, test=None,  confirm=None):
     translator = Translator()
@@ -385,38 +406,54 @@ def update_user_state_imaging(numero, state, language=None, opcion=None, opcion2
             print("encuentra datos del status")
             if opcion:
                 print("entra en opcion esto es lo que trae opcion: ", opcion)
+                #opcion trae el nombre del estudio de la lista de mapas, ejemplo: ecografia, rayos x
                 conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
                              .values(numero=numero, state=state, opcion=opcion))
                 conn.commit()
                 return True
             if test:
+                
+                #guardamos el texto que ingresa el usuario para tomarlo en la siguiente fase del flujo, ejemplo: Columna, pierna, brazo
+                with engine.connect() as conn:
+                    if language:
+                        translated_resp = translator.translate(test, src='en', dest='es').text
+                    else:
+                        translated_resp = test
+                    print("entra en test esto es lo que guardara: ", translated_resp)
+                    conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero).values(numero=numero, state=state, opcion2=translated_resp))
+                    conn.commit()
+                    return True
+            if opcion2:
+                print("esto trae la opcion2: ", opcion2)
+                
+                #consultamos con las opciones que ha ingresado el usuario
+                
+                selected_service =  conn.execute(user_state_imaging.select().where(user_state_imaging.c.numero==numero)).first()
+                print("el selectec_service: ", selected_service)
+                print("el selected_service.opcion2: ", selected_service.opcion2, " y el opcion: ", selected_service.opcion)
+                list_study = conn.execute(text(f"select * from data_imagenologia where des_pru like '%{selected_service.opcion2}%' and tip_con='{selected_service.opcion}'")).fetchall()
+                print("esto es el list_study: ", list_study)
                 # Crear un diccionario de mapeo de números a tipos de servicios exactos
                 service_map = {}
                 data_list = []
-                for imag in list_imag:
+                for imag in list_study:
                     number += 1
-                    service_map[number] = imag.tip_con  # Mapear número a nombre exacto del servicio
-                    data_list.append(f"\n{number}. {imag.tip_con.title()}")
-                print("entra en test")
-                if int(test) not in service_map:
-                    return False
-                selected_service = service_map[int(test)]
-                print("el select_service: ", selected_service)
-                verify_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{selected_service}'")).scalar()
-                print("el verify_test: ", verify_test)
-                if not verify_test:
+                    service_map[number] = imag.des_pru  # Mapear número a nombre exacto del servicio
+                    data_list.append(f"\n{number}. {imag.des_pru.title()}")
+                print("esto es el service map: ", service_map)
+                selected_service_map = ""
+                if int(opcion2) not in service_map:
                     print("entra en el if")
                     return False
                 else:
-                    print("entra en el else")
-                    if language:
-                        tranlated_text = translator.translate(verify_test, src='es', dest='en').text
-                    else:
-                        tranlated_text = imag.tip_con
+                    print("entra en el else, esto va a colocar en nombre: ", selected_service_map)
+                    selected_service_map = service_map[int(opcion2)]
+                    print("esto trae el selected_service: ", selected_service_map)
                     conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
-                                 .values(numero=numero, state=state, opcion=test, nombre=tranlated_text))
+                                 .values(numero=numero, state=state, nombre=selected_service_map))
                     conn.commit()
                     return True
+                
             else:
                 print("entra en el else de que no consiguio parametros")
                 conn.execute(user_state_imaging.update().where(user_state_imaging.c.numero==numero)
@@ -428,6 +465,27 @@ def update_user_state_imaging(numero, state, language=None, opcion=None, opcion2
             conn.execute(user_state_imaging.insert().values(numero=numero, state=state))
             conn.commit()
             return True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #para la solicitud de una prueba de laboratorio
@@ -524,26 +582,59 @@ def update_user_state_ambulance(numero, state, municipalities=None, confirm=None
                 
                 number = 0
     
-               
-                list_munic= conn.execute(text("select * from data_aten_med_domi where hor_diu = True;")).fetchall()
-                print("esto muestra el list imag ", list_munic)
-                # Crear un diccionario de mapeo de números a tipos de municipios exactos
-                munic_map = {}
+                venezuela_tz = pytz.timezone('America/Caracas')
+    
+                # Obtener la hora actual en la zona horaria de Venezuela
+                now = datetime.now(venezuela_tz)
                 
-                for munic in list_munic:
-                    number += 1
-                    munic_map[number] = munic.des_dom  # Mapear número a nombre exacto del municipio
-                   
-                selected_munic = munic_map[int(municipalities)]
-                list_munic= conn.execute(text(f"select * from data_aten_med_domi where hor_diu = True and des_dom='{selected_munic}';")).first()
-                print("esto trae el list_munic: ", list_munic)
-                print("el selected_munic: ", selected_munic)
-               
-                conn.execute(user_state_ambulance.update().where(user_state_ambulance.c.numero==numero)
-                             .values(numero=numero, state=state, location=selected_munic, precio=int(list_munic.pre_amd)))
-                conn.commit()
                 
-                return True                
+                morning_limit = time(6, 0)  # 6:00 AM
+                evening_limit = time(19, 0)  # 7:00 PM
+                print("el now ", now)
+                print("el morning_limit: ", morning_limit)
+                print("el evening_limit: ", evening_limit)
+            
+                if now.time() <= evening_limit or now.time() >= morning_limit: 
+                    list_munic= conn.execute(text("select * from data_aten_med_domi where hor_diu = True;")).fetchall()
+                    print("esto muestra el list imag ", list_munic)
+                    # Crear un diccionario de mapeo de números a tipos de municipios exactos
+                    munic_map = {}
+                    
+                    for munic in list_munic:
+                        number += 1
+                        munic_map[number] = munic.des_dom  # Mapear número a nombre exacto del municipio
+                    
+                    selected_munic = munic_map[int(municipalities)]
+                    list_munic= conn.execute(text(f"select * from data_aten_med_domi where hor_diu = True and des_dom='{selected_munic}';")).first()
+                    print("esto trae el list_munic: ", list_munic)
+                    print("el selected_munic: ", selected_munic)
+                
+                    conn.execute(user_state_ambulance.update().where(user_state_ambulance.c.numero==numero)
+                                .values(numero=numero, state=state, location=selected_munic, precio=int(list_munic.pre_amd)))
+                    conn.commit()
+                    
+                    return True   
+                else:
+                    list_munic= conn.execute(text("select * from data_aten_med_domi where hor_diu = False;")).fetchall()
+                    print("esto muestra el list imag ", list_munic)
+                    # Crear un diccionario de mapeo de números a tipos de municipios exactos
+                    munic_map = {}
+                    
+                    for munic in list_munic:
+                        number += 1
+                        munic_map[number] = munic.des_dom  # Mapear número a nombre exacto del municipio
+                    
+                    selected_munic = munic_map[int(municipalities)]
+                    list_munic= conn.execute(text(f"select * from data_aten_med_domi where hor_diu = True and des_dom='{selected_munic}';")).first()
+                    print("esto trae el list_munic: ", list_munic)
+                    print("el selected_munic: ", selected_munic)
+                
+                    conn.execute(user_state_ambulance.update().where(user_state_ambulance.c.numero==numero)
+                                .values(numero=numero, state=state, location=selected_munic, precio=int(list_munic.pre_amd)))
+                    conn.commit()
+                    
+                    return True   
+                              
             elif confirm:
                 print("entra en confirmacion")
                 conn.execute(user_state_ambulance.update().where(user_state_ambulance.c.numero == numero)

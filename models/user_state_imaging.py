@@ -6,9 +6,9 @@ from database.connection import engine, meta_data
 user_state_imaging = Table("user_state_imaging", meta_data,
               Column("numero", String(30), primary_key=True),
               Column("state", String(191), nullable=False),
-              Column("opcion", String(80), nullable=True),
-              Column("opcion2", String(3), nullable=True),
-              Column("nombre", String(80), nullable=True),
+              Column("opcion", String(191), nullable=True),
+              Column("opcion2", String(191), nullable=True),
+              Column("nombre", String(191), nullable=True),
               Column("created_at", TIMESTAMP, nullable=False, server_default=func.now())
 )
 

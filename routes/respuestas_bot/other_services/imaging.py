@@ -119,8 +119,8 @@ def send_tip_imaging(numero, texto):
         else:
             tranlated_text = imag.tip_con
         data_list.append(f"\n{number}. {tranlated_text.title()}")
-    selected_service = service_map[int(texto)]
-    if selected_service is None:
+    selected_service = ""
+    if int(texto) not in service_map:
         if language:
             data = {
                 "messaging_product": "whatsapp",
@@ -146,8 +146,10 @@ def send_tip_imaging(numero, texto):
             }
             
         enviar_mensajes_whatsapp(data)
+        update_user_state_imaging(numero, 'WAITING_FOR_IMAGING')
         return True
     else:
+        selected_service = service_map[int(texto)]
         with engine.connect() as conn:
             list_imag_selected = conn.execute(text(f"select * from data_imagenologia where tip_con='{selected_service}'")).fetchall()
         for imag in list_imag_selected:
@@ -197,6 +199,7 @@ def verify_imaging(numero, texto):
         list_study = conn.execute(text(f"select * from data_imagenologia where des_pru like '%{translated_resp}%' and tip_con='{selected_service.opcion}'")).fetchall()
     print("el selected_service: ", selected_service)
     print("el list_study: ", list_study)
+    
     if len(list_study) < 1:
         print("entra en el if de if len(list_study) < 1:")
         if language:
@@ -207,7 +210,7 @@ def verify_imaging(numero, texto):
                 "interactive": {
                     "type": "button",
                     "body": {
-                        "text": "I have not been able to get the study that you indicate in the system❌ you can indicate another study that you want or go back to the beginning ↩️"
+                        "text": f"I have not been able to get the study that you indicate in the system❌ You can tell me another study regarding {selected_service.opcion.title()} that you want or go back to the beginning ↩️"
                     },
                     "action": {
                         "buttons": [
@@ -230,7 +233,7 @@ def verify_imaging(numero, texto):
                 "interactive": {
                     "type": "button",
                     "body": {
-                        "text": "No he logrado conseguir en sistema el estudio que me indicas❌ puedes volver a indicarme otro estudio que desees o volver al inicio ↩️"
+                        "text": f"No he logrado conseguir en sistema el estudio que me indicas ❌ puedes volver a indicarme otro estudio referente a {selected_service.opcion.title()} que desees o volver al inicio ↩️"
                     },
                     "action": {
                         "buttons": [
@@ -246,6 +249,7 @@ def verify_imaging(numero, texto):
                 }
             }
         enviar_mensajes_whatsapp(data)
+        update_user_state_imaging(numero, 'WAITING_FOR_SEND_IMAGING')
         return True
     else:
         print("llega al else")
@@ -267,7 +271,7 @@ def verify_imaging(numero, texto):
                 "to": numero,
                 "text": {
                     "preview_url": False,
-                    "body": f"I have found the {selected_service.opcion} study you need in the system 👨🏻‍💻 below I show you the names and prices available: \n{''.join(data_list)} \n\nSelect one of them💉"
+                    "body": f"I have found the {selected_service.opcion.title()} study you need in the system 👨🏻‍💻 below I show you the names and prices available: \n{''.join(data_list)} \n\nSelect one of them💉"
                 }
             }
         else:
@@ -276,129 +280,87 @@ def verify_imaging(numero, texto):
                 "to": numero,
                 "text": {
                     "preview_url": False,
-                    "body": f"He encontrado el estudio de {selected_service.opcion} que necesitas en sistema 👨🏻‍💻 a continuación te muestro los nombres y precios disponibles: \n{''.join(data_list)} \n\nAl especificarme💉"
+                    "body": f"He encontrado en sistema dentro de los estudios de {selected_service.opcion.title()} el estudio que necesitas 👨🏻‍💻 a continuación te muestro los nombres y precios disponibles: \n{''.join(data_list)} \n\nPuedes especificarme uno de ellos escribiendo el número correspondiente al que deseas agendar💉"
                 }
             }
         
         enviar_mensajes_whatsapp(data)
-        update_user_state_imaging(numero, 'WAITING_FOR_SELECT_IMAGING', language=language, test=texto)
+        update_user_state_imaging(numero, 'WAITING_FOR_SELECT_IMAGING', test=translated_resp)
         return True
     
 def question_visit_lab(numero, texto):
-    
     translator = Translator()
     language = verify_language(numero)
-    result = update_user_state_imaging(numero, 'CONFIRM_VISIT_IMAGING', language=language, test=texto)
+    result = update_user_state_imaging(numero, 'WAITING_REQUEST_CONFIRM', language=language, opcion2=texto)
+    print("sale de update_user_state_imaging ")
+    message_error = "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
+    if language:
+      
+        translate_message_error = translator.translate(message_error, src='es', dest='en').text
+    else:
+       
+        translate_message_error = message_error
     if result == True:
         with engine.connect() as conn:
             test = conn.execute(user_state_imaging.select().where(user_state_imaging.c.numero==numero)
-                                .where(user_state_imaging.c.opcion==texto).order_by(user_state_imaging.c.created_at.asc())).first()
-            if language:
-                translate_resp = translator.translate(test.nombre, src='en', dest='es').text
-                name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{translate_resp}'")).scalar()
-                trans_name_test = translator.translate(name_test, src='es', dest='en').text
-                min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con='{translate_resp}'")).scalar()
-                max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con='{translate_resp}'")).scalar()
-            else:
-                
-                name_test = conn.execute(text(f"select distinct tip_con from data_imagenologia where tip_con='{test.nombre}'")).scalar()
-                trans_name_test = name_test
-                min_price = conn.execute(text(f"select min(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
-                max_price = conn.execute(text(f"select max(pre_pru) from data_imagenologia where tip_con='{test.nombre}'")).scalar()
-        print("el name_test: ", name_test) 
-        print("el min_price: ", min_price)
-        print("el max_price: ", max_price)
-        if language:
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"The {trans_name_test.title()} test has a minimum cost of {min_price}$ and a maximum of {max_price}$💸 \n When scheduling the visit, I will put you in contact with the staff in charge where you can specify the type of test you need📞 Do you want to schedule a visit to our laboratory?"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmvisitimag",
-                                    "title": "Schedule Visit"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idcancelvisitimag",
-                                    "title": "Cancel Visit"
-                                }
-                            },
-                        ]
-                    }
-                }
-            } 
-        else:
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "interactive",
-                "interactive":{
-                    "type": "button",
-                    "body": {
-                        "text": f"La prueba de {trans_name_test.title()} tiene un costo minimo de {min_price}$ y un maximo de {max_price}$💸 \n Al agendar la visita, te pondria en contacto con el personal encargado donde podrás especificarle el tipo de prueba que necesitas📞¿Desea agendar la visita a nuestro laboratorio?"
-                    },
-                    "action": {
-                        "buttons":[
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idconfirmvisitimag",
-                                    "title": "Agendar Visita"
-                                }
-                            },
-                            {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "idcancelvisitimag",
-                                    "title": "Cancelar Visita"
-                                }
-                            },
-                        ]
-                    }
-                }
-            } 
+                                .order_by(user_state_imaging.c.created_at.asc())).first()
+            print("esto trae el test: ", test)
+            name_study = conn.execute(data_imagenologia.select().where(data_imagenologia.c.des_pru==test.nombre)).first()
             
+            message = f"La prueba de {name_study.des_pru.title()} tiene un costo de {name_study.pre_pru}$💸 \n Al agendar la visita, te pondria en contacto con el personal encargado donde podrás especificarle el tipo de prueba que necesitas📞¿Desea agendar la visita a nuestro laboratorio?"
+         
+            
+            if language:
+                translate_message = translator.translate(message, src='es', dest='en').text
+                
+            else:
+                translate_message = message 
+               
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "interactive",
+            "interactive":{
+                "type": "button",
+                "body": {
+                    "text": translate_message
+                },
+                "action": {
+                    "buttons":[
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idconfirmvisitimag",
+                                "title": "Agendar Visita"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "idcancelvisitimag",
+                                "title": "Cancelar Visita"
+                            }
+                        },
+                    ]
+                }
+            }
+        } 
         enviar_mensajes_whatsapp(data)
-        
         return True
     else:
-        if language:
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "text",
-                "text": {
-                    "preview_url": False,
-                    "body": "I didn't understand your answer very well, remember to only use the number corresponding to the options that I have proposed to you🤖👨🏻‍💻"
-                }
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": translate_message_error
             }
-        else:
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": numero,
-                "type": "text",
-                "text": {
-                    "preview_url": False,
-                    "body": "No comprendí muy bien tu respuesta, recuerda usar solamente el número correspondiente a las opciones que te he propuesto🤖👨🏻‍💻"
-                }
-            }
+        }
         enviar_mensajes_whatsapp(data)
-        update_user_state_imaging(numero, "WAITING_FOR_IMAGING")
+        update_user_state_imaging(numero, "WAITING_FOR_SELECT_IMAGING")
         return True 
     
 def confirm_visit_imag(numero):
@@ -427,6 +389,7 @@ def confirm_visit_imag(numero):
                 }
             }
         } 
+        
     else:
         data = {
             "messaging_product": "whatsapp",
@@ -480,6 +443,7 @@ def cancel_test(numero):
                 }
             }
         } 
+        
     else:
         data = {
             "messaging_product": "whatsapp",

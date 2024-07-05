@@ -89,9 +89,7 @@ def principal_message(numero):
                 }
             }
         }
-        print("envia el mensaje principal")
-        enviar_mensajes_whatsapp(data)
-        return True
+        
     else:
         data = {
             "messaging_product": "whatsapp",
@@ -124,8 +122,46 @@ def principal_message(numero):
             }
         }
         print("envia el mensaje principal")
-        enviar_mensajes_whatsapp(data)
-        return True
+        
+    with engine.connect() as conn:
+        verify_register = conn.execute(select(user_state_register.c.state).select_from(user_state_register).where(user_state_register.c.numero==numero)).scalar()
+        verify_ident = conn.execute(select(user_state_attention.c.state).select_from(user_state_attention).where(user_state_attention.c.numero==numero)).scalar()
+        verify_consult = conn.execute(select(user_state_especiality.c.state).select_from(user_state_especiality).where(user_state_especiality.c.numero==numero)).scalar()
+        verify_lab = conn.execute(select(user_state_laboratory.c.state).select_from(user_state_laboratory).where(user_state_laboratory.c.numero==numero)).scalar()
+        verify_imaging = conn.execute(select(user_state_imaging.c.state).select_from(user_state_imaging).where(user_state_imaging.c.numero==numero)).scalar()
+        verify_ambulance = conn.execute(select(user_state_ambulance.c.state).select_from(user_state_ambulance).where(user_state_ambulance.c.numero==numero)).scalar()
+        verify_domiciliary = conn.execute(select(user_state_domiciliary.c.state).select_from(user_state_domiciliary).where(user_state_domiciliary.c.numero==numero)).scalar()
+        if verify_register:
+            if verify_register != "REGISTERED":
+                print("entra en el if para reiniciar status de registro")
+                get_user_state_register(numero,'INIT')
+        #la condicion se puede extender a medida que se creen las opciones
+        if verify_ident:
+            if verify_ident == "WAITING_FOR_ID_TELEMEDICINE" or verify_ident == "WAITING_FOR_ID":
+                print("entra en el if para reiniciar status de identidad")
+                get_user_state_identification_register(numero,'INIT')
+        if verify_consult:
+            if verify_consult not in ['CONFIRM_CONSULT', 'CANCEL_CONSULT']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_especiality(numero, 'INIT')
+        if verify_lab:
+            if verify_lab not in ['CONFIRM_VISIT_LAB', 'CANCEL_VISIT_LAB']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_lab(numero, 'INIT')
+        if verify_imaging:
+            if verify_imaging != ['CONFIRM_VISIT_IMAGING']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_imaging(numero, 'INIT')
+        if verify_ambulance:
+            if verify_ambulance not in ['CONFIRM_AMBULANCE', 'CANCEL_AMBULANCE']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_ambulance(numero, 'INIT') 
+        if verify_domiciliary:
+            if verify_ambulance not in ['CONFIRM_MEDIC_TEAM', 'CANCEL_MEDIC_TEAM']:
+                print("entra en el if para reiniciar status de consulta")
+                update_user_state_domiciliary(numero, 'INIT') 
+    enviar_mensajes_whatsapp(data)
+    return True
 
 def get_services(numero):
     language = verify_language(numero)
